@@ -1,0 +1,19 @@
+{
+  "name": "PiDash",
+  "version": "0.0.0",
+  "description": "A Raspberry Pi management WebApp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jayx239/PiDash.git"
+  },
+  "author": "Jason Gallagher",
+  "license": "Apache License 2.0",
+  "bugs": {
+    "url": "https://github.com/Jayx239/PiDash/issues"
+  },
+  "homepage": "https://github.com/Jayx239/PiDash#readme"
+}
