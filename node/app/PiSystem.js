@@ -12,8 +12,11 @@ function getMemoryUsage() {
 function getMemory() {
 
 	return {
-		"total" : os.totalmem(),
-		"free" : os.freemem()
+		"memory": {
+			"total": os.totalmem(),
+			"free": os.freemem(),
+			"usage": getMemoryUsage()
+		}
 	}
 }
 

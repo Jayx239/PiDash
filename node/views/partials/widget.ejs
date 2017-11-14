@@ -1,0 +1,67 @@
+<div ng-app="memoryApp" ng-controller="memoryCtrl" class="widget outter-container draggable">
+	<div class="title-container">
+		<h1>Memory Monitor</h1>
+	</div>
+	<div class="widget-body-container">
+		<h3>Free</h3><span>{{freeMemory}}</span>
+		<h3>Total</h3><span>{{totalMemory}}</span>
+		<h3>Usage</h3><span>{{memoryUsage}} %</span>
+		<div class="memory-usage-bar-container">
+			<div class="memory-usage-bar" style="width: {{memoryUsage}}%;">
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var app = angular.module('memoryApp', []);
+	app.controller('memoryCtrl', function($scope, $interval) {
+		$scope.freeMemory = 0;
+		$scope.totalMemory = 0;
+		$scope.memoryUsage = 0;
+		$interval(function() {
+			$.ajax({
+				url: "/App/System/Memory",
+			}).done(function(resp) {
+				$scope.freeMemory = resp.memory.free;
+				$scope.totalMemory = resp.memory.total;
+				$scope.memoryUsage = resp.memory.usage*100;
+	
+			})},1000);
+	});
+
+</script>
+<script>
+
+		interact(".draggable").draggable({
+			intertia: true,
+			restrict: {
+				restriction: "parent",
+				endonly: true,
+				elementRect: { top: 0, left: 0, bottom: 1, right: 1}
+			},
+			autoscroll: true,
+			onmove: dragMoveListener,
+			onend: function (event) {
+      				var textEl = event.target.querySelector('p');
+
+      				textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy)|0) + 'px');
+    			}
+		});
+
+function dragMoveListener (event) {
+	var target = event.target,
+	// keep the dragged position in the data-x/data-y attributes
+	x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+	y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+	// translate the element
+	target.style.webkitTransform =
+	target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+	// update the posiion attributes
+	target.setAttribute('data-x', x);
+	target.setAttribute('data-y', y);
+}
+	window.dragMoveListener = dragMoveListener;
+</script>
