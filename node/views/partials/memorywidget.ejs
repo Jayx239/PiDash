@@ -1,4 +1,4 @@
-<div ng-app="memoryApp" ng-controller="memoryCtrl" class="widget outter-container draggable">
+<div ng-controller="memoryMonitorController" class="widget outter-container draggable">
 	<div class="title-container">
 		<h1>Memory Monitor</h1>
 	</div>
@@ -13,24 +13,10 @@
 	</div>
 </div>
 
-<script>
-	var app = angular.module('memoryApp', []);
-	app.controller('memoryCtrl', function($scope, $interval) {
-		$scope.freeMemory = 0;
-		$scope.totalMemory = 0;
-		$scope.memoryUsage = 0;
-		$interval(function() {
-			$.ajax({
-				url: "/App/System/Memory",
-			}).done(function(resp) {
-				$scope.freeMemory = resp.memory.free;
-				$scope.totalMemory = resp.memory.total;
-				$scope.memoryUsage = resp.memory.usage*100;
-	
-			})},1000);
-	});
+<script src="/angular-app/app.js"></script>
+<script src="/angular-app/memorymonitor/memorymonitorcontroller.js"></script>
+<script src="/angular-app/memorymonitor/memorymonitorservice.js"></script>
 
-</script>
 <script>
 
 		interact(".draggable").draggable({

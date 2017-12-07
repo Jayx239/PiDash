@@ -10,7 +10,10 @@
 	</head>
 	<body>
 		<% include partials/header %>
-		<% include partials/widget %>
+		<div id="PiDashContainer" ng-app="PiDashApp">
+        	<% include partials/memorywidget %>
+			<% include partials/cpuwidget %>
+		</div>
 		<% include partials/footer %>
 
 	</body>
