@@ -11,6 +11,7 @@ app.use('/tooltip',express.static('node_modules/tooltip.js'));
 app.use('/popper',express.static('node_modules/popper.js'));
 app.use('/content',express.static(__dirname + '/../content'));
 app.use('/angular',express.static('node_modules/angular'));
+app.use('/angular-app',express.static(__dirname + '/../angular-app'));
 
 /* Configure winston logger */
 var logger = new (winston.Logger) ({

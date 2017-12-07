@@ -1,0 +1,57 @@
+<div ng-controller="cpuMonitorController" class="widget outter-container draggable">
+    <div class="title-container">
+        <h1>Cpu Monitor</h1>
+    </div>
+    <div class="widget-body-container">
+    <div ng-repeat="core in cpuCores track by $index">
+        <h4>Core {{$index + 1}}</h4>
+        <span><b>Model: </b>{{core.model}}</span>
+        <span><b>Speed: </b>{{core.speed}}</span>
+        <div><b>Times: </b>
+            <li><b>User: </b>{{core.times.user}}</li>
+            <li><b>Nice: </b>{{core.times.nice}}</li>
+            <li><b>System: </b>{{core.times.sys}}</li>
+            <li><b>Idle: </b>{{core.times.idle}}</li>
+            <li><b>IRQ: </b>{{core.times.irq}}</li>
+        </div>
+    </div>
+    </div>
+</div>
+<script src="/angular-app/app.js"></script>
+<script src="/angular-app/cpumonitor/cpumonitorcontroller.js"></script>
+<script src="/angular-app/cpumonitor/cpumonitorservice.js"></script>
+
+<script>
+
+    interact(".draggable").draggable({
+        intertia: true,
+        restrict: {
+            restriction: "parent",
+            endonly: true,
+            elementRect: { top: 0, left: 0, bottom: 1, right: 1}
+        },
+        autoscroll: true,
+        onmove: dragMoveListener,
+        onend: function (event) {
+            var textEl = event.target.querySelector('p');
+
+            textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy)|0) + 'px');
+        }
+    });
+
+    function dragMoveListener (event) {
+        var target = event.target,
+            // keep the dragged position in the data-x/data-y attributes
+            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        // translate the element
+        target.style.webkitTransform =
+            target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+        // update the posiion attributes
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+    }
+    window.dragMoveListener = dragMoveListener;
+</script>

@@ -6,7 +6,7 @@ function getCpus() {
 }
 
 function getMemoryUsage() {
-	return (1-(os.freemem()/os.totalmem()))
+    return (1-(os.freemem()/os.totalmem()))
 }
 
 function getMemory() {
