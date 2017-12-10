@@ -1,4 +1,4 @@
-const os = require('os')
+const os = require('os');
 
 
 function getCpus() {
@@ -29,4 +29,4 @@ module.exports = {
 	getMemoryUsage : getMemoryUsage,
 	getMemory : getMemory,
 	getLoadAverage : getLoadAverage
-}
+};
