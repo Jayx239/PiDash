@@ -1,9 +1,9 @@
-all: makedirs
+all: makedirs npminstall
 
 npminstall:
 	npm install
 
-makedirs: logsdir configdir
+makedirs: logsdir configdir programsdir
 
 logsdir:
 	echo "Making logs directory";
@@ -21,6 +21,15 @@ configdir:
 	else \
 		mkdir config; \
         echo "config directory created"; \
+	fi \
+
+programsdir:
+	echo "Making programs directory";
+	if [ -d "programs" ]; then \
+	echo "Copy Canceled - programs directory already exists"; \
+	else \
+		mkdir programs; \
+        echo "programs directory created"; \
 	fi \
 
 .PHONY : configurator

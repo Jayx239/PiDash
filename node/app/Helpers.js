@@ -6,3 +6,7 @@ function isNullOrWhitespace(val) {
 
     return false
 }
+
+module.exports = {
+    isNullOrWhitespace: isNullOrWhitespace
+}

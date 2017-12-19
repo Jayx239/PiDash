@@ -2,6 +2,7 @@
 const crypto = require('crypto');
 const winston = require('./Logger');
 const server = require('./Server');
+const provider = require('./Provider');
 
 var logger = winston.logger;
 var app = server.app;
@@ -16,22 +17,52 @@ app.use(helmet());
 app.use(session({
     cookieName: 'session',
     secret: getRandomString(32),
-    sessionId: saltHashPassword(getRandomString(16)),
+    genid: function (req) {
+        return sha512(genRandomString(16),genRandomString(16)).passwordHash;
+    },
     duration: sessionTimeout,
     user: "",
     admin: ""
 }));
 
-function logSession(sessionId, message, logType){
-    message = "[SessionId: " + sessionId + "] - " + message;
-    if(logType)
-        logger.log(logType,message);
-    else
-        logger.info(message);
+app.use(function(req,res,next) {
+
+    if(req.session) {
+        req.user = req.session.user;
+        req.sessionID = req.session.sessionToken;
+        res.locals.user = req.session.user;
+        if(req.session.sesh && req.session.expires && req.session.sessionToken) {
+            var cookieExp = new Date(req.session.expires)
+            if(cookieExp.getTime() < new Date(Date.now()).getTime()) {
+                delete req.session.sesh;
+                delete req.session.sessionToken;
+            }
+
+        }
+    }
+    next()
+});
+
+function validUser(req, res, next){
+        provider.getCredentialsByUserName(req.body.userName, function(response) {
+        if(response.status === provider.Statuses.Error) {
+            return false;
+        }
+        else
+            return true;
+    });
 }
 
-function validateUser(req, res, next){
+function validateUserPassword(userPassword, passwordHash, salt) {
+    var userHashed = sha512(userPassword, salt).passwordHash;
 
+    if(userHashed === passwordHash) {
+        logger.info("Valid creds");
+        return true;
+    }
+
+    logSession(req.sessionID,"Invalid password",'error');
+    return false;
 }
 
 function requireLogon(req,res,next) {
@@ -45,11 +76,11 @@ function requireAdmin(req,res,next) {
     requireLogon(req,res,function() {
         logSession(req.sessionID,"Admin validation required", 'debug');
         if(req.admin) {
-            logSession(req.sessionID,"Admin validation successful", 'debug');
+            logger.logSession(req.sessionID,"Admin validation successful", 'debug');
             next();
         }
         else {
-            logSession((req.sessionID, "Admin validation failed"), 'debug');
+            logger.logSession((req.sessionID, "Admin validation failed"), 'debug');
             res.redirect(invalidRedirectPath);
         }
     });
@@ -65,7 +96,7 @@ function genRandomString(length){
     return crypto.randomBytes(Math.ceil(length/2))
         .toString('hex') /** convert to hexadecimal format */
         .slice(0,length);   /** return required number of characters */
-};
+}
 
 /**
  *  * hash password with sha512.
@@ -81,7 +112,7 @@ function sha512(password, salt){
         salt:salt,
         passwordHash:value
     };
-};
+}
 
 function getRandomString(length) {
     return crypto.randomBytes(Math.ceil(length/2))
@@ -97,12 +128,12 @@ function saltHashPassword(userpassword) {
 
 
 module.exports = {
-    logSession : logSession,
-    validateUser : validateUser,
+    validUser : validUser,
+    validateUserPassword: validateUserPassword,
     requireLogon : requireLogon,
     requireAdmin : requireAdmin,
     genRandomString : getRandomString,
     sha512 : sha512,
     getRandomString : getRandomString,
     saltHashPassword : saltHashPassword
-}
+};

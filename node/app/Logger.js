@@ -11,7 +11,16 @@ var logger = new (winston.Logger) ({
     ]
 });
 
+function logSession(sessionId, message, logType){
+    message = "[SessionId: " + sessionId + "] - " + message;
+    if(logType)
+        logger.log(logType,message);
+    else
+        logger.info(message);
+}
+
 /* Export */
 module.exports = {
-    logger: logger
+    logger: logger,
+    logSession: logSession
 };

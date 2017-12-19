@@ -5,6 +5,7 @@ var winston = require('./Logger');
 var PiSys = require('./PiSystem');
 var logger = winston.logger; /* Get configured winston logger */
 var validation = require('./Validation');
+var Process = require('./Process');
 
 app.set('view engine','ejs');
 app.set('views','./views');
@@ -25,6 +26,12 @@ app.get('/Dashboard/',function(req,res) {
 	logger.info("/Dashboard/");
 	res.render('dashboard');
 });
+app.get('/ServerManager',function(req,res) {
+	res.render('servermanager');
+})
+app.get("/Process/Tester",function(req,res){
+	res.render('processtester');
+})
 
 /* PiSystem API */
 app.get('/App/System/GetCpus', function(req,res) {
