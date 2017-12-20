@@ -1,12 +1,12 @@
 function isNullOrWhitespace(val) {
     if(!val)
-        return true
+        return true;
     if(val === "")
-        return true
+        return true;
 
     return false
 }
 
 module.exports = {
     isNullOrWhitespace: isNullOrWhitespace
-}
+};

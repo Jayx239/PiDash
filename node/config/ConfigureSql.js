@@ -118,7 +118,7 @@ var createAdminsTable = function(sqlConn) {
         else{
             console.log("Success: Admins table created");
         }
-    })
+    });
 };
 
 module.exports = {

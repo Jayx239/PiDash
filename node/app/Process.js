@@ -2,7 +2,7 @@ const server = require('./Server');
 const express = server.express;
 const app = server.app;
 const fs = require('fs');
-const helpers = require('./Helpers')
+const helpers = require('./Helpers');
 var winston = require('./Logger');
 var logger = winston.logger;
 
@@ -10,34 +10,29 @@ const { exec } = require('child_process');
 
 const execFile = require('child_process').execFile;
 
-/*var prog = exec('echo "what is up"');
-console.log(prog.pid);
-prog.stdout.on('data',(data) => {
-    console.log(data.toString())
-});
-
-var showProcess = exec('ps');
-
-showProcess.stdout.on('data',(data) => {
-    console.log(data.toString())
-});
-*/
+/* Stores process information for spawned processes */
 var processes = [];
+
+/* Console signal codes */
 var STDIN = "stdin";//0;
 var STDOUT = "stdout";//1;
 var STDERR = "stderr";//2;
 var CLOSE = "close";//3;
 
+
+/* Writes the 'command' to the input of 'proccess' */
 function writeToProcessIn(process, command) {
     logger.log('debug',"Writing to process, Pid: " + process.pid + " Command: " + command);
     process.stdin.write(command);
     processes[process.pid].messages.push(createMessage(STDIN,command));
 }
 
+/* Packages response with source type */
 function createMessage(src,message) {
     return {"Source":src,"Message":message};
 }
 
+/* Funtion for listening to shell outputs */
 function listenToProcess(childProcess) {
     var pid =  childProcess.pid;
     logger.log('Debug',"Started listening Pid" + pid);
@@ -61,6 +56,7 @@ function listenToProcess(childProcess) {
 
 }
 
+/* Executes command and spawns new process */
 app.post("/Process/Spawn/",function(req,res) {
     console.log('debug',"Spawning process Command: " + req.body.Command);
     var childProcess = exec(req.body.Command);
@@ -87,37 +83,10 @@ app.post("/Process/Spawn/",function(req,res) {
 
 });
 
-app.post("/Process/Spawn2/",function(req,res) {
-    console.log(req.body.Command);
-    var childProcess = exec(req.body.Command);
-    logger.info("Process Spawned");
-    logger.log('debug',"Process started: Pid: " + childProcess.pid);
-
-    var pid = childProcess.pid;
-    processes.push(pid);
-    processes[pid] = [];
-    processes[pid]['messages'] = [];
-    processes[pid]['process'] = childProcess;
-
-    listenToProcess(childProcess);
-
-    var response;
-    if(childProcess.error) {
-        logger.error("Error starting process, PID: " + childProcess.pid);
-        response = { "Status":"Error","Pid":childProcess.pid };
-        res.json(response);
-    }
-    else {
-        response = { "Status":"Success","Pid" : childProcess.pid };
-        res.json(response);
-    }
-
-});
-
+/* Action to return console for process with 'pid' */
 app.post("/Process/Console/",function(req,res){
     var pid = req.body.pid;
-    console.log(pid);
-    console.log(processes[pid].messages);
+    console.log('debug', '/Process/Console for pid=' + pid);
     res.json(processes[pid].messages);
 });
 
@@ -140,6 +109,7 @@ app.post("/Process/Command/",function (req,res) {
     }
 });
 
+/* Action to kill a process */
 app.post("/Process/Kill/",function(req,res){
     var pid = req.body.pid;
     var command = "kill " + pid;

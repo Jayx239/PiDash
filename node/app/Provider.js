@@ -3,7 +3,6 @@ const fs = require('fs');
 var mysql = require('mysql');
 var pool;
 var logger = winston.logger;
-var server = require('./Server');
 
 var Statuses = {"Success": "success", "Error":"error"};
 
@@ -20,6 +19,7 @@ fs.readFile('./config/sql.config','utf-8', function(err,contents) {
     }
 });
 
+/* Function for running server commands */
 var runCommand = function(sqlQuery,callback) {
     pool.getConnection(function(err,connection){
         if(err) {
@@ -101,10 +101,20 @@ var getAdminByUserName = function(userName,callback){
 };
 
 /* Insert provider functions */
-var addUserToUsersTable = function(userId, userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear, callback) {
-    var sqlQuery = "INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('" + userName + "','" + primaryEmail + "','" + firstName + "','" + middleName + "','" + lastName + "'," + birthDay + "," + birthMonth + "," + birthYear + ");";
-    runCommand(sqlQuery,function(result){
-        callback(result);
+var addUserToUsersTable = function(userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear, callback) {
+    getUserByUserName(userName,function(returnObject){
+        if(returnObject.Status !== validation.Statuses.Error) {
+                logger.log('debug',"Valid UserName");
+                var sqlQuery = "INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('" + userName + "','" + primaryEmail + "','" + firstName + "','" + middleName + "','" + lastName + "'," + birthDay + "," + birthMonth + "," + birthYear + ");";
+                runCommand(sqlQuery,function(result){
+                    callback(result);
+            });
+        }
+        else {
+            logger.log('debug', "Error adding user to Users table, UserName already exists");
+            returnObject.message = "User name already exists";
+            callback(returnObject);
+        }
     });
 };
 

@@ -21,8 +21,7 @@ app.use(session({
         return sha512(genRandomString(16),genRandomString(16)).passwordHash;
     },
     duration: sessionTimeout,
-    user: "",
-    admin: ""
+    activeDuration: sessionTimeout
 }));
 
 app.use(function(req,res,next) {
@@ -37,19 +36,20 @@ app.use(function(req,res,next) {
                 delete req.session.sesh;
                 delete req.session.sessionToken;
             }
-
         }
     }
     next()
 });
 
+/* Determines if a username is in the database */
 function validUser(req, res, next){
         provider.getCredentialsByUserName(req.body.userName, function(response) {
         if(response.status === provider.Statuses.Error) {
-            return false;
+
+            return next(false);
         }
         else
-            return true;
+            return next(true);
     });
 }
 
