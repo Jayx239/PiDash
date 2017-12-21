@@ -1,7 +1,7 @@
 function isNullOrWhitespace(val) {
-    if(!val)
+    if (!val)
         return true;
-    if(val === "")
+    if (val === "")
         return true;
 
     return false

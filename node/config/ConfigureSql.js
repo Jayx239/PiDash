@@ -5,8 +5,8 @@
 const mysql = require('mysql');
 const fs = require('fs');
 
-fs.readFile('./sql.config',function(err,contents) {
-    if(err) {
+fs.readFile('./sql.config', function (err, contents) {
+    if (err) {
         console.log("Error reading sql config file");
     }
     else {
@@ -19,40 +19,41 @@ fs.readFile('./sql.config',function(err,contents) {
         });
 
         sqlConn.connect();
-        createDatabase(sqlConn, function() {
-	       sqlConn.query("USE " + sqlCreds.database + ";",function(err,result,fields){	
-                  if(err){
-		     console.log("Error using database");
-		  }
-	          createUsersTable(sqlConn,function(sqlConn){
-                     createCredentialsTable(sqlConn,function(sqlConn){
-		  
-                        createGroupsTable(sqlConn,function(sqlConn){
-			   createAdminsTable(sqlConn,function(sqlConn){})
-			      console.log("----------- Database Setup Complete -----------");
-			   });
-		     });
-		  })
-           });
-	});
+        createDatabase(sqlConn, function () {
+            sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
+                if (err) {
+                    console.log("Error using database");
+                }
+                createUsersTable(sqlConn, function (sqlConn) {
+                    createCredentialsTable(sqlConn, function (sqlConn) {
+
+                        createGroupsTable(sqlConn, function (sqlConn) {
+                            createAdminsTable(sqlConn, function (sqlConn) {
+                            })
+                            console.log("----------- Database Setup Complete -----------");
+                        });
+                    });
+                })
+            });
+        });
     }
 });
 
-var createDatabase = function(sqlConn, callback) {
+var createDatabase = function (sqlConn, callback) {
     var query = "CREATE DATABASE PiDash";
-    sqlConn.query(query,function(err,result,fields){
-        if(err) {
+    sqlConn.query(query, function (err, result, fields) {
+        if (err) {
             console.log("Error creating PiDash Database");
         }
-        else{
+        else {
             console.log("Success: PiDash Database created");
         }
-	    if(callback)
-		    callback();
+        if (callback)
+            callback();
     })
 };
 
-var createUsersTable  = function(sqlConn, callback) {
+var createUsersTable = function (sqlConn, callback) {
     var query = "CREATE TABLE Users(" +
         "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
@@ -66,58 +67,58 @@ var createUsersTable  = function(sqlConn, callback) {
         "BirthMonth INT CHECK(BirthMonth > 0 AND BirthMonth <=12), " +
         "BirthYear INT);";
 
-    sqlConn.query(query,function(err,result,fields){
-        if(err) {
+    sqlConn.query(query, function (err, result, fields) {
+        if (err) {
             console.log("Error creating Users table");
         }
-        else{
+        else {
             console.log("Success: Users table created");
-	}
-	if(callback)
-	   callback(sqlConn);
+        }
+        if (callback)
+            callback(sqlConn);
     })
 };
 
 
-var createCredentialsTable = function(sqlConn, callback) {
+var createCredentialsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE Credentials(" +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "UserId INT NOT NULL, " +
         "Salt CHAR(16) NOT NULL, " +
         "Hash CHAR(128) NOT NULL);";
-    sqlConn.query(query,function(err,result,fields){
-        if(err) {
+    sqlConn.query(query, function (err, result, fields) {
+        if (err) {
             console.log("Error creating Credentials table");
         }
-        else{
+        else {
             console.log("Success: Credentials table created");
         }
-	   if(callback)
-	      callback(sqlConn);
+        if (callback)
+            callback(sqlConn);
 
     });
 };
 
-var createGroupsTable = function(sqlConn, callback) {
+var createGroupsTable = function (sqlConn, callback) {
     var query = "CREATE Table Groups(" +
         "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "GroupId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "CreatorUserId INT NOT NULL, " +
-        "GroupName VARCHAR(36));" ;
-    sqlConn.query(query,function(err,result,fields){
-        if(err) {
+        "GroupName VARCHAR(36));";
+    sqlConn.query(query, function (err, result, fields) {
+        if (err) {
             console.log("Error creating Groups table");
         }
-        else{
+        else {
             console.log("Success: Groups table created");
         }
-    
-	if(callback)
-	   callback(sqlConn);
+
+        if (callback)
+            callback(sqlConn);
     });
 };
-var createAdminsTable = function(sqlConn, callback) {
+var createAdminsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE Admins(" +
         "AdminId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "UserId INT NOT NULL, " +
@@ -125,15 +126,15 @@ var createAdminsTable = function(sqlConn, callback) {
         "CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP, " +
         "GroupId INT NOT NULL, " +
         "Active bool);";
-    sqlConn.query(query,function(err,result,fields){
-        if(err) {
+    sqlConn.query(query, function (err, result, fields) {
+        if (err) {
             console.log("Error creating Admins table");
         }
-        else{
+        else {
             console.log("Success: Admins table created");
         }
-	if(callback)
-	   callback(sqlConn);
+        if (callback)
+            callback(sqlConn);
 
     });
 };
