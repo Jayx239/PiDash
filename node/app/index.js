@@ -1,10 +1,10 @@
 const server = require('./Server');
 const express = server.express;
 const app = server.app;
+var validation = require('./Validation');
 var winston = require('./Logger');
 var PiSys = require('./PiSystem');
 var logger = winston.logger; /* Get configured winston logger */
-var validation = require('./Validation');
 var Process = require('./Process');
 var logonRegister = require('./LogonRegister');
 
@@ -19,12 +19,15 @@ app.use('/angular',express.static('node_modules/angular'));
 app.use('/angular-app',express.static(__dirname + '/../angular-app'));
 
 app.get('/', function(req,res) {
-	logger.info("/");
-	if(req.user) {
+	if(req.user)
 		res.redirect("/Dashboard")
-    }
-    else
-        res.redirect('/LogonRegister/Logon');
+	else
+		res.redirect("/LogonRegister/Logon");
+});
+
+app.get('/Logout', function(req,res) {
+	req.session.reset();
+		res.redirect("/")
 });
 
 app.get('/Dashboard/',validation.requireLogon, function(req,res) {

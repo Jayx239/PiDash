@@ -11,7 +11,7 @@ var logger = new (winston.Logger) ({
     ]
 });
 
-function logSession(sessionId, message, logType){
+var logSession = function(sessionId, message, logType){
     message = "[SessionId: " + sessionId + "] - " + message;
     if(logType)
         logger.log(logType,message);

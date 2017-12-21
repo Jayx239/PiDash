@@ -7,7 +7,7 @@ const provider = require('./Provider');
 var logger = winston.logger;
 var app = server.app;
 var sessionTimeout = 30*60*1000;    /* Default to 30 minutes */
-var session = require('express-session');
+var session = require('client-sessions');
 var helmet = require('helmet');
 
 var invalidRedirectPath = "/";
@@ -26,10 +26,12 @@ app.use(session({
 
 app.use(function(req,res,next) {
 
-    if(req.session) {
+    if(req.session && req.session.user) {
         req.user = req.session.user;
         req.sessionID = req.session.sessionToken;
         res.locals.user = req.session.user;
+	if(req.session.admin)
+		    req.admin = req.session.admin;
         if(req.session.sesh && req.session.expires && req.session.sessionToken) {
             var cookieExp = new Date(req.session.expires)
             if(cookieExp.getTime() < new Date(Date.now()).getTime()) {
@@ -38,7 +40,7 @@ app.use(function(req,res,next) {
             }
         }
     }
-    next()
+    next();
 });
 
 /* Determines if a username is in the database */
@@ -61,26 +63,26 @@ function validateUserPassword(userPassword, passwordHash, salt) {
         return true;
     }
 
-    logSession(req.sessionID,"Invalid password",'error');
+    winston.logSession(req.sessionID,"Invalid password",'error');
     return false;
 }
 
 function requireLogon(req,res,next) {
-    if(!req.user)
-        res.redirect(invalidRedirectPath);
-    else
+	if(req.user)
         next();
+    else
+       res.redirect(invalidRedirectPath);
 }
 
 function requireAdmin(req,res,next) {
     requireLogon(req,res,function() {
-        logSession(req.sessionID,"Admin validation required", 'debug');
+        winston.logSession(req.sessionID,"Admin validation required", 'debug');
         if(req.admin) {
-            logger.logSession(req.sessionID,"Admin validation successful", 'debug');
+            winston.logSession(req.sessionID,"Admin validation successful", 'debug');
             next();
         }
         else {
-            logger.logSession((req.sessionID, "Admin validation failed"), 'debug');
+            winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
             res.redirect(invalidRedirectPath);
         }
     });

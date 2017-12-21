@@ -19,13 +19,22 @@ fs.readFile('./sql.config',function(err,contents) {
         });
 
         sqlConn.connect();
-        createDatabase(sqlConn);
-        createDatabase(sqlConn, function(sqlConn) {
-            createUsersTable(sqlConn);
-            createCredentialsTable(sqlConn);
-            createGroupsTable(sqlConn);
-            createAdminsTable(sqlConn);
-        });
+        createDatabase(sqlConn, function() {
+	       sqlConn.query("USE " + sqlCreds.database + ";",function(err,result,fields){	
+                  if(err){
+		     console.log("Error using database");
+		  }
+	          createUsersTable(sqlConn,function(sqlConn){
+                     createCredentialsTable(sqlConn,function(sqlConn){
+		  
+                        createGroupsTable(sqlConn,function(sqlConn){
+			   createAdminsTable(sqlConn,function(sqlConn){})
+			      console.log("----------- Database Setup Complete -----------");
+			   });
+		     });
+		  })
+           });
+	});
     }
 });
 
@@ -38,6 +47,8 @@ var createDatabase = function(sqlConn, callback) {
         else{
             console.log("Success: PiDash Database created");
         }
+	    if(callback)
+		    callback();
     })
 };
 
@@ -52,7 +63,7 @@ var createUsersTable  = function(sqlConn, callback) {
         "MiddleName VARCHAR(36), " +
         "LastName VARCHAR(36), " +
         "BirthDay INT CHECK(BirthDay > 0 AND BirthDay <= 31), " +
-        "BirthMonth INT CHECK(BirthMonth > 0 AND BirthMonth <=12, " +
+        "BirthMonth INT CHECK(BirthMonth > 0 AND BirthMonth <=12), " +
         "BirthYear INT);";
 
     sqlConn.query(query,function(err,result,fields){
@@ -61,15 +72,15 @@ var createUsersTable  = function(sqlConn, callback) {
         }
         else{
             console.log("Success: Users table created");
-        }
-
-        callback(sqlConn);
+	}
+	if(callback)
+	   callback(sqlConn);
     })
 };
 
 
 var createCredentialsTable = function(sqlConn, callback) {
-    var query = "CCREATE TABLE Credentials(" +
+    var query = "CREATE TABLE Credentials(" +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "UserId INT NOT NULL, " +
         "Salt CHAR(16) NOT NULL, " +
@@ -81,9 +92,10 @@ var createCredentialsTable = function(sqlConn, callback) {
         else{
             console.log("Success: Credentials table created");
         }
+	   if(callback)
+	      callback(sqlConn);
 
-        callback(sqlConn);
-    })
+    });
 };
 
 var createGroupsTable = function(sqlConn, callback) {
@@ -100,10 +112,12 @@ var createGroupsTable = function(sqlConn, callback) {
         else{
             console.log("Success: Groups table created");
         }
-        callback(sqlConn);
-    })
+    
+	if(callback)
+	   callback(sqlConn);
+    });
 };
-var createAdminsTable = function(sqlConn) {
+var createAdminsTable = function(sqlConn, callback) {
     var query = "CREATE TABLE Admins(" +
         "AdminId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "UserId INT NOT NULL, " +
@@ -118,6 +132,9 @@ var createAdminsTable = function(sqlConn) {
         else{
             console.log("Success: Admins table created");
         }
+	if(callback)
+	   callback(sqlConn);
+
     });
 };
 
