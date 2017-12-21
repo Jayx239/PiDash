@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>PiDash</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <% include bundles/bundle %>
+    <script>
+        $(document).ready(function(){
+            var Processes = [];
+
+
+            $("#CommandForm").submit(function(e) {
+
+                var data = $(this).serialize();
+                e.preventDefault();
+                $.ajax({
+                    method: "POST",
+                    url: "/Process/Spawn",
+                    data: $(this).serialize()
+                }).done(function(res){
+                    $("#ProcessDetails").text(JSON.stringify(res));
+
+                })
+            })
+
+            $("#ConsoleForm").submit(function(e) {
+                e.preventDefault();
+                if(!Processes[$(this).serialize().pid])
+                    initializeProcess($(this).serialize().pid);
+                $.ajax({
+                    method: "POST",
+                    url: "/Process/Console",
+                    data: $(this).serialize()
+                }).done(function(res){
+                    //for(var i=/*Processes[$(this).serialize().pid].length*/0; i<res.length; i++)
+                        //$("#Console").append(JSON.stringify(res[i]));
+                    $("#Console").text(JSON.stringify(res));
+                    if(res.length > 0) {
+                        Processes[$(this).serialize().pid].messages = res;
+                    }
+                })
+            })
+
+
+            $("#AppCommandForm").submit(function(e) {
+                e.preventDefault();
+                if(!Processes[$(this).serialize().pid])
+                    initializeProcess($(this).serialize().pid);
+                $.ajax({
+                    method: "POST",
+                    url: "/Process/Command",
+                    data: $(this).serialize()
+                }).done(function(res){
+                        $("#AppCommandConsole").text(JSON.stringify(res));
+                })
+            })
+
+            function initializeProcess(pid) {
+                Processes[pid] = [];
+                Processes[pid].messages = []
+            }
+        })
+
+
+    </script>
+</head>
+<body>
+<% include partials/header %>
+<form id="CommandForm" name="CommandForm" method="POST" action="/Process/Spawn">
+    <label for="Command">Command</label><input type="text" name="Command"/>
+    <br>
+    <button type="submit">Run Command</button>
+    <br>
+    <textarea id="ProcessDetails"></textarea>
+
+</form>
+
+<form id="ConsoleForm" name="ConsoleForm" method="GET" action="/Process/Console">
+    <label for="pid">Pid</label><input type="text" name="pid"/>
+
+    <br>
+    <button type="submit">Get Console</button>
+    <br>
+    <textarea id="Console"></textarea>
+
+</form>
+<form id="AppCommandForm" name="AppCommandForm" method="post" action="/Process/Command">
+    <br>
+    <label for="command">Command</label><input type="text" name="command"/>
+    <br>
+    <label for="pid">Pid</label><input type="text" name="pid"/>
+    <br>
+    <textarea id="AppCommandConsole"></textarea>
+    <button type="submit">Run App Command</button>
+</form>
+<% include partials/footer %>
+
+</body>
+
+</html>

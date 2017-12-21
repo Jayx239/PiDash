@@ -222,3 +222,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/node,macos,linux,windows,angular,webstorm
+/node/config/*.config
+/node/logs/
