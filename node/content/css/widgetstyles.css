@@ -1,5 +1,5 @@
 body {min-height: 1024px; height: 100%;}
-footer {top: 1000px; position: absolute;}
+footer { margin-top: 400px; position: absolute;}
 .widget-body-container .memory-usage-bar-container {max-width: 300px; width: 100%;border-color: black; border-style: solid; background-color: white; border-radius: 5px;}
 .widget-body-container .memory-usage-bar-container .memory-usage-bar  {background-color: red; height: 30px; border-radius: 2px;}
 .widget.outter-container { background-color: #c32343; max-width: 300px; padding: 10px;}

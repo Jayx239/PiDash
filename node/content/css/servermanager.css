@@ -1,0 +1,8 @@
+#AppList {margin-top: 50px; }
+#ConsoleArea {margin-top: 100px; }
+#ConsoleArea #Console {resize: vertical; background-color: black; color: #2e6d1b; min-height: 300px; }
+#ExecuteButton, #RefreshButton { margin-top: 15px; }
+#ConsoleArea label{margin-bottom: 15px; }
+.app-list {border: 2px solid #2c4557; background-color: #0066FF; padding-top: 15px; padding-bottom: 15px; border-radius: 15px; }
+.app-list .app-row {border-top: 2px solid; border-bottom: 2px solid; background-color: #a7dbd8; }
+.app-list .app-row button {float: right;}
