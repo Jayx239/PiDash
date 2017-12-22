@@ -26,6 +26,9 @@ app.use(session({
 }));
 
 app.use(function (req, res, next) {
+    res.locals.messages = {"errors":[],"success":[]};
+    res.locals.messages.errors = [];
+    res.locals.messages.success = [];
 
     if (req.session && req.session.user) {
         req.user = req.session.user;

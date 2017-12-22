@@ -1,0 +1,15 @@
+
+<% if(messages.errors && messages.errors.length) {
+%>
+<div class="col-xs-0 col-sm-4"></div>
+<div class="col-xs-12 col-sm-4 error-box">
+    <div class="col-xs-12">
+        <ul>
+            <% messages.errors.forEach(function(error){%>
+            <li><%=error %></li>
+            <% })%>
+        </ul>
+    </div>
+</div>
+<div class="col-xs-0 col-sm-4"></div>
+<%}%>
