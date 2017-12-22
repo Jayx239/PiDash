@@ -14,7 +14,8 @@ app.post("/LogonRegister/Logon", function (req, res) {
     provider.getCredentialsByUserName(req.body.UserName, function (returnObject) {
         if (returnObject.status === provider.Statuses.Error) {
             logger.error("User not found, UserName: " + req.body.UserName);
-            res.redirect('/');
+            res.locals.messages.errors.push("Invalid Credentials");
+            res.render("logon");
         }
         else {
             if (validation.validateUserPassword(req.body.Password, returnObject.results[0].Hash, returnObject.results[0].Salt)) {
@@ -24,11 +25,14 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     if (returnObject.Status !== provider.Statuses.Error) {
                         req.session.admin = "granted";
                     }
+                    res.locals.messages.success.push("Logon Succesful");
                     res.redirect("/");
                 });
             }
-            else
-                res.redirect("/LogonRegister/Logon");
+            else {
+                res.locals.message.errors.push("Invalid Credentials");
+                res.render("logon");
+            }
         }
     });
 });
@@ -42,7 +46,9 @@ app.post("/LogonRegister/Register", function (req, res) {
     provider.addUserToUsersTable(req.body.UserName, req.body.PrimaryEmailAddress, req.body.FirstName, req.body.MiddleName, req.body.LastName, req.body.BirthDay, req.body.BirthMonth, req.body.BirthYear, function (result) {
         if (result.status === provider.Statuses.Error) {
             console.error("Error registering user");
-            res.json(result);
+            logger.error("Unable to create user credentials, registration failed");
+            res.locals.messages.errors.push(result.message);
+            res.render("register");
         }
         else {
             console.info("User registered, UserName: " + req.body.UserName);
@@ -50,13 +56,15 @@ app.post("/LogonRegister/Register", function (req, res) {
             provider.addCredentialsByUserName(req.body.UserName, saltHash.passwordHash, saltHash.salt, function (result) {
                 if (result.status === provider.Statuses.Error) {
                     logger.error("Unable to create user credentials, registration failed");
-                    res.send(result);
+                    res.locals.messages.errors.push(result.message);
+                    res.render("register.ejs");
                 }
                 else {
+                    res.locals.messages.success.push("Registration Successful");
 
                 }
             });
-            res.json(result);
+            res.render("logon");
         }
     });
 });

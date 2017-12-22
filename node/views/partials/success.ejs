@@ -1,0 +1,14 @@
+<% if(messages.success && messages.success.length) {
+%>
+<div class="col-xs-0 col-sm-4"></div>
+<div class="col-xs-12 col-sm-4 error-box">
+    <div class="col-xs-12">
+        <ul>
+            <% messages.success.forEach(function(success){%>
+            <li><%=success %></li>
+            <% })%>
+        </ul>
+    </div>
+</div>
+<div class="col-xs-0 col-sm-4"></div>
+<%}%>

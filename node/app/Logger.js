@@ -1,7 +1,5 @@
 var winston = require('winston');
-const tsFormat = () =
->
-(new Date()).toLocaleTimeString();
+const tsFormat = () => (new Date()).toLocaleTimeString();
 
 /* Configure winston logger */
 var logger = new (winston.Logger)({
