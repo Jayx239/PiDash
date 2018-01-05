@@ -42,20 +42,17 @@ function listenToProcess(childProcess) {
         var message = createMessage(STDOUT, data.toString());
     logger.log('debug', message);
     processes[pid]['messages'].push(message);
-})
-    ;
+});
     childProcess.stderr.on('data', (data) => {
         var message = createMessage(STDERR, data.toString());
     logger.log('debug', message);
     processes[pid]['messages'].push(message);
-})
-    ;
+});
     childProcess.on('close', (code) => {
         var message = createMessage(CLOSE, "Process closed, Pid: " + pid + " Exit code: " + code);
     processes[pid]['messages'].push(message);
     logger.log('debug', message);
-})
-    ;
+});
 
 }
 

@@ -11,7 +11,7 @@ angular.module('PiDashApp.ServerManagerController',[])
         var Statuses = {"Starting":"Starting","Running":"Running","Stopped":"Stopped"};
         var MessageSourceTypes = {"Out": "stdout", "In":"stdin","Error":"stderr","Close": "close"};
         $interval(function(){
-            if($scope.apps.length > 0) {
+            if($scope.activeApp.status === Statuses.Running || $scope.activeApp.status === Statuses.Starting ) {
                 $scope.refreshConsole($scope.activeApp);
             }
             },refreshRate);

@@ -12,7 +12,7 @@ var session = require('client-sessions');
 var helmet = require('helmet');
 
 var invalidRedirectPath = "/";
-
+var adminCode = "Granted";
 app.use(helmet());
 
 app.use(session({
@@ -49,8 +49,8 @@ app.use(function (req, res, next) {
 
 /* Determines if a username is in the database */
 function validUser(req, res, next) {
-    provider.getCredentialsByUserName(req.body.userName, function (response) {
-        if (response.status === provider.Statuses.Error) {
+    provider.getCredentialsByUserName(req.body.UserName, function (response) {
+        if (response.status === provider.Statuses.Error || response.results.length == 0) {
 
             return next(false);
         }
@@ -81,7 +81,7 @@ function requireLogon(req, res, next) {
 function requireAdmin(req, res, next) {
     requireLogon(req, res, function () {
         winston.logSession(req.sessionID, "Admin validation required", 'debug');
-        if (req.admin) {
+        if (req.admin === adminCode) {
             winston.logSession(req.sessionID, "Admin validation successful", 'debug');
             next();
         }
@@ -138,6 +138,7 @@ function saltHashPassword(userpassword) {
 
 
 module.exports = {
+    adminCode: adminCode,
     validUser: validUser,
     validateUserPassword: validateUserPassword,
     requireLogon: requireLogon,
