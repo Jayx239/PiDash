@@ -1,0 +1,15 @@
+<div class="app-list">
+    <div class="row">
+        <div class="col-xs-12"><h2>Apps</h2></div>
+    </div>
+    <div class="row" ng-repeat="app in apps track by $index">
+        <div class="col-xs-12 app-row" ng-click="setActiveApp($index);">
+            <h4>{{app.appName}}</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 app-row">
+            <button ng-click="addApplication()" class="col-xs-12 btn btn-primary">Add App</button>
+        </div>
+    </div>
+</div>

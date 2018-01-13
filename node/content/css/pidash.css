@@ -1,0 +1,14 @@
+.error-box, .success-box{
+    border: #B22222 solid 3px;
+    color: #FF0000;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f6f8f9+0,e5ebee+50 */,
+background: #f6f8f9; /* Old browsers */
+    background: -moz-linear-gradient(top, #f6f8f9 0%, #e5ebee 50%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #f6f8f9 0%,#e5ebee 50%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #f6f8f9 0%,#e5ebee 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#e5ebee',GradientType=0 ); /* IE6-9 */
+    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 10px;
+}
+.success-box {color: #2e6d1b; }
