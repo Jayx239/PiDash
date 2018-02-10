@@ -8,6 +8,7 @@ const fs = require('fs');
 fs.readFile('./sql.config', function (err, contents) {
     if (err) {
         console.log("Error reading sql config file");
+        exitError();
     }
     else {
         var sqlCreds = JSON.parse(contents);
@@ -18,37 +19,48 @@ fs.readFile('./sql.config', function (err, contents) {
             password: sqlCreds.password
         });
 
-        sqlConn.connect();
-        createDatabase(sqlConn, function () {
-            sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
-                if (err) {
-                    console.log("Error using database");
-                }
-                createUsersTable(sqlConn, function (sqlConn) {
-                    createCredentialsTable(sqlConn, function (sqlConn) {
-                        createGroupsTable(sqlConn, function (sqlConn) {
-                            createAdminsTable(sqlConn, function (sqlConn) {
-                                createAppsTable(sqlConn,function(sqlConn){
-                                    createAppPermissionsTable(sqlConn, function(sqlConn){
-                                        createAppLogsTable(sqlConn, function(sqlConn){
-                                            console.log("----------- Database Setup Complete -----------");
-                                            process.exit(0);
+        sqlConn.connect(function (err) {
+            if (err) {
+                console.log("Error connecting to db");
+                console.log("Connection State: " + sqlConn.state);
+                exitError();
+            }
+            createDatabase(sqlConn, sqlCreds.database, function () {
+                sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
+                    if (err) {
+                        console.log("Error using database");
+                        exitError();
+                    }
+                    createUsersTable(sqlConn, function (sqlConn) {
+                        createCredentialsTable(sqlConn, function (sqlConn) {
+                            createGroupsTable(sqlConn, function (sqlConn) {
+                                createAdminsTable(sqlConn, function (sqlConn) {
+                                    createAppsTable(sqlConn, function (sqlConn) {
+                                        createAppPermissionsTable(sqlConn, function (sqlConn) {
+                                            createAppLogsTable(sqlConn, function (sqlConn) {
+                                                console.log("----------- Database Setup Complete -----------");
+                                                process.exit(0);
+                                            });
                                         });
                                     });
                                 });
                             });
                         });
-                    });
-                })
+                    })
+                });
             });
         });
     }
-    console.log("Database configuration exited unexpectedly");
-    process.exit(-1);
+
 });
 
-var createDatabase = function (sqlConn, callback) {
-    var query = "CREATE DATABASE PiDash";
+function exitError() {
+    console.log("Database configuration exited unexpectedly");
+    process.exit(-1);
+}
+
+var createDatabase = function (sqlConn, databaseName, callback) {
+    var query = "CREATE DATABASE " + databaseName + ";";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating PiDash Database");
@@ -78,6 +90,7 @@ var createUsersTable = function (sqlConn, callback) {
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Users table");
+            exitError();
         }
         else {
             console.log("Success: Users table created");
@@ -93,11 +106,12 @@ var createCredentialsTable = function (sqlConn, callback) {
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "UserId INT NOT NULL, " +
         "Salt CHAR(16) NOT NULL, " +
-        "Hash CHAR(128) NOT NULL, "+
+        "Hash CHAR(128) NOT NULL, " +
         "FOREIGN KEY(UserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Credentials table");
+            exitError();
         }
         else {
             console.log("Success: Credentials table created");
@@ -119,6 +133,7 @@ var createGroupsTable = function (sqlConn, callback) {
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Groups table");
+            exitError();
         }
         else {
             console.log("Success: Groups table created");
@@ -140,6 +155,7 @@ var createAdminsTable = function (sqlConn, callback) {
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Admins table");
+            exitError();
         }
         else {
             console.log("Success: Admins table created");
@@ -150,19 +166,20 @@ var createAdminsTable = function (sqlConn, callback) {
     });
 };
 
-var createAppsTable = function(sqlConn, callback){
-  var query = "CREATE TABLE Apps(" +
-      "AppId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
-      "AppName varchar(256) NOT NULL, " +
-      "StartCommand varchar(256) NOT NULL, " +
-      "CreatorUserId INT NOT NULL, " +
-      "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
-      "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
-      "FOREIGN KEY(CreatorUserId) REFERENCES Users(UserId));";
+var createAppsTable = function (sqlConn, callback) {
+    var query = "CREATE TABLE Apps(" +
+        "AppId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+        "AppName varchar(256) NOT NULL, " +
+        "StartCommand varchar(256) NOT NULL, " +
+        "CreatorUserId INT NOT NULL, " +
+        "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+        "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
+        "FOREIGN KEY(CreatorUserId) REFERENCES Users(UserId));";
 
-  sqlConn.query(query, function (err, result, fields) {
+    sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Apps table");
+            exitError();
         }
         else {
             console.log("Success: Apps table created");
@@ -173,7 +190,7 @@ var createAppsTable = function(sqlConn, callback){
     });
 };
 
-var createAppPermissionsTable = function(sqlConn, callback){
+var createAppPermissionsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE AppPermissions(" +
         "PermissionId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "AppId INT NOT NULL, " +
@@ -185,6 +202,7 @@ var createAppPermissionsTable = function(sqlConn, callback){
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Apps table");
+            exitError();
         }
         else {
             console.log("Success: Apps table created");
@@ -195,7 +213,7 @@ var createAppPermissionsTable = function(sqlConn, callback){
     });
 };
 
-var createAppLogsTable = function(sqlConn, callback){
+var createAppLogsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE AppLogs(" +
         "LogId INT NOT NULL PRIMARY KEY, " +
         "AppId INT NOT NULL, " +
@@ -206,6 +224,7 @@ var createAppLogsTable = function(sqlConn, callback){
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Apps table");
+            exitError();
         }
         else {
             console.log("Success: Apps table created");

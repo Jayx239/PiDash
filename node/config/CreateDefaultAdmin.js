@@ -54,65 +54,79 @@ fs.readFile('./sql.config', function (err, contents) {
             password: sqlCreds.password
         });
 
-        sqlConn.connect();
-        sqlConn.query("USE PiDash;", function (err, result, fields) {
-            sqlConn.query("START TRANSACTION;", function (err, result, fields) {
-                if (err) {
-                    console.log("Error starting transaction")
-                    process.exit(1);
-                    return;
-                }
-
-                sqlConn.query("SELECT * FROM Users WHERE UserName='admin';", function (err, result, fields) {
-                    if (err || result.length == 0) {
-                        sqlConn.query("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('admin','admin@admin.com','admin','admin','admin',1,1,1990);", function (err, result, fields) {
-                            if (err) {
-                                console.log("Error adding user")
-                                rollback(sqlConn);
-                                process.exit(3)
-                            }
-                            else {
-                                sqlConn.query("SELECT * FROM Users WHERE UserName='admin';", function (err, result, fields) {
-                                    var userId = result[0].UserId;
-                                    console.log(userId);
-                                    if (err || result.length === 0) {
-                                        console.log("Error adding user");
-                                        process.exit(4);
-                                    }
-                                    else {
-                                        var saltHash = saltHashPassword("admin");
-                                        sqlConn.query("INSERT INTO Credentials(UserId,Salt,Hash) Values(" + userId + ",'" + saltHash.salt + "','" + saltHash.passwordHash + "')", function (err, result, fields) {
-                                            if (err) {
-                                                console.log("Error adding credentials for admin");
-                                                rollback(userId);
-                                                process.exit(5);
-                                            }
-
-                                            sqlConn.query("INSERT INTO Admins(UserId,GroupId,Active) Values(" + userId + ", 0, 1);", function (err, result, fields) {
-                                                if (err) {
-                                                    console.log("Error adding user to admins table");
-                                                    rollback(userId);
-                                                    process.exit(6)
-                                                }
-                                                else {
-                                                    console.log("Admin added");
-                                                    sqlConn.query("COMMIT;");
-                                                    process.exit(0);
-                                                }
-                                            });
-                                        })
-                                    }
-                                });
-                            }
+        sqlConn.connect(function (err) {
+            if (err) {
+                console.log("Error connection to db")
+                process.exit(-1);
+                return;
+            }
+            sqlConn.query("USE PiDash;", function (err, result, fields) {
+                sqlConn.beginTransaction(function (err) {
+                    if (err) {
+                        console.log("Error starting transaction");
+                        sqlConn.rollback(function () {
+                            process.exit(1);
+                            return;
                         });
                     }
-                    else {
-                        console.log("User admin already exists");
-                        process.exit(2);
-                    }
 
-                })
-            })
-        })
+                    sqlConn.query("SELECT * FROM Users WHERE UserName='admin';", function (err, result, fields) {
+                        if (err || result.length == 0) {
+                            sqlConn.query("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('admin','admin@admin.com','admin','admin','admin',1,1,1990);", function (err, result, fields) {
+                                if (err) {
+                                    console.log("Error adding user");
+                                    sqlConn.rollback(function () {
+                                        process.exit(3);
+                                    })
+                                }
+                                else {
+                                    sqlConn.query("SELECT * FROM Users WHERE UserName='admin';", function (err, result, fields) {
+                                        var userId = result[0].UserId;
+                                        console.log(userId);
+                                        if (err || result.length === 0) {
+                                            console.log("Error adding user");
+                                            sqlConn.rollback(function () {
+                                                process.exit(4);
+                                            })
+                                        }
+                                        else {
+                                            var saltHash = saltHashPassword("admin");
+                                            sqlConn.query("INSERT INTO Credentials(UserId,Salt,Hash) Values(" + userId + ",'" + saltHash.salt + "','" + saltHash.passwordHash + "')", function (err, result, fields) {
+                                                if (err) {
+                                                    console.log("Error adding credentials for admin");
+                                                    sqlConn.rollback(function () {
+                                                        process.exit(5);
+                                                    })
+                                                }
+
+                                                sqlConn.query("INSERT INTO Admins(UserId,GroupId,Active) Values(" + userId + ", 0, 1);", function (err, result, fields) {
+                                                    if (err) {
+                                                        console.log("Error adding user to admins table");
+                                                        sqlConn.rollback(function () {
+                                                            process.exit(6)
+                                                        });
+                                                    }
+                                                    else {
+                                                        console.log("Admin added");
+                                                        sqlConn.commit(function () {
+                                                            process.exit(0);
+                                                        });
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            console.log("User admin already exists");
+                            process.exit(2);
+                        }
+
+                    });
+                });
+            });
+        });
     }
 });

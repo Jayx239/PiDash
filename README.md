@@ -24,6 +24,7 @@ PiDash is a remote web server management application that allows a user to view 
     make all
     ```
 4. Create configuration files by running configurator
+    * Requires python, tested for v2.x.x or v3.x.x
     ```bash
     make configurator
     ```
