@@ -4,10 +4,11 @@ const app = server.app;
 var validation = require('./Validation');
 var winston = require('./Logger');
 var PiSys = require('./PiSystem');
-var logger = winston.logger;
 /* Get configured winston logger */
+var logger = winston.logger;
 var Process = require('./Process');
 var logonRegister = require('./LogonRegister');
+var account = require('./Account');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');

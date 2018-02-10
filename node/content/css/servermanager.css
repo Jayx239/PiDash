@@ -15,4 +15,4 @@ background: #f6f8f9; /* Old browsers */
 .app-list .app-row button {float: right;}
 .app-list .app-row button.btn.btn-primary {background-color: #011936; border-color: #DEE5E5; color: #DEE5E5; }
 .app-list .app-row button.btn.btn-primary:active {background-color: #DEE5E5; border-color: #DEE5E5; color: #011936; }
-.server-manager-container {background-color: #DEE5E5; color: #011936; }
+.server-manager-container, body {background-color: #DEE5E5; color: #011936; }

@@ -32,6 +32,7 @@ fs.readFile('./sql.config', function (err, contents) {
                                     createAppPermissionsTable(sqlConn, function(sqlConn){
                                         createAppLogsTable(sqlConn, function(sqlConn){
                                             console.log("----------- Database Setup Complete -----------");
+                                            process.exit(0);
                                         });
                                     });
                                 });
@@ -42,6 +43,8 @@ fs.readFile('./sql.config', function (err, contents) {
             });
         });
     }
+    console.log("Database configuration exited unexpectedly");
+    process.exit(-1);
 });
 
 var createDatabase = function (sqlConn, callback) {
@@ -133,8 +136,7 @@ var createAdminsTable = function (sqlConn, callback) {
         "CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP, " +
         "GroupId INT, " +
         "Active bool, " +
-        "FOREIGN KEY(UserId) REFERENCES Users(UserId), " +
-        "FOREIGN KEY(GroupId) REFERENCES Groups(GroupId));";
+        "FOREIGN KEY(UserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
             console.log("Error creating Admins table");
@@ -151,6 +153,7 @@ var createAdminsTable = function (sqlConn, callback) {
 var createAppsTable = function(sqlConn, callback){
   var query = "CREATE TABLE Apps(" +
       "AppId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+      "AppName varchar(256) NOT NULL, " +
       "StartCommand varchar(256) NOT NULL, " +
       "CreatorUserId INT NOT NULL, " +
       "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
@@ -177,8 +180,7 @@ var createAppPermissionsTable = function(sqlConn, callback){
         "AdminId INT NOT NULL, " +
         "GroupId INT, " +
         "FOREIGN KEY(AppId) REFERENCES Apps(AppId), " +
-        "FOREIGN KEY(AdminId) REFERENCES Admins(AdminId), " +
-        "FOREIGN KEY(GroupId) REFERENCES Groups(GroupId));";
+        "FOREIGN KEY(AdminId) REFERENCES Admins(AdminId));";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {

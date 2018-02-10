@@ -67,7 +67,7 @@ function validateUserPassword(userPassword, passwordHash, salt) {
         return true;
     }
 
-    winston.logSession(req.sessionID, "Invalid password", 'error');
+    logger.error("Invalid creds");
     return false;
 }
 
@@ -136,8 +136,12 @@ function saltHashPassword(userpassword) {
     return passwordData;
 }
 
+/* TODO: Add password requirements */
+var validPassword = function(password){
+    return true;
+};
 
-module.exports = {
+    module.exports = {
     adminCode: adminCode,
     validUser: validUser,
     validateUserPassword: validateUserPassword,
@@ -146,5 +150,6 @@ module.exports = {
     genRandomString: getRandomString,
     sha512: sha512,
     getRandomString: getRandomString,
-    saltHashPassword: saltHashPassword
+    saltHashPassword: saltHashPassword,
+    validPassword: validPassword
 };
