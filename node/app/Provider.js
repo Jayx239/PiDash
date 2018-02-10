@@ -1,49 +1,11 @@
-const winston = require('./Logger');
-const fs = require('fs');
-var mysql = require('mysql');
-var pool;
-var logger = winston.logger;
+const baseProvider = require('./BaseProvider');
+var logger = baseProvider.logger;
 var validation = require('./Validation');
 
-var Statuses = {"Success": "success", "Error": "error"};
+var Statuses = baseProvider.Statuses;
 
-fs.readFile('./config/sql.config', 'utf-8', function (err, contents) {
-    logger.info("Reading sql config file");
-    if (err) {
-        logger.error("Error opening database config file")
-    }
-    else {
-        var poolConfig = JSON.parse(contents);
-
-        pool = mysql.createPool(poolConfig);
-        logger.info("Database configured");
-    }
-});
-
-/* Function for running server commands */
-var runCommand = function (sqlQuery, callback) {
-    pool.getConnection(function (err, connection) {
-        if (err) {
-            logger.error("Provider Error: Error opening connection");
-            logger.log('debug', "Provider runCommand, Query: " + sqlQuery);
-            var returnObject = {"status": Statuses.Error, "message": "Error opening database connection"};
-            callback(returnObject)
-        }
-        else {
-            connection.query(sqlQuery, function (err, results, fields) {
-                if (err) {
-                    logger.error("Provider Error: Error running command");
-                    logger.log('debug', "Provider runCommand, Query: " + sqlQuery);
-                    var returnObject = {"status": Statuses.Error, "message": "Error running command"};
-                    callback(returnObject);
-                    return;
-                }
-                var returnObject = {"status": Statuses.Success, "results": results, "fields": fields};
-                callback(returnObject);
-            });
-        }
-    });
-};
+/* Function for running sql commands */
+var runCommand = baseProvider.runCommand;
 
 /* Database get provider functions */
 var getUserByUserName = function (userName, callback) {
@@ -61,7 +23,7 @@ var getUserByUserId = function (userId, callback) {
 };
 
 var getCredentialsByUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Credentials WHERE UserId='" + userId + "';";
+    var sqlQuery = "SELECT * FROM Credentials WHERE UserId=" + userId + ";";
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
@@ -102,54 +64,6 @@ var getAdminByUserName = function (userName, callback) {
     });
 };
 
-var getAppByAppId = function (appId, callback) {
-    var sqlQuery = "SELECT * FROM Apps WHERE AppId=" + appId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var getAppsByCreatorUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Apps WHERE CreatorUserId=" + userId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var getAppsByGroupId = function (groupId, callback) {
-    var sqlQuery = "SELECT * FROM Apps WHERE GroupId=" + groupId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var getAllAppsForUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Permissions WHERE CreatorUserId=" + userId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var getPermissionByPermissionId = function (permissionId, callback) {
-    var sqlQuery = "SELECT * FROM AppPermissions WHERE PermissionId=" + permissionId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var getLogByLogId = function (logId, callback) {
-    var sqlQuery = "SELECT * FROM Logs WHERE LogId=" + logId + ";";
-
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
 /* Insert provider functions */
 var addUserToUsersTable = function (userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear, callback) {
     getUserByUserName(userName, function (returnObject) {
@@ -174,7 +88,7 @@ var addUserToUsersTable = function (userName, primaryEmail, firstName, middleNam
     });
 };
 
-var addCredentialsForUserById = function (userId, password, salt, callback) {
+var addCredentialsForUserById = function (userId, passwordHash, salt, callback) {
     getCredentialsByUserId(userId, function (result) {
         if (result.status === Statuses.Error || result.results.length < 1) {
             getUserByUserId(userId, function (result) {
@@ -186,8 +100,8 @@ var addCredentialsForUserById = function (userId, password, salt, callback) {
                 getCredentialsByUserId(userId, function (result) {
                     if (result.error === Statuses.Error || result.results.length < 1) {
 
-                        var sqlQuery = "INSERT INTO Credentials(UserId,Password,Salt) " +
-                            "VALUES('" + userId + "','" + password + "','" + salt + "');";
+                        var sqlQuery = "INSERT INTO Credentials(UserId,Salt,Hash) " +
+                            "VALUES('" + userId + "','" + salt + "','" + passwordHash + "');";
                         runCommand(sqlQuery, function (result) {
                             callback(result);
                         });
@@ -202,17 +116,58 @@ var addCredentialsForUserById = function (userId, password, salt, callback) {
     });
 };
 
-var addCredentialsByUserName = function (userName, password, salt, callback) {
+var addCredentialsByUserName = function(userName, passwordHash, salt, callback) {
     getUserByUserName(userName, function (result) {
         if (result.status === Statuses.Error) {
             logger.log('debug', "Error adding credentials ,Result: " + result);
             callback(result);
         }
         else {
-            var userId = result.results.UserId;
-            addCredentialsForUserById(userId, password, salt, function (result) {
+            var userId = result.results[0].UserId;
+            addCredentialsForUserById(userId, passwordHash, salt, function (result) {
                 if (result.status === Statuses.Error || result.results.length < 1) {
                     logger.debug('Error adding credentials, credentials already exist for User name: ' + userName);
+                }
+                callback(result);
+            });
+        }
+    });
+};
+
+var updateCredentialsForUserById = function (userId, passwordHash, salt, callback) {
+    getCredentialsByUserId(userId, function (result) {
+        if (result.status !== Statuses.Error && result.results.length > 0 ) {
+                        var sqlQuery = "UPDATE Credentials " +
+                            "SET Salt='" + salt + "', " +
+                            "Hash='" + passwordHash + "' " +
+                            "WHERE UserId=" + userId + ";";
+
+                        runCommand(sqlQuery, function (result) {
+                            callback(result);
+                        });
+                    }
+                    else {
+                        logger.log('debug','Error updating credentials, no credentials exist for User id: ' + userId);
+                        callback(result);
+                    }
+                });
+
+        };
+var updateCredentialsByUserName = function (userName, passwordHash, salt, callback) {
+    getUserByUserName(userName, function (result) {
+        if (result.status === Statuses.Error) {
+            logger.log('debug', "Error updating credentials ,Result: " + result);
+            callback(result);
+        }
+        else if(result.results.length < 0){
+            logger.log('debug', "Error updating credentials, User name not found, UserName: " + userName);
+            callback(result);
+        }
+        else {
+            var userId = result.firstResult.UserId;
+            updateCredentialsForUserById(userId, passwordHash, salt, function (result) {
+                if (result.status === Statuses.Error) {
+                    logger.debug('Error updating credentials, UserName: ' + userName);
                 }
                 callback(result);
             });
@@ -274,59 +229,6 @@ var addAdminByUserName = function (userName, groupId, isActive, callback) {
     })
 };
 
-var addApp = function (creatorUserId, appName, startCommand, callback) {
-    getUserByUserId(creatorUserId, function (result) {
-        if (result.status === Statuses.Error || result.results.length < 0) {
-            logger.log('debug', 'Invalid user id');
-            callback(result);
-            return;
-        }
-        else {
-            var sqlQuery = "INSERT INTO Apps(CreatorUserId,AppName,StartCommand) " +
-                "VALUES(" + creatorUserId + ",'" + appName + "','" + startCommand + "');";
-            runCommand(sqlQuery, function (result) {
-                callback(result);
-
-            });
-        }
-    })
-};
-
-
-var addPermissions = function (appId, permissionId, adminId, groupId, permission, callback) {
-
-    var sqlQuery = "INSERT INTO AppPermissions(AppId,PermissionId,AdminId, GroupId, Permission) " +
-        "VALUES(" + appId + ", " + permissionId + ", " + adminId + ", " + groupId + ", " + permission + ");";
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-var addLogs = function (logId, appId, path, logName, callback) {
-    var sqlQuery = "INSERT INTO AppPermissions(LogId, AppId, Path, LogName) " +
-        "VALUES(" + logId + ", " + appId + ", '" + path + "', '" + logName + "');";
-    runCommand(sqlQuery, function (result) {
-        callback(result);
-    });
-};
-
-/*var addCredentialsForUserById = function(userId, password, salt, callback) {
-    var checkQuery = "SELECT * FROM Users as U "
-    "WHERE U.UserName = '" + userId + "';";
-    runCommand(checkQuery,function(result) {
-        if(result.Status === Statuses.Error) {
-            logger.log('debug',"Unable to add credentials, UserId not found, UserId: " + userId);
-            callback(result);
-        }
-        var sqlQuery = "INSERT INTO Credentials(UserId,Password,Salt) " +
-            "VALUES('" + userId + "','" + password + "','" + salt + "');";
-        runCommand(sqlQuery, function (result) {
-            callback(result);
-        });
-    });
-};*/
-
-
 /* Export */
 module.exports = {
     Statuses: Statuses,
@@ -339,5 +241,8 @@ module.exports = {
     getAdminByUserName: getAdminByUserName,
     addUserToUsersTable: addUserToUsersTable,
     addCredentialsByUserId: addCredentialsForUserById,
-    addCredentialsByUserName: addCredentialsByUserName
+    addCredentialsByUserName: addCredentialsByUserName,
+    updateCredentialsForUserById: updateCredentialsForUserById,
+    updateCredentialsByUserName: updateCredentialsByUserName,
+    addAdminByUserName: addAdminByUserName
 };

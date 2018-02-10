@@ -25,13 +25,13 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     if (returnObject.Status !== provider.Statuses.Error && returnObject.results.length > 0) {
                         req.session.admin = validation.adminCode;
                     }
-                    logger.debug(returnObject);
-                    res.locals.messages.success.push("Logon Succesful");
+                    //logger.debug(returnObject);
+                    res.locals.messages.success.push("Logon Successful");
                     res.redirect("/");
                 });
             }
             else {
-                res.locals.message.errors.push("Invalid Credentials");
+                res.locals.messages.errors.push("Invalid Credentials");
                 res.render("logon");
             }
         }
