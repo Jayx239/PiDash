@@ -32,12 +32,13 @@ app.use(function (req, res, next) {
 
     if (req.session && req.session.user) {
         req.user = req.session.user;
+        req.userId = req.session.userId;
         req.sessionID = req.session.sessionToken;
         res.locals.user = req.session.user;
         if (req.session.admin)
             req.admin = req.session.admin;
         if (req.session.sesh && req.session.expires && req.session.sessionToken) {
-            var cookieExp = new Date(req.session.expires)
+            var cookieExp = new Date(req.session.expires);
             if (cookieExp.getTime() < new Date(Date.now()).getTime()) {
                 delete req.session.sesh;
                 delete req.session.sessionToken;
@@ -51,7 +52,6 @@ app.use(function (req, res, next) {
 function validUser(req, res, next) {
     provider.getCredentialsByUserName(req.body.UserName, function (response) {
         if (response.status === provider.Statuses.Error || response.results.length == 0) {
-
             return next(false);
         }
         else
@@ -81,14 +81,17 @@ function requireLogon(req, res, next) {
 function requireAdmin(req, res, next) {
     requireLogon(req, res, function () {
         winston.logSession(req.sessionID, "Admin validation required", 'debug');
-        if (req.admin === adminCode) {
-            winston.logSession(req.sessionID, "Admin validation successful", 'debug');
-            next();
-        }
-        else {
-            winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
-            res.redirect(invalidRedirectPath);
-        }
+
+        provider.getAdminByUserName(req.user, function(result) {
+            if(result.status === provider.Statuses.Error || !result.firstResult) {
+                winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
+                res.redirect(invalidRedirectPath);
+            }
+            else {
+                winston.logSession(req.sessionID, "Admin validation successful", 'debug');
+                next();
+            }
+        });
     });
 }
 

@@ -1,7 +1,7 @@
 #AppList {margin-top: 50px; contain: content;}
 #ConsoleArea {margin-top: 100px; }
 #ConsoleArea #Console {resize: vertical; background-color: black; color: #2e6d1b; min-height: 300px; }
-#ExecuteButton, #RefreshButton { margin-top: 15px; }
+/*#ExecuteButton, #RefreshButton { margin-top: 15px; }*/
 #ConsoleArea label{margin-bottom: 15px; }
 .app-list {border: 2px solid #2c4557;
     /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f6f8f9+0,e5ebee+50 */,
@@ -10,9 +10,10 @@ background: #f6f8f9; /* Old browsers */
     background: -webkit-linear-gradient(bottom, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
     background: linear-gradient(to top, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
-    padding-top: 15px; padding-bottom: 15px; border-radius: 15px; height: 300px; overflow: scroll;}
+    padding-top: 15px; padding-bottom: 15px; border-radius: 15px; min-height: 300px!important; height: auto; max-height: 600px;}
 .app-list .app-row {border-top: #011936 2px solid; border-bottom: #011936 2px solid ; background-color: #313D5A; color: #DEE5E5;}
 .app-list .app-row button {float: right;}
 .app-list .app-row button.btn.btn-primary {background-color: #011936; border-color: #DEE5E5; color: #DEE5E5; }
 .app-list .app-row button.btn.btn-primary:active {background-color: #DEE5E5; border-color: #DEE5E5; color: #011936; }
-.server-manager-container, body {background-color: #DEE5E5; color: #011936; }
+body {background-color: #DEE5E5 !important; color: #011936 !important; }
+.app-details-container { margin-bottom: 15px; }

@@ -4,59 +4,75 @@
 
 const mysql = require('mysql');
 const fs = require('fs');
+var errors = false;
+var configureDatabase = function(test, callback){
+    var configFile;
+    if(test)
+        configFile = "./sqltest.config";
+    else
+        configFile = "./sql.config";
 
-fs.readFile('./sql.config', function (err, contents) {
-    if (err) {
-        console.log("Error reading sql config file");
-        exitError();
-    }
-    else {
-        var sqlCreds = JSON.parse(contents);
+    fs.readFile(configFile, function (err, contents) {
+        if (err) {
+            console.log("Error reading sql config file");
+            exitError(callback);
+            return;
+        }
+        else {
+            var sqlCreds = JSON.parse(contents);
 
-        var sqlConn = mysql.createConnection({
-            host: sqlCreds.host,
-            user: sqlCreds.user,
-            password: sqlCreds.password
-        });
+            var sqlConn = mysql.createConnection({
+                host: sqlCreds.host,
+                user: sqlCreds.user,
+                password: sqlCreds.password
+            });
 
-        sqlConn.connect(function (err) {
-            if (err) {
-                console.log("Error connecting to db");
-                console.log("Connection State: " + sqlConn.state);
-                exitError();
-            }
-            createDatabase(sqlConn, sqlCreds.database, function () {
-                sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
-                    if (err) {
-                        console.log("Error using database");
-                        exitError();
-                    }
-                    createUsersTable(sqlConn, function (sqlConn) {
-                        createCredentialsTable(sqlConn, function (sqlConn) {
-                            createGroupsTable(sqlConn, function (sqlConn) {
-                                createAdminsTable(sqlConn, function (sqlConn) {
-                                    createAppsTable(sqlConn, function (sqlConn) {
-                                        createAppPermissionsTable(sqlConn, function (sqlConn) {
-                                            createAppLogsTable(sqlConn, function (sqlConn) {
-                                                console.log("----------- Database Setup Complete -----------");
-                                                process.exit(0);
+            sqlConn.connect(function (err) {
+                if (err) {
+                    console.log("Error connecting to db");
+                    console.log("Connection State: " + sqlConn.state);
+                    exitError(callback);
+                    return;
+                }
+                createDatabase(sqlConn, sqlCreds.database, function () {
+                    sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
+                        if (err) {
+                            console.log("Error using database");
+                            exitError(callback);
+                            return;
+                        }
+                        createUsersTable(sqlConn, function (sqlConn) {
+                            createCredentialsTable(sqlConn, function (sqlConn) {
+                                createGroupsTable(sqlConn, function (sqlConn) {
+                                    createAdminsTable(sqlConn, function (sqlConn) {
+                                        createAppsTable(sqlConn, function (sqlConn) {
+                                            createAppPermissionsTable(sqlConn, function (sqlConn) {
+                                                createAppLogsTable(sqlConn, function (sqlConn) {
+                                                    console.log("----------- Database Setup Complete -----------");
+                                                    if(callback)
+                                                        callback();
+                                                    return;
+                                                });
                                             });
                                         });
                                     });
                                 });
                             });
                         });
-                    })
+                    });
                 });
             });
-        });
-    }
+        }
 
-});
+    });
+};
 
-function exitError() {
-    console.log("Database configuration exited unexpectedly");
-    process.exit(-1);
+function exitError(callback) {
+    //console.log("Database configuration exited unexpectedly");
+    errors = true;
+
+    if(callback)
+        callback();
 }
 
 var createDatabase = function (sqlConn, databaseName, callback) {
@@ -196,16 +212,19 @@ var createAppPermissionsTable = function (sqlConn, callback) {
         "AppId INT NOT NULL, " +
         "AdminId INT NOT NULL, " +
         "GroupId INT, " +
+        "ReadPermission BIT, " +
+        "WritePermission BIT, " +
+        "ExecutePermission BIT, " +
         "FOREIGN KEY(AppId) REFERENCES Apps(AppId), " +
         "FOREIGN KEY(AdminId) REFERENCES Admins(AdminId));";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Apps table");
+            console.log("Error creating AppPermissions table");
             exitError();
         }
         else {
-            console.log("Success: Apps table created");
+            console.log("Success: AppPermissions table created");
         }
         if (callback)
             callback(sqlConn);
@@ -215,7 +234,7 @@ var createAppPermissionsTable = function (sqlConn, callback) {
 
 var createAppLogsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE AppLogs(" +
-        "LogId INT NOT NULL PRIMARY KEY, " +
+        "LogId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "AppId INT NOT NULL, " +
         "Path VARCHAR(256), " +
         "LogName VARCHAR(256), " +
@@ -223,11 +242,11 @@ var createAppLogsTable = function (sqlConn, callback) {
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Apps table");
+            console.log("Error creating AppLogs table");
             exitError();
         }
         else {
-            console.log("Success: Apps table created");
+            console.log("Success: AppLogs table created");
         }
         if (callback)
             callback(sqlConn);
@@ -235,7 +254,22 @@ var createAppLogsTable = function (sqlConn, callback) {
     });
 };
 
+
+/* Create and configure database */
+configureDatabase(false,function(){
+
+    /* Create and configure test database */
+    configureDatabase(true, function() {
+        if(errors)
+            process.exit(-1);
+        else
+            process.exit(0);
+
+    });
+});
+
 module.exports = {
+    configureDatabase: configureDatabase,
     createDatabase: createDatabase,
     createAdminsTable: createAdminsTable,
     createGroupsTable: createGroupsTable,

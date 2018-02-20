@@ -3,31 +3,52 @@ const fs = require('fs');
 var mysql = require('mysql');
 var pool;
 var logger = winston.logger;
-
+var configFile = "./config/sql.config";
 var Statuses = {"Success": "success", "Error": "error"};
+var databaseConfigured = false;
 
-fs.readFile('./config/sql.config', 'utf-8', function (err, contents) {
-    logger.info("Reading sql config file");
-    if (err) {
-        logger.error("Error opening database config file")
-    }
-    else {
-        var poolConfig = JSON.parse(contents);
+/* Method for starting/configuring database */
+var configureDatabase = function(callback) {
+    fs.readFile(configFile, 'utf-8', function (err, contents) {
+        logger.info("Reading sql config file");
+        if (err) {
+            logger.error("Error opening database config file");
+            if(callback)
+                callback(false);
+        }
+        else {
+            var poolConfig = JSON.parse(contents);
+            pool = mysql.createPool(poolConfig);
+            databaseConfigured = true;
+            logger.info("Database configured");
 
-        pool = mysql.createPool(poolConfig);
-        logger.info("Database configured");
-    }
-});
+            if(callback)
+                callback(true);
+        }
+    });
+};
 
 /* Function for running sql commands */
 var runCommand = function (sqlQuery, callback) {
+    if(!databaseConfigured)
+        configureDatabase(function(success){
+            if(!success){
+                var returnObject = {"status": Statuses.Error, "message": "Error opening database connection"};
+                if(callback)
+                    callback(returnObject);
+            }
+            else
+                runCommand(sqlQuery,callback);
+    });
+
     pool.getConnection(function (err, connection) {
         if (err) {
             logger.error("Provider Error: Error opening connection");
             logger.log('debug', "Provider runCommand, Query: " + sqlQuery);
             var returnObject = {"status": Statuses.Error, "message": "Error opening database connection"};
             connection.release();
-            callback(returnObject)
+            if(callback)
+                callback(returnObject)
         }
         else {
             connection.query(sqlQuery, function (err, results, fields) {
@@ -36,7 +57,8 @@ var runCommand = function (sqlQuery, callback) {
                     logger.error("Provider Error: Error running command");
                     logger.log('debug', "Provider runCommand, Query: " + sqlQuery);
                     var returnObject = {"status": Statuses.Error, "message": "Error running command"};
-                    callback(returnObject);
+                    if(callback)
+                        callback(returnObject);
                     return;
                 }
 
@@ -47,15 +69,25 @@ var runCommand = function (sqlQuery, callback) {
                     firstResult = results;
 
                 var returnObject = {"status": Statuses.Success, "results": results, "fields": fields, "firstResult": firstResult};
-                callback(returnObject);
+                if(callback)
+                    callback(returnObject);
             });
         }
     });
 };
 
+var setConfigFile = function(newConfigFile,callback) {
+    configFile = newConfigFile;
+    databaseConfigured = false;
+    configureDatabase(callback);
+};
+
 /* Export */
 module.exports = {
+    configureDatabase: configureDatabase,
   Statuses: Statuses,
     runCommand: runCommand,
-    logger: logger
+    logger: logger,
+    setConfigFile: setConfigFile
+
 };

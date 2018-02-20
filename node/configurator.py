@@ -9,6 +9,8 @@ def prompt(promptText):
         return raw_input(prompt);
 
 configPath = './config/'
+standardConfigFileName = "sql.config"
+testConfigFileName = "sqltest.config"
 
 class Server:
     def __init__(self):
@@ -21,22 +23,34 @@ class Server:
     def export(self):
             f = open(configPath + 'server.config','w')
             f.write(json.dumps(self.__dict__))
+            f.close()
 class Sql:
     def __init__(self):
         self.host = ""
         self.user = ""
         self.password = ""
         self.database = ""
+        self.isTest = False
     def generate(self):
         print("Sql configurator")
+        isTestIn = prompt("Configuration for test database? (Y/N): ")
+        if len(isTestIn) > 0 and isTestIn[0].lower() == 'y':
+            self.isTest = True
+        else:
+            self.isTest = False
         self.host = prompt("Enter host: ")
         self.user = prompt("Enter database user: ")
         self.password = prompt("Enter database password: ")
         self.database = prompt("Enter database name: ")
     def export(self):
-        f = open(configPath + 'sql.config','w')
+        fullPath = ""
+        if(self.isTest):
+            fullPath = configPath + testConfigFileName
+        else:
+            fullPath = configPath + standardConfigFileName
+        f = open(fullPath,'w')
         f.write(json.dumps(self.__dict__))
-
+        f.close()
 
 configTypes = ["Server","Sql"]
 def printConfigTypes():

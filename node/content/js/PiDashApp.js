@@ -1,0 +1,135 @@
+/* Data Structures */
+function PiDashApp(app,appPermissions, processes) {
+    this.app = app;
+    this.appPermissions = appPermissions;
+    this.processes = processes;
+}
+
+
+PiDashApp.prototype.setAppId = function(appId) {
+    this.app.appId = appId;
+};
+
+function App(name, appId, creatorUserId, startCommand, logs) {
+    this.name = name;
+    this.appId = appId;
+    this.creatorUserId = creatorUserId;
+    this.startCommand = startCommand;
+    this.logs = logs
+}
+
+App.prototype.setLogs = function(logs) {
+    this.logs = logs;
+};
+
+function AppLog(logId, appId, path, name) {
+    this.id = logId;
+    this.appId = appId;
+    this.path = path;
+    this.name = name;
+}
+
+
+function AppPermission(permissionId, appId, appUser, isAdmin, groupId, read, write, execute) {
+    this.permissionId = permissionId;
+    this.appId = appId;
+    this.appUser = appUser;
+    this.admin = isAdmin;
+    this.groupId = groupId;
+    this.read = read;
+    this.write = write;
+    this.execute = execute;
+}
+
+function AppUser(userName, userId) {
+    this.userName = userName;
+    this.userId = userId;
+}
+
+function Process(pid, startTime) {
+    this.pid = pid;
+    this.startTime = Date.now();
+    if(startTime)
+        this.startTime = startTime;
+
+}
+
+Process.prototype.stopProcess = function(){
+    this.endTime = Date.now();
+};
+
+Process.prototype.getUpTime = function(){
+    if(this.endTime)
+        return this.endTime - this.startTime;
+    else
+        return Date.now() - this.startTime;
+};
+
+
+
+var buildPiDashAppFromResponse = function(res) {
+    console.log(res);
+    var jsonRes = JSON.parse(res);
+    var app = buildAppFromResponse(jsonRes);
+    if(res.appPermissions)
+        var permissions = buildPermissionsFromResponse(jsonRes);
+    if(res.processes)
+        var processes = buildProcessesFromResponse(jsonRes);
+    var dashApp = new PiDashApp(app,permissions,processes);
+
+    return dashApp;
+};
+
+var buildAppFromResponse = function(res) {
+    if(!res) {
+        return null;
+    }
+    else {
+        var logs = buildLogsFromResponse(res);
+        var app = new App(res.app.name, res.app.appId,res.app.creatorUserId,res.app.startCommand,logs);
+        return app;
+    }
+
+};
+
+var buildLogsFromResponse = function(res){
+    var logs = [];
+    for(var i=0; i<res.app.logs.length; i++) {
+        var log = res.app.logs[i];
+        logs.push(new AppLog(log.logId, res.app.appId, log.path, log.name));
+    }
+    return logs;
+};
+
+var buildPermissionsFromResponse = function(res) {
+    var permissions = [];
+    for(var i=0; i <res.appPermissions.length; i++){
+        var permission = res.appPermissions[i];
+        permissions.push(new AppPermission(permission.permissionId,res.app.appId,permission.appUser,permission.admin,permission.groupId,permission.read, permission.write,permission.execute));
+    }
+    return permissions;
+};
+
+var buildProcessesFromResponse = function(res) {
+    var processes = [];
+
+    for(var i=0; i<res.processes.length; i++) {
+        var process = res.processes[i];
+        processes.push(new Process(process.pid,process.startTime));
+    }
+    return processes;
+};
+
+module.exports = {
+    PiDashApp: PiDashApp,
+    App: App,
+    AppLog: AppLog,
+    AppPermission: AppPermission,
+    AppUser: AppUser,
+    Process: Process,
+    buildPiDashAppFromResponse: buildPiDashAppFromResponse,
+    buildAppFromResponse: buildAppFromResponse,
+    buildLogsFromResponse: buildLogsFromResponse,
+    buildPermissionsFromResponse: buildPermissionsFromResponse,
+    buildProcessesFromResponse: buildProcessesFromResponse
+};

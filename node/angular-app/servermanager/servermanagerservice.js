@@ -6,31 +6,31 @@ angular.module('PiDashApp.ServerManagerService',[])
         var baseUrl = 'localhost:4656';
 
         /* Methods */
-        serverManagerApi.spawnProcess = function(userCommand, callBack){
+        serverManagerApi.spawnProcess = function(userCommand, callback){
             $.ajax({
                 method: "POST",
                 url: "/Process/Spawn",
                 data: {"Command" : userCommand}
             }).done(function(res){
-                if(callBack)
-                    callBack(res);
+                if(callback)
+                    callback(res);
                 return res;
             })
         };
 
-        serverManagerApi.getConsoleByPid = function(userPid, callBack) {
+        serverManagerApi.getConsoleByPid = function(userPid, callback) {
             $.ajax({
                 method: "POST",
                 url: "/Process/Console",
                 data: {"pid":userPid}
             }).done(function(res){
-                if(callBack)
-                    callBack(res);
+                if(callback)
+                    callback(res);
                 return res;
             })
         };
 
-        serverManagerApi.runCommand = function(pid, command, callBack) {
+        serverManagerApi.runCommand = function(pid, command, callback) {
             console.log("Pid " + pid);
             $.ajax({
                 method: "POST",
@@ -38,21 +38,46 @@ angular.module('PiDashApp.ServerManagerService',[])
                 data: { "pid": pid, "command":command}
             }).done(function(res) {
 
-                    callBack(res);
+                    callback(res);
                 if(res.Status === "Error") {
 
                 }
             })
         };
 
-        serverManagerApi.killProcess = function(pid,callBack) {
+        serverManagerApi.killProcess = function(pid,callback) {
             $.ajax({
                 method: "POST",
                 url: "/Process/Kill",
                 data: { "pid": pid}
             }).done(function(res) {
 
-                callBack(res);
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+        serverManagerApi.addPiDashApp = function(piDashApp, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/AddApp",
+                data: JSON.stringify(piDashApp)
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+        serverManagerApi.getPiDashApp = function(appId ,callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/GetApp"
+            }).done(function(res) {
+                callback(res);
                 if(res.Status === "Error") {
 
                 }

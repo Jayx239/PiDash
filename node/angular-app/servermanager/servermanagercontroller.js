@@ -1,9 +1,10 @@
+//var piDashApp = require('../../content/js/PiDashApp');
 angular.module('PiDashApp.ServerManagerController',[])
     .controller('serverManagerController',function($scope, $interval, serverManagerService){
         var refreshRate = 1000; // ms, TODO: abstract this
         $scope.processes = [];
         $scope.apps = [];
-
+        $scope.piDashApps = [];
         $scope.activeApp = [];
         $scope.activeAppIndex = 0;
         $scope.command = "";
@@ -113,12 +114,12 @@ angular.module('PiDashApp.ServerManagerController',[])
             }
         };
 
-        $scope.startActiveApp = function(){
+        $scope.startActiveApp = function() {
             spawnProcess($scope.activeApp);
 
         };
 
-        $scope.stopActiveApp = function(){
+        $scope.stopActiveApp = function() {
             $scope.killApp($scope.activeApp);
         };
 
@@ -126,6 +127,26 @@ angular.module('PiDashApp.ServerManagerController',[])
             serverManagerService.killProcess(app.pid,function() {
                 $scope.refreshConsole(app);
             });
+        };
+
+        $scope.retrieveApps = function() {
+            serverManagerService.getPiDashApp("",function(res) {
+                $scope.addApplication();
+                var newApp = buildPiDashAppFromResponse(res);
+                $scope.piDashApps.push(newApp);
+                $scope.activeApp = newApp;
+                $scope.activeApp.appName = newApp.app.name;
+                $scope.activeApp.startCommand = newApp.app.startCommand;
+            });
+        };
+
+        $scope.addPiDashApp = function() {
+            alert($scope.activeApp.appName);
+            serverManagerService.addPiDashApp($scope.activeApp, function(res) {
+                $scope.activeApp = buildPiDashAppFromResponse(res.app);
+                alert("App Added!");
+            });
         }
+
 
     });

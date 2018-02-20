@@ -9,6 +9,8 @@ var logger = winston.logger;
 var Process = require('./Process');
 var logonRegister = require('./LogonRegister');
 var account = require('./Account');
+var baseProvider = require('./BaseProvider');
+var piDashAppRoutes = require("./App");
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -38,10 +40,10 @@ app.get('/Dashboard/', validation.requireLogon, function (req, res) {
 });
 app.get('/ServerManager', validation.requireAdmin, function (req, res) {
     res.render('servermanager');
-})
+});
 app.get("/Process/Tester", validation.requireAdmin, function (req, res) {
     res.render('processtester');
-})
+});
 
 /* PiSystem API */
 app.get('/App/System/GetCpus', validation.requireLogon, function (req, res) {
@@ -56,3 +58,15 @@ app.get('/App/System/LoadAverage', validation.requireLogon, function (req, res) 
     res.json(PiSys.getLoadAverage());
 });
 
+/* Start App */
+server.startServer(function(success) {
+    if(!success) {
+        logger.error("Error starting server, shutting down app...");
+        process.exit(-1);
+    }
+
+});
+baseProvider.configureDatabase(function(success) {
+    if(!success)
+        logger.error("Error configuring database...");
+});
