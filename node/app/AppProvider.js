@@ -23,7 +23,7 @@ var getMostRecentAppByDetails = function(appName,startCommand, creatorUserId, ca
         "AppName='" +
         appName+ "' AND startCommand='" +
         startCommand + "' AND creatorUserId='" +
-         creatorUserId + "';";
+         creatorUserId + "' ORDER BY CreateDate DESC;";
 
     runCommand(sqlQuery, function(result) {
         if(callback)

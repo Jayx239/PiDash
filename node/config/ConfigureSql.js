@@ -210,13 +210,12 @@ var createAppPermissionsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE AppPermissions(" +
         "PermissionId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "AppId INT NOT NULL, " +
-        "AdminId INT NOT NULL, " +
+        "UserId INT, " +
         "GroupId INT, " +
         "ReadPermission BIT, " +
         "WritePermission BIT, " +
         "ExecutePermission BIT, " +
-        "FOREIGN KEY(AppId) REFERENCES Apps(AppId), " +
-        "FOREIGN KEY(AdminId) REFERENCES Admins(AdminId));";
+        "FOREIGN KEY(AppId) REFERENCES Apps(AppId));";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {

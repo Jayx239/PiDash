@@ -65,11 +65,15 @@ Process.prototype.getUpTime = function(){
         return Date.now() - this.startTime;
 };
 
-
-
 var buildPiDashAppFromResponse = function(res) {
+
     console.log(res);
-    var jsonRes = JSON.parse(res);
+    var jsonRes;
+    if(typeof res === 'object')
+        jsonRes = res;
+    else
+        jsonRes = JSON.parse(res);
+
     var app = buildAppFromResponse(jsonRes);
     if(res.appPermissions)
         var permissions = buildPermissionsFromResponse(jsonRes);
@@ -80,14 +84,25 @@ var buildPiDashAppFromResponse = function(res) {
     return dashApp;
 };
 
-var buildAppFromResponse = function(res) {
-    if(!res) {
-        return null;
+var buildPiDashAppsFromResponse = function(res) {
+    console.log(res);
+    var jsonRes = JSON.parse(res);
+    var piDashApps = new Object();
+    for(var i=0; i<jsonRes.apps.length; i++) {
+        var piDashApp = buildPiDashAppFromResponse(jsonRes.apps[i]);
+        piDashApps[piDashApp.app.appId] = piDashApp;
     }
-    else {
+    return piDashApps;
+};
+
+var buildAppFromResponse = function(res) {
+    if(res) {
         var logs = buildLogsFromResponse(res);
         var app = new App(res.app.name, res.app.appId,res.app.creatorUserId,res.app.startCommand,logs);
         return app;
+    }
+    else {
+        return null;
     }
 
 };
@@ -128,6 +143,7 @@ module.exports = {
     AppUser: AppUser,
     Process: Process,
     buildPiDashAppFromResponse: buildPiDashAppFromResponse,
+    buildPiDashAppsFromResponse: buildPiDashAppsFromResponse,
     buildAppFromResponse: buildAppFromResponse,
     buildLogsFromResponse: buildLogsFromResponse,
     buildPermissionsFromResponse: buildPermissionsFromResponse,

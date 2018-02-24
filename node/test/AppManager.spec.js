@@ -42,9 +42,9 @@
             });
         });
 
-        describe("'getPiDashAppById'", function() {
+        describe("'getPiDashAppByAppId'", function() {
             it("Function to get PiDashApp by the app id",function() {
-                appManager.getPiDashAppById(0,function(app) {
+                appManager.getPiDashAppByAppId(0,function(app) {
                     app.should.be.a('PiDashApp');
                 });
             });

@@ -32,14 +32,15 @@ var getAppById = function(appId, callback) {
     });
 };
 
-var getPiDashAppById = function(appId, callback) {
+var getPiDashAppByAppId = function(appId, callback) {
     if(ActiveApps[appId]) {
         callback(ActiveApps[appId]);
     }
     else {
         getAppById(appId,function(app) {
             if(!app) {
-                callback(app);
+                if(callback)
+                    callback(app);
                 return;
             }
             getLogsByAppId(appId,function(logs) {
@@ -63,7 +64,7 @@ var getPiDashAppByDetails = function(piDashApp, callback) {
             return;
         }
         else
-            getPiDashAppById(result.firstResult.AppId, callback);
+            getPiDashAppByAppId(result.firstResult.AppId, callback);
     });
 };
 
@@ -93,8 +94,45 @@ var getAppPermissionsByAppId = function(appId, callback) {
             appPermissions.push(appPermission);
         }
 
-        return appPermissions;
+        if(callback)
+            callback(appPermissions);
     });
+};
+
+var getPiDashAppsByUserId = function(userId, callback) {
+    appProvider.getAppsByCreatorUserId(userId, function(results) {
+        var piDashAppIds = [];
+        if(results.results.length > 0) {
+            for(var i=0; i<results.results.length; i++) {
+                piDashAppIds.push(results.results[i].AppId);
+            }
+            var piDashApps = [];
+            getPiDashAppsByAppIds(piDashAppIds, function(piDashApps) {
+                callback(piDashApps);
+            });
+        }
+        else
+            callback([]);
+    })
+};
+var getPiDashAppsByAppIds = function(piDashAppIds, callback) {
+    var outputList = [];
+    createListOperation(piDashAppIds, 0, getPiDashAppByAppId, outputList, function(piDashApps) {
+        callback(piDashApps);
+    });
+};
+
+var createListOperation = function(elementList, currentListIndex, operationFunction, outputList, onComplete) {
+    if(!elementList || currentListIndex >= elementList.length) {
+        onComplete(outputList);
+    }
+    else {
+        operationFunction(elementList[currentListIndex], function(output) {
+            outputList.push(output);
+            currentListIndex = currentListIndex+1;
+            createListOperation(elementList, currentListIndex, operationFunction, outputList, onComplete);
+        });
+    }
 };
 
 /* Creates new PiDashApp from input data and stores it in the db */
@@ -104,7 +142,7 @@ var createPiDashApp = function() {
 
 /* Adds PiDashApp to db */
 var addPiDashApp = function(piDashApp, callback) {
-    addApp(piDashApp,function() {
+    addApp(piDashApp.app,function() {
         appProvider.getMostRecentAppByDetails(piDashApp.app.name, piDashApp.app.startCommand, piDashApp.app.creatorUserId, function(result){
             setAllPiDashAppIds(piDashApp, result.firstResult.AppId);
 
@@ -121,8 +159,8 @@ var addPiDashApp = function(piDashApp, callback) {
 
 var setAllPiDashAppIds = function(piDashApp, appId) {
     piDashApp.app.appId = appId;
-    setAppPermissionsAppId(permissions, appId);
-    setAllLogsAppId(logs,appId);
+    setAppPermissionsAppId(piDashApp.appPermissions, appId);
+    setAllLogsAppId(piDashApp.app.logs,appId);
 };
 
 var setAppPermissionsAppId = function(permissions, appId) {
@@ -140,12 +178,12 @@ var setAllLogsAppId = function(logs,appId) {
 };
 
 var addApp = function(app, callback) {
-    appProvider.addApp(app.creatorUserId, app.appName, app.startCommand, function(result) {
+    appProvider.addApp(app.creatorUserId, app.name, app.startCommand, function(result) {
         if(result.Status === appProvider.Statuses.Error)
             logger.error("Error adding app to db");
         if(callback)
             callback();
-    })
+    });
 };
 
 var addLog = function(log, callback) {
@@ -154,13 +192,13 @@ var addLog = function(log, callback) {
             logger.error("Error adding log");
         if(callback)
             callback();
-    })
+    });
 };
 var addLogs = function(logs,index, callback) {
-    addList(logs,index,addLog,callback);
+    addListOperation(logs,index,addLog,callback);
 };
 
-var addAppPermission = function(appPermission, piDashApp, callback) {
+var addAppPermission = function(appPermission, callback) {
     if(!appPermission) {
         callback();
         return;
@@ -173,7 +211,7 @@ var addAppPermission = function(appPermission, piDashApp, callback) {
     if(appPermission.admin)
         adminId = appPermission.appUser.userId;
 
-    appProvider.addPermissions(piDashApp.app.appId, adminId, appPermission.groupId, appPermission.read, appPermission.write, appPermission.execute, function(result){
+    appProvider.addPermissions(appPermission.appId, adminId, appPermission.groupId, appPermission.read, appPermission.write, appPermission.execute, function(result){
         if(result.firstResult === appProvider.Statuses.Error)
             logger.error("Error adding app permission");
         if(callback)
@@ -182,17 +220,17 @@ var addAppPermission = function(appPermission, piDashApp, callback) {
 };
 
 var addAppPermissions = function(permissions, permissionIndex, callback) {
-   addList(permissionIndex,permissionIndex,addAppPermission,callback);
+    addListOperation(permissionIndex,permissionIndex,addAppPermission,callback);
 };
-var addList = function(elementList, currentListIndex, operationFunction, onComplete) {
-    if(!elementList)
+
+var addListOperation = function(elementList, currentListIndex, operationFunction, onComplete) {
+    if(!elementList || currentListIndex >= elementList.length) {
         onComplete();
-    if(currentListIndex >= elementList.length)
-        onComplete();
+    }
     else {
-        operationFunction(elementList, currentListIndex, function() {
+        operationFunction(elementList[currentListIndex], function() {
             currentListIndex = currentListIndex+1;
-            addList(elementList, currentListIndex,operationFunction,onComplete);
+            addListOperation(elementList, currentListIndex,operationFunction,onComplete);
         });
     }
 };
@@ -212,10 +250,11 @@ module.exports = {
     Process: Process,
     ActiveApps: ActiveApps,
     getAppById: getAppById,
-    getPiDashAppById: getPiDashAppById,
+    getPiDashAppByAppId: getPiDashAppByAppId,
     getPiDashAppByDetails: getPiDashAppByDetails,
     getLogsByAppId: getLogsByAppId,
     getAppPermissionsByAppId: getAppPermissionsByAppId,
+    getPiDashAppsByUserId: getPiDashAppsByUserId,
     addPiDashApp: addPiDashApp,
 
 };

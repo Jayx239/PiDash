@@ -20,7 +20,12 @@ angular.module('PiDashApp.ServerManagerController',[])
 
 
         $scope.setActiveApp = function(index) {
-            $scope.activeApp = $scope.apps[index];
+            $scope.activeApp = $scope.piDashApps[index].app;
+            if(!$scope.activeApp.messages)
+                $scope.activeApp.messages = [];
+            if(!$scope.activeApp.status)
+                $scope.activeApp.status = Statuses.Stopped;
+
         };
 
         $scope.addApplication = function() {
@@ -129,20 +134,38 @@ angular.module('PiDashApp.ServerManagerController',[])
             });
         };
 
-        $scope.retrieveApps = function() {
+        $scope.retrieveApps2 = function() {
             serverManagerService.getPiDashApp("",function(res) {
                 $scope.addApplication();
                 var newApp = buildPiDashAppFromResponse(res);
                 $scope.piDashApps.push(newApp);
-                $scope.activeApp = newApp;
-                $scope.activeApp.appName = newApp.app.name;
-                $scope.activeApp.startCommand = newApp.app.startCommand;
+                //$scope.activeApp = newApp;
+                //$scope.activeApp.appName = newApp.app.name;
+                //$scope.activeApp.startCommand = newApp.app.startCommand;
+            });
+        };
+
+        $scope.retrieveApps = function() {
+            serverManagerService.getPiDashApps(function(res) {
+                //$scope.addApplication();
+                if(res) {
+                    //for(var i=0; i<res.apps.length; i++) {
+                        var userApps = buildPiDashAppsFromResponse(res);
+                        if(userApps)
+                            for( var i in userApps)
+                                $scope.piDashApps[userApps[i].app.appId] = userApps[i];
+                }
+
+                //$scope.piDashApps.push(newApp);
+                //$scope.activeApp = newApp;
+                //$scope.activeApp.appName = newApp.app.name;
+                //$scope.activeApp.startCommand = newApp.app.startCommand;
             });
         };
 
         $scope.addPiDashApp = function() {
             alert($scope.activeApp.appName);
-            serverManagerService.addPiDashApp($scope.activeApp, function(res) {
+            serverManagerService.addPiDashApp($scope.piDashApps[0], function(res) {
                 $scope.activeApp = buildPiDashAppFromResponse(res.app);
                 alert("App Added!");
             });

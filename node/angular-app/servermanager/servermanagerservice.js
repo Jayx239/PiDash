@@ -63,7 +63,8 @@ angular.module('PiDashApp.ServerManagerService',[])
             $.ajax({
                 method: "POST",
                 url: "/App/AddApp",
-                data: JSON.stringify(piDashApp)
+                data: {json: JSON.stringify(piDashApp)},
+                dataType: 'json'
             }).done(function(res) {
                 callback(res);
                 if(res.Status === "Error") {
@@ -76,6 +77,18 @@ angular.module('PiDashApp.ServerManagerService',[])
             $.ajax({
                 method: "POST",
                 url: "/App/GetApp"
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+        serverManagerApi.getPiDashApps = function(callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/GetAppsByUserId"
             }).done(function(res) {
                 callback(res);
                 if(res.Status === "Error") {
