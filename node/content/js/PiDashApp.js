@@ -135,6 +135,14 @@ var buildProcessesFromResponse = function(res) {
     return processes;
 };
 
+var createDefaultPiDashApp = function(userName, userId) {
+    var app = new App("",-1,-1,"",[]);
+    var appUser = new AppUser(userName, userId);
+    var appPermissions = [new AppPermission(-1,-1,appUser,true,-1,true,true,true)];
+    var piDAshApp = new PiDashApp(app,appPermissions, new Object());
+    return piDAshApp;
+};
+
 module.exports = {
     PiDashApp: PiDashApp,
     App: App,
@@ -147,5 +155,6 @@ module.exports = {
     buildAppFromResponse: buildAppFromResponse,
     buildLogsFromResponse: buildLogsFromResponse,
     buildPermissionsFromResponse: buildPermissionsFromResponse,
-    buildProcessesFromResponse: buildProcessesFromResponse
+    buildProcessesFromResponse: buildProcessesFromResponse,
+    createDefaultPiDashApp: createDefaultPiDashApp
 };

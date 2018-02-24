@@ -73,6 +73,18 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
+        serverManagerApi.getUser = function(callback) {
+            $.ajax({
+                method: "POST",
+                url: "/LogonRegister/User"
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
         serverManagerApi.getPiDashApp = function(appId ,callback) {
             $.ajax({
                 method: "POST",

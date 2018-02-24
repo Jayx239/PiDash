@@ -2,7 +2,7 @@ var winston = require('./Logger');
 var logger = winston.logger;
 var server = require('./Server');
 var app = server.app;
-var provider = require('./Provider');
+var provider = require('./CredentialProvider');
 var validation = require('./Validation');
 
 
@@ -89,8 +89,13 @@ app.get("/LogonRegister/User", validation.requireLogon, function(req,res) {
 
 app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
 
-    if(req.body.UserId) {
-        provider.getUserByUserId(req.body.UserId,function(result) {
+    var response = new Object();
+    response.userName = req.user;
+    response.userId = req.userId;
+    res.json(response);
+
+    /*if(req.user) {
+        provider.getUserByUserId(req.user,function(result) {
             if(result.status === provider.Statuses.Error || result.results.length < 1) {
                 logger.error("/LogonRegister/User: Error getting user details");
                 res.json({status:'error'});
@@ -98,12 +103,12 @@ app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
             else {
                 var response = new Object();
                 response.userName = result.firstResult.UserName;
-                response.userId = req.body.UserId;
+                response.userId = req.user;
                 res.json(response);
             }
         });
     }
-    else if(req.body.UserName) {
+    else if(req.) {
         provider.getUserByUserName(req.body.UserName,function(result) {
             if(result.status === provider.Statuses.Error || result.results.length < 1) {
                 logger.error("/LogonRegister/User: Error getting user details");
@@ -119,5 +124,5 @@ app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
     }
     else {
         res.json({status:"error"});
-    }
+    }*/
 });

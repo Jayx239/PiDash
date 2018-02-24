@@ -1,7 +1,7 @@
 const baseProvider = require('./BaseProvider');
 var logger = baseProvider.logger;
 var validation = require('./Validation');
-var provider = require('./Provider');
+var provider = require('./CredentialProvider');
 var Statuses = baseProvider.Statuses;
 
 /* Function for running sql commands */
