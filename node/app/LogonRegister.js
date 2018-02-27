@@ -26,6 +26,7 @@ app.post("/LogonRegister/Logon", function (req, res) {
             if (validation.validateUserPassword(req.body.Password, returnObject.results[0].Hash, returnObject.results[0].Salt)) {
                 req.session.user = req.body.UserName;
                 req.session.userId = returnObject.firstResult.UserId;
+                req.session.sessionToken = validation.genRandomString(16);
                 req.body.user = req.body.UserName;
                 provider.getAdminByUserName(req.body.UserName, function (returnObject) {
                     if (returnObject.Status !== provider.Statuses.Error && returnObject.results.length > 0) {
@@ -74,7 +75,6 @@ app.post("/LogonRegister/Register", function (req, res) {
                         }
 
                     });
-
                 }
             });
 });
@@ -94,7 +94,8 @@ app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
     response.userId = req.userId;
     res.json(response);
 
-    /*if(req.user) {
+    /*
+    if(req.user) {
         provider.getUserByUserId(req.user,function(result) {
             if(result.status === provider.Statuses.Error || result.results.length < 1) {
                 logger.error("/LogonRegister/User: Error getting user details");

@@ -109,6 +109,19 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
+        serverManagerApi.deletePiDashApp = function(appId, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/DeleteAppByAppId",
+                data: { "appId": appId}
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
 
         return serverManagerApi;
     });

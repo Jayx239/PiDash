@@ -22,7 +22,7 @@ var getAppById = function(appId, callback) {
         return;
     }
     appProvider.getAppByAppId(appId,function(result) {
-        if(result.status === appProvider.Statuses.Error || result.results.length < 1) {
+        if(result.status === appProvider.Statuses.Error || result.results.length < 1 || result.firstResult.Active[0] == 0) {
             callback(null);
         }
         else {
@@ -35,6 +35,7 @@ var getAppById = function(appId, callback) {
 var getPiDashAppByAppId = function(appId, callback) {
     if(ActiveApps[appId]) {
         callback(ActiveApps[appId]);
+        return;
     }
     else {
         getAppById(appId,function(app) {
@@ -60,6 +61,10 @@ var getPiDashAppByDetails = function(piDashApp, callback) {
     appProvider.getMostRecentAppByDetails(piDashApp.app.name, piDashApp.app.startCommand, piDashApp.app.creatorUserId, function(result) {
         if(result.status === appProvider.Statuses.Error) {
             logger.error("Error retrieving PiDashApp by details");
+            callback(null);
+            return;
+        }
+        else if(result.firstResult.Active[0] == 0) {
             callback(null);
             return;
         }
@@ -90,7 +95,11 @@ var getAppPermissionsByAppId = function(appId, callback) {
 
         var appPermissions = [];
         for(var i=0; i<result.results.length; i++) {
-            var appPermission = AppPermission(result.results[i]);
+            var user;
+            // TODO: implement logic for getting AppUser from userId
+            if(result.results[i].UserId)
+                user = getAppUserByUserId(result.results[i].UserId);
+            var appPermission = new AppPermission(result.results[i].PermissionId,result.results[i].AppId, user, result.results[i].GroupId, result.results[i].ReadPermission, result.results[i].WritePermission, result.results[i].ExecutePermission);
             appPermissions.push(appPermission);
         }
 
@@ -99,12 +108,18 @@ var getAppPermissionsByAppId = function(appId, callback) {
     });
 };
 
+// TODO: implement logic for getting full AppUser
+var getAppUserByUserId = function(userId) {
+    return new piDashApp.AppUser(null,userId);
+};
+
 var getPiDashAppsByUserId = function(userId, callback) {
     appProvider.getAppsByCreatorUserId(userId, function(results) {
         var piDashAppIds = [];
         if(results.results.length > 0) {
             for(var i=0; i<results.results.length; i++) {
-                piDashAppIds.push(results.results[i].AppId);
+                if(results.results[i].Active[0] == 1)
+                    piDashAppIds.push(results.results[i].AppId);
             }
             var piDashApps = [];
             getPiDashAppsByAppIds(piDashAppIds, function(piDashApps) {
@@ -205,13 +220,11 @@ var addAppPermission = function(appPermission, callback) {
     }
 
 
-    var adminId = null;
+
     var groupId = appPermission.groupId;
+    var userId = appPermission.appUser.userId;
 
-    if(appPermission.admin)
-        adminId = appPermission.appUser.userId;
-
-    appProvider.addPermissions(appPermission.appId, adminId, appPermission.groupId, appPermission.read, appPermission.write, appPermission.execute, function(result){
+    appProvider.addPermissions(appPermission.appId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write),booleanToDatabaseBoolean(appPermission.execute), function(result){
         if(result.firstResult === appProvider.Statuses.Error)
             logger.error("Error adding app permission");
         if(callback)
@@ -220,7 +233,7 @@ var addAppPermission = function(appPermission, callback) {
 };
 
 var addAppPermissions = function(permissions, permissionIndex, callback) {
-    addListOperation(permissionIndex,permissionIndex,addAppPermission,callback);
+    addListOperation(permissions,permissionIndex,addAppPermission,callback);
 };
 
 var addListOperation = function(elementList, currentListIndex, operationFunction, onComplete) {
@@ -239,7 +252,26 @@ var addProcess = function() {
 
 };
 
+var booleanToDatabaseBoolean = function(value) {
+    if(value)
+        return 1;
+    else
+        return 0;
+};
 
+var deleteAppByAppId = function(appId, callback) {
+    delete ActiveApps[appId];
+    appProvider.deleteAppByAppId(appId,callback);
+
+};
+
+var deleteAppPermissionByPermissionId = function(permissionId, callback) {
+    appProvider.deleteAppPermissionByPermissionId(permissionId,callback)
+};
+
+var deleteAppLogByLogId = function(logId, callback) {
+    appProvider.deleteAppLogByLogId(logId,callback);
+};
 
 module.exports = {
     PiDashApp: PiDashApp,
@@ -256,5 +288,7 @@ module.exports = {
     getAppPermissionsByAppId: getAppPermissionsByAppId,
     getPiDashAppsByUserId: getPiDashAppsByUserId,
     addPiDashApp: addPiDashApp,
-
+    deleteAppByAppId: deleteAppByAppId,
+    deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
+    deleteAppLogByLogId: deleteAppLogByLogId
 };

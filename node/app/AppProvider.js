@@ -116,7 +116,73 @@ var addApp = function (creatorUserId, appName, startCommand, callback) {
 };
 
 
-var addPermissions = function (appId, adminId, groupId, read, write, execute, callback) {
+var addPermissions = function (appId, userId, groupId, read, write, execute, callback) {
+
+    var sqlQuery = "INSERT INTO AppPermissions(AppId, UserId, GroupId, ReadPermission, WritePermission, ExecutePermission) " +
+        "VALUES(" + appId + ", " + userId + ", " + groupId + ", " + read + ", " + write + ", " + execute + ");";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+var addLogs = function (appId, path, logName, callback) {
+    var sqlQuery = "INSERT INTO AppPermissions(LogId, AppId, Path, LogName) " +
+        "VALUES(" + appId + ", '" + path + "', '" + logName + "');";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+/* Delete functions */
+var deleteAppByAppId = function(appId, callback) {
+    var sqlQuery = "UPDATE Apps SET Active=0 WHERE AppId=" + appId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+var deleteAppPermissionByPermissionId = function(permissionId, callback) {
+    var sqlQuery = "UPDATE AppPermissions SET Active=0 WHERE PermissionId=" + permissionId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+var deleteAppLogByLogId = function(logId, callback) {
+    var sqlQuery = "UPDATE AppLogs SET Active=0 WHERE LogId=" + logId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+/* Update functions */
+var updateApp = function (appId, appName, startCommand, callback) {
+    provider.getUserByUserId(creatorUserId, function (result) {
+        if (result.status === Statuses.Error || result.results.length < 0) {
+            logger.log('debug', 'Invalid user id');
+            if(callback)
+                callback(result);
+            return;
+        }
+        else {
+            var sqlQuery = "INSERT INTO Apps(CreatorUserId,AppName,StartCommand) " +
+                "VALUES(" + creatorUserId + ",'" + appName + "','" + startCommand + "');";
+            runCommand(sqlQuery, function (result) {
+                if(callback)
+                    callback(result);
+
+            });
+        }
+    })
+};
+
+
+var updatePermissions = function (appId, adminId, groupId, read, write, execute, callback) {
 
     var sqlQuery = "INSERT INTO AppPermissions(AppId, AdminId, GroupId, ReadPermission, WritePermission, ExecutePermission) " +
         "VALUES(" + appId + ", " + adminId + ", " + groupId + ", " + read + ", " + write + ", " + execute + ");";
@@ -126,7 +192,7 @@ var addPermissions = function (appId, adminId, groupId, read, write, execute, ca
     });
 };
 
-var addLogs = function (appId, path, logName, callback) {
+var updateLogs = function (appId, path, logName, callback) {
     var sqlQuery = "INSERT INTO AppPermissions(LogId, AppId, Path, LogName) " +
         "VALUES(" + appId + ", '" + path + "', '" + logName + "');";
     runCommand(sqlQuery, function (result) {
@@ -148,5 +214,8 @@ module.exports = {
     getLogsByAppId: getLogsByAppId,
     addApp : addApp,
     addPermissions : addPermissions,
-    addLogs : addLogs
+    addLogs : addLogs,
+    deleteAppByAppId: deleteAppByAppId,
+    deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
+    deleteAppLogByLogId: deleteAppLogByLogId
 };

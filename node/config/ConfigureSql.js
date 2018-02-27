@@ -145,6 +145,7 @@ var createGroupsTable = function (sqlConn, callback) {
         "GroupId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
         "CreatorUserId INT NOT NULL, " +
         "GroupName VARCHAR(36), " +
+        "Active BOOL DEFAULT 1, " +
         "FOREIGN KEY(CreatorUserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
@@ -166,7 +167,7 @@ var createAdminsTable = function (sqlConn, callback) {
         "LastUpdate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "CreateDate DATETIME DEFAULT CURRENT_TIMESTAMP, " +
         "GroupId INT, " +
-        "Active bool, " +
+        "Active BOOL DEFAULT 1, " +
         "FOREIGN KEY(UserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
@@ -190,7 +191,7 @@ var createAppsTable = function (sqlConn, callback) {
         "CreatorUserId INT NOT NULL, " +
         "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
-        "FOREIGN KEY(CreatorUserId) REFERENCES Users(UserId));";
+        "Active BIT DEFAULT 1);";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
@@ -215,6 +216,7 @@ var createAppPermissionsTable = function (sqlConn, callback) {
         "ReadPermission BIT, " +
         "WritePermission BIT, " +
         "ExecutePermission BIT, " +
+        "Active BOOL DEFAULT 1, " +
         "FOREIGN KEY(AppId) REFERENCES Apps(AppId));";
 
     sqlConn.query(query, function (err, result, fields) {
@@ -237,7 +239,7 @@ var createAppLogsTable = function (sqlConn, callback) {
         "AppId INT NOT NULL, " +
         "Path VARCHAR(256), " +
         "LogName VARCHAR(256), " +
-        "FOREIGN KEY(AppId) REFERENCES Apps(AppId))";
+        "Active BOOL DEFAULT 1)";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {

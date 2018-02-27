@@ -37,13 +37,6 @@ app.use(function (req, res, next) {
         res.locals.user = req.session.user;
         if (req.session.admin)
             req.admin = req.session.admin;
-        if (req.session.sesh && req.session.expires && req.session.sessionToken) {
-            var cookieExp = new Date(req.session.expires);
-            if (cookieExp.getTime() < new Date(Date.now()).getTime()) {
-                delete req.session.sesh;
-                delete req.session.sessionToken;
-            }
-        }
     }
     next();
 });

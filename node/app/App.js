@@ -49,6 +49,14 @@ app.post("/App/AddApp", validation.requireLogon, function(req,res) {
     var piDashApp = createAppFromRequest(req);
     var result = new Object();
     if(piDashApp) {
+        /* Apps with appId > 0 should already exist in database */
+        if(piDashApp.app.appId > 0) {
+            result.status = "error";
+            result.message = "App already exists";
+            res.json(result);
+            return;
+        }
+
         if (!piDashApp.app.creatorUserId || piDashApp.app.creatorUserId === '') {
             piDashApp.creatorUserId = req.userId;
         }
@@ -74,8 +82,27 @@ app.post("/App/AddApp", validation.requireLogon, function(req,res) {
         result.status = "error";
         res.json(result);
     }
+});
 
+app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
+    var piDashApp = createAppFromRequest(req);
+    var result = new Object();
+    if(piDashApp) {
+        /* Apps with appId < 0 should not already exist in database */
+        if(piDashApp.app.appId < 0) {
+            result.status = "error";
+            result.message = "App does not exist";
+            res.json(result);
+            return;
+        }
+        else {
 
+        }
+    }
+    else {
+        result.status = "error";
+        res.json(result);
+    }
 });
 
 app.post("/App/GetApp", validation.requireAdmin, function(req,res) {
@@ -100,6 +127,22 @@ app.post("/App/GetAppsByUserId", validation.requireAdmin, function(req,res) {
         }
         res.json(JSON.stringify(response));
     });
+});
+
+app.post("/App/DeleteAppByAppId", validation.requireAdmin, function(req,res) {
+    var appId = req.body.appId;
+    appManager.deleteAppByAppId(appId,function(result) {
+        var result = new Object();
+
+        // TODO: don't hardcode error
+        if(result.status === "Error") {
+            result.status = "Error";
+        }
+        else {
+            result.status = "Success";
+        }
+        res.json(result);
+    })
 });
 
 var createAppFromRequest = function(req) {

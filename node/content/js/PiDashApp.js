@@ -30,11 +30,10 @@ function AppLog(logId, appId, path, name) {
 }
 
 
-function AppPermission(permissionId, appId, appUser, isAdmin, groupId, read, write, execute) {
+function AppPermission(permissionId, appId, appUser, groupId, read, write, execute) {
     this.permissionId = permissionId;
     this.appId = appId;
     this.appUser = appUser;
-    this.admin = isAdmin;
     this.groupId = groupId;
     this.read = read;
     this.write = write;
@@ -120,7 +119,8 @@ var buildPermissionsFromResponse = function(res) {
     var permissions = [];
     for(var i=0; i <res.appPermissions.length; i++){
         var permission = res.appPermissions[i];
-        permissions.push(new AppPermission(permission.permissionId,res.app.appId,permission.appUser,permission.admin,permission.groupId,permission.read, permission.write,permission.execute));
+        if(permission && permission.appUser)
+            permissions.push(new AppPermission(permission.permissionId, res.app.appId, new AppUser(permission.appUser.userName, permission.appUser.userId), permission.groupId, permission.read, permission.write, permission.execute));
     }
     return permissions;
 };
@@ -136,9 +136,9 @@ var buildProcessesFromResponse = function(res) {
 };
 
 var createDefaultPiDashApp = function(userName, userId) {
-    var app = new App("",-1,-1,"",[]);
+    var app = new App("",-1,userId,"",[]);
     var appUser = new AppUser(userName, userId);
-    var appPermissions = [new AppPermission(-1,-1,appUser,true,-1,true,true,true)];
+    var appPermissions = [new AppPermission(-1, -1, appUser, -1, true, true, true)];
     var piDAshApp = new PiDashApp(app,appPermissions, new Object());
     return piDAshApp;
 };
