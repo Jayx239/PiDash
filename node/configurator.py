@@ -6,7 +6,7 @@ def prompt(promptText):
     if isVersion3:
         return input(promptText);
     else:
-        return raw_input(prompt);
+        return raw_input(promptText);
 
 configPath = './config/'
 standardConfigFileName = "sql.config"
