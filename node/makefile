@@ -1,5 +1,5 @@
 .SILENT:
-all: makedirs npminstall
+all: makedirs npminstall configurator
 
 npminstall:
 	npm install
