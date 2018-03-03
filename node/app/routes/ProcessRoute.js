@@ -1,9 +1,9 @@
-const server = require('./Server');
+const server = require('../Server');
 const express = server.express;
 const app = server.app;
 const fs = require('fs');
-const helpers = require('./Helpers');
-var winston = require('./Logger');
+const helpers = require('../Helpers');
+var winston = require('../Logger');
 var logger = winston.logger;
 
 const {exec} = require('child_process');
@@ -12,6 +12,9 @@ const execFile = require('child_process').execFile;
 
 /* Stores process information for spawned processes */
 var processes = [];
+
+/* Timeout for killing child process's */
+var killTimeout = 3000;
 
 /* Console signal codes */
 var STDIN = "stdin";//0;
@@ -112,11 +115,15 @@ app.post("/Process/Command/", function (req, res) {
 /* Action to kill a process */
 app.post("/Process/Kill/", function (req, res) {
     var pid = req.body.pid;
-    var command = "kill " + pid;
+    var command = "pkill -P " + pid; //"kill " + pid;
     logger.log('debug', "Killing process, Pid: " + pid);
-    var childProcess = exec(command);
-    var retVal = childProcess.returnValue;
-    var response = {"Status": retVal};
+    var childProcess = setTimeout(exec(command),killTimeout);
+    var childRetVal = childProcess.returnValue;
+    console.log("killing");
+    var parentCommand = "kill " + pid;
+    var parentProcess = exec(parentCommand);
+    var parentRetVal = parentProcess.returnValue;
+    var response = {"Status": "Unknown" };
     res.json(response);
 
 });

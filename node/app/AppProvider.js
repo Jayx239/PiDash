@@ -162,23 +162,36 @@ var deleteAppLogByLogId = function(logId, callback) {
 
 /* Update functions */
 var updateApp = function (appId, appName, startCommand, callback) {
-    provider.getUserByUserId(creatorUserId, function (result) {
-        if (result.status === Statuses.Error || result.results.length < 0) {
-            logger.log('debug', 'Invalid user id');
-            if(callback)
-                callback(result);
-            return;
-        }
-        else {
-            var sqlQuery = "INSERT INTO Apps(CreatorUserId,AppName,StartCommand) " +
-                "VALUES(" + creatorUserId + ",'" + appName + "','" + startCommand + "');";
-            runCommand(sqlQuery, function (result) {
+    if(appName) {
+        updateAppName(appName,appId,function(result) {
+            updateAppStartCommand(startCommand,appId,function(result) {
                 if(callback)
-                    callback(result);
-
+                    callback();
             });
-        }
-    })
+        });
+    }
+    else {
+        updateAppStartCommand(startCommand,appId,function(result) {
+            if(callback)
+                callback();
+        })
+    }
+};
+
+var updateAppName = function(appName, appId, callback) {
+    var sqlQuery = "UPDATE Apps SET AppName='" + appName + "' WHERE appId=" + appId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
+var updateAppStartCommand = function(appStartCommand, appId, callback) {
+    var sqlQuery = "UPDATE Apps SET StartCommand='" + appStartCommand + "' WHERE appId=" + appId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
 };
 
 
@@ -217,5 +230,6 @@ module.exports = {
     addLogs : addLogs,
     deleteAppByAppId: deleteAppByAppId,
     deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
-    deleteAppLogByLogId: deleteAppLogByLogId
+    deleteAppLogByLogId: deleteAppLogByLogId,
+    updateApp: updateApp
 };

@@ -1,10 +1,10 @@
-const appManager = require('./AppManager');
-const server = require('./Server');
-const piDashApp = require('../content/js/PiDashApp');
-const validation = require('./Validation');
+const appManager = require('../AppManager');
+const server = require('../Server');
+const piDashApp = require('../../content/js/PiDashApp');
+const validation = require('../Validation');
 const app = server.app;
-
-
+const script = require("../../content/js/Script");
+const fs = require('fs');
 /*
     App.json
     {
@@ -96,7 +96,11 @@ app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
             return;
         }
         else {
-
+            appManager.updatePiDashApp(piDashApp,function() {
+                result.status = "Unknown";
+                result.message = "Validation not yet implemented";
+                res.json(result);
+            });
         }
     }
     else {
@@ -145,15 +149,40 @@ app.post("/App/DeleteAppByAppId", validation.requireAdmin, function(req,res) {
     })
 });
 
+app.post("/App/SaveScript", function(req,res) {
+    var appScript = script.buildScriptFromRequest(req.body);
+    var result = Object();
+    if(appScript) {
+        var path = "./programs/scripts/" + appScript.appName + ".run";
+        fs.writeFile(path, appScript.getScriptContents(),function(err) {
+            if(err) {
+                result.status = "Error";
+            }
+            else {
+                fs.chmod(path,fs.constants.S_IRUSR|fs.constants.S_IWUSR|fs.constants.S_IXUSR,function(err){
+                    if(err)
+                        result.status = "Error";
+                    else
+                        result.status = "Success";
+                });
+            }
+            res.json(result);
+        });
+    }
+    else {
+        result.status = "Error";
+        result.message = "Invalid script details";
+        res.json(result)
+    }
+});
+
 var createAppFromRequest = function(req) {
     var jsonReq = JSON.parse(req.body.json);
-    //jsonReq.app.creatorUserId = req.userId;
-    //console.log(JSON.stringify(jsonReq));
-    //console.log(jsonReq.app);
 
     var app = piDashApp.buildAppFromResponse(jsonReq);
     var permissions;
     var processes;
+
     if(jsonReq.appPermissions)
         permissions = piDashApp.buildPermissionsFromResponse(jsonReq);
     else

@@ -29,7 +29,6 @@ function AppLog(logId, appId, path, name) {
     this.name = name;
 }
 
-
 function AppPermission(permissionId, appId, appUser, groupId, read, write, execute) {
     this.permissionId = permissionId;
     this.appId = appId;
@@ -66,18 +65,15 @@ Process.prototype.getUpTime = function(){
 
 var buildPiDashAppFromResponse = function(res) {
 
-    console.log(res);
-    var jsonRes;
-    if(typeof res === 'object')
-        jsonRes = res;
-    else
-        jsonRes = JSON.parse(res);
+    var jsonRes = tryParseJson(res);
 
     var app = buildAppFromResponse(jsonRes);
-    if(res.appPermissions)
-        var permissions = buildPermissionsFromResponse(jsonRes);
-    if(res.processes)
-        var processes = buildProcessesFromResponse(jsonRes);
+    var permissions;
+    var processes;
+    if(jsonRes.appPermissions)
+        permissions = buildPermissionsFromResponse(jsonRes);
+    if(jsonRes.processes)
+        processes = buildProcessesFromResponse(jsonRes);
     var dashApp = new PiDashApp(app,permissions,processes);
 
     return dashApp;
@@ -85,7 +81,7 @@ var buildPiDashAppFromResponse = function(res) {
 
 var buildPiDashAppsFromResponse = function(res) {
     console.log(res);
-    var jsonRes = JSON.parse(res);
+    var jsonRes = tryParseJson(res);
     var piDashApps = new Object();
     for(var i=0; i<jsonRes.apps.length; i++) {
         var piDashApp = buildPiDashAppFromResponse(jsonRes.apps[i]);
@@ -106,7 +102,7 @@ var buildAppFromResponse = function(res) {
 
 };
 
-var buildLogsFromResponse = function(res){
+var buildLogsFromResponse = function(res) {
     var logs = [];
     for(var i=0; i<res.app.logs.length; i++) {
         var log = res.app.logs[i];
@@ -143,18 +139,29 @@ var createDefaultPiDashApp = function(userName, userId) {
     return piDAshApp;
 };
 
-module.exports = {
-    PiDashApp: PiDashApp,
-    App: App,
-    AppLog: AppLog,
-    AppPermission: AppPermission,
-    AppUser: AppUser,
-    Process: Process,
-    buildPiDashAppFromResponse: buildPiDashAppFromResponse,
-    buildPiDashAppsFromResponse: buildPiDashAppsFromResponse,
-    buildAppFromResponse: buildAppFromResponse,
-    buildLogsFromResponse: buildLogsFromResponse,
-    buildPermissionsFromResponse: buildPermissionsFromResponse,
-    buildProcessesFromResponse: buildProcessesFromResponse,
-    createDefaultPiDashApp: createDefaultPiDashApp
+var tryParseJson = function(res) {
+    var jsonRes;
+    if((typeof res) == 'string')
+        jsonRes = JSON.parse(res);
+    else
+        jsonRes = res;
+
+    return jsonRes;
+
 };
+if(typeof module != 'undefined' && module.exports)
+    module.exports = {
+        PiDashApp: PiDashApp,
+        App: App,
+        AppLog: AppLog,
+        AppPermission: AppPermission,
+        AppUser: AppUser,
+        Process: Process,
+        buildPiDashAppFromResponse: buildPiDashAppFromResponse,
+        buildPiDashAppsFromResponse: buildPiDashAppsFromResponse,
+        buildAppFromResponse: buildAppFromResponse,
+        buildLogsFromResponse: buildLogsFromResponse,
+        buildPermissionsFromResponse: buildPermissionsFromResponse,
+        buildProcessesFromResponse: buildProcessesFromResponse,
+        createDefaultPiDashApp: createDefaultPiDashApp
+    };

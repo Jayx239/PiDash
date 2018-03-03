@@ -1,4 +1,4 @@
-const process = require('./Process');
+const process = require('./routes/ProcessRoute');
 const appProvider = require("./AppProvider");
 const logger = require('./Logger').logger;
 const piDashApp = require('../content/js/PiDashApp');
@@ -14,11 +14,13 @@ var Process = piDashApp.Process;
 
 /* Process management functions */
 ActiveApps = [];
+var getAppById = function (appId, callback) {
+    getAppByIdExtended(appId, false, callback);
+};
 
-var getAppById = function(appId, callback) {
-
-    if(ActiveApps[appId]) {
-        callback(ActiveApps[appId]);
+var getAppByIdExtended = function(appId, noCache, callback) {
+    if(!noCache && ActiveApps[appId]) {
+        callback(ActiveApps[appId].app);
         return;
     }
     appProvider.getAppByAppId(appId,function(result) {
@@ -33,19 +35,23 @@ var getAppById = function(appId, callback) {
 };
 
 var getPiDashAppByAppId = function(appId, callback) {
-    if(ActiveApps[appId]) {
+    getPiDashAppByAppIdExtended(appId, false, callback);
+};
+
+var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
+    if(!noCache && ActiveApps[appId]) {
         callback(ActiveApps[appId]);
         return;
     }
     else {
-        getAppById(appId,function(app) {
+        getAppByIdExtended(appId, true, function(app) {
             if(!app) {
                 if(callback)
                     callback(app);
                 return;
             }
             getLogsByAppId(appId,function(logs) {
-                app.setLogs(logs);
+                app.logs = logs;
                 getAppPermissionsByAppId(appId,function(permissions) {
 
                     var newApp = new PiDashApp(app,permissions,[]);
@@ -259,6 +265,7 @@ var booleanToDatabaseBoolean = function(value) {
         return 0;
 };
 
+/* Delete functions */
 var deleteAppByAppId = function(appId, callback) {
     delete ActiveApps[appId];
     appProvider.deleteAppByAppId(appId,callback);
@@ -271,6 +278,24 @@ var deleteAppPermissionByPermissionId = function(permissionId, callback) {
 
 var deleteAppLogByLogId = function(logId, callback) {
     appProvider.deleteAppLogByLogId(logId,callback);
+};
+
+/* Update functions */
+var updatePiDashApp = function(piDashApp,callback) {
+    updateApp(piDashApp.app.appId, piDashApp.app.name, piDashApp.app.startCommand, function() {
+        if(callback)
+            callback();
+    });
+};
+
+var updateApp = function(appId, appName, appStartCommand, callback) {
+    // TODO: Validate user has permission to update app
+    appProvider.updateApp(appId,appName,appStartCommand,function() {
+        getPiDashAppByAppIdExtended(appId, true, function(newPiDashApp) {
+        if(callback)
+            callback();
+        });
+    })
 };
 
 module.exports = {
@@ -290,5 +315,6 @@ module.exports = {
     addPiDashApp: addPiDashApp,
     deleteAppByAppId: deleteAppByAppId,
     deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
-    deleteAppLogByLogId: deleteAppLogByLogId
+    deleteAppLogByLogId: deleteAppLogByLogId,
+    updatePiDashApp: updatePiDashApp
 };

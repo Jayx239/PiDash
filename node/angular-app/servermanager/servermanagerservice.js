@@ -122,6 +122,34 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
+        serverManagerApi.updatePiDashApp = function(piDashApp, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/UpdateApp",
+                data: {json: JSON.stringify(piDashApp)},
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+
+        serverManagerApi.saveScript = function(script, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/SaveScript",
+                data: {json: JSON.stringify(script)},
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
 
         return serverManagerApi;
     });

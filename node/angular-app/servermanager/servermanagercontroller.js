@@ -186,41 +186,38 @@ angular.module('PiDashApp.ServerManagerController',[])
             });
         };
 
-        $scope.retrieveApps2 = function() {
-            serverManagerService.getPiDashApp("",function(res) {
-                $scope.addApplication();
-                var newApp = buildPiDashAppFromResponse(res);
-                $scope.piDashApps.push(newApp);
-                //$scope.activeApp = newApp;
-                //$scope.activeApp.appName = newApp.app.name;
-                //$scope.activeApp.startCommand = newApp.app.startCommand;
-            });
-        };
-
         $scope.retrieveApps = function() {
             serverManagerService.getPiDashApps(function(res) {
-                //$scope.addApplication();
                 if(res) {
-                    //for(var i=0; i<res.apps.length; i++) {
                         var userApps = buildPiDashAppsFromResponse(res);
                         if(userApps)
                             for( var i in userApps)
                                 $scope.piDashApps[userApps[i].app.appId] = userApps[i];
                 }
-
-                //$scope.piDashApps.push(newApp);
-                //$scope.activeApp = newApp;
-                //$scope.activeApp.appName = newApp.app.name;
-                //$scope.activeApp.startCommand = newApp.app.startCommand;
             });
         };
 
         $scope.addPiDashApp = function() {
-            serverManagerService.addPiDashApp($scope.piDashApps[$scope.activeApp.appId], function(res) {
+            var activePiDashApp = $scope.piDashApps[$scope.activeApp.appId];
+            if(activePiDashApp.app.appId <= 0)
+                addPiDashApp(activePiDashApp);
+            else
+                updatePiDashApp(activePiDashApp);
+        };
+
+        var addPiDashApp = function(piDashApp) {
+            serverManagerService.addPiDashApp(piDashApp, function(res) {
                 $scope.activeApp = buildPiDashAppFromResponse(res.app);
                 alert("App Added!");
             });
-        }
+        };
+
+        var updatePiDashApp = function(piDashApp) {
+            serverManagerService.updatePiDashApp(piDashApp, function(res) {
+
+            });
+        };
+
 
 
     });

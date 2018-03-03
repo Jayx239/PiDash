@@ -6,11 +6,11 @@ var winston = require('./Logger');
 var PiSys = require('./PiSystem');
 /* Get configured winston logger */
 var logger = winston.logger;
-var Process = require('./Process');
-var logonRegister = require('./LogonRegister');
+var Process = require('./routes/ProcessRoute');
+var logonRegister = require('./routes/LogonRegisterRoute');
 var account = require('./Account');
 var baseProvider = require('./BaseProvider');
-var piDashAppRoutes = require("./App");
+var piDashAppRoutes = require("./routes/PiDashAppRoute");
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
