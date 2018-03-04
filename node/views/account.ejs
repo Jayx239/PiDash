@@ -15,6 +15,9 @@
 <div class="panel">
     <div class="panel-body">
         <% include partials/resetpassword %>
+    <% if(admin) { %>
+        <% include partials/adminprivileges%>
+        <%}%>
     </div>
 </div>
 <% include partials/footer %>

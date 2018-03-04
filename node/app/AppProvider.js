@@ -31,6 +31,14 @@ var getMostRecentAppByDetails = function(appName,startCommand, creatorUserId, ca
     })
 };
 
+var getAppsByUserId = function(userId, callback) {
+    var sqlQuery = "SELECT A.* FROM Apps A INNER JOIN AppPermissions P ON P.AppId=A.AppId WHERE P.UserId=" + userId + ";";
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
+};
+
 var getAppsByCreatorUserId = function (userId, callback) {
     var sqlQuery = "SELECT * FROM Apps WHERE CreatorUserId=" + userId + ";";
 
@@ -59,7 +67,7 @@ var getAllAppsForUserId = function (userId, callback) {
 };
 
 var getPermissionByPermissionId = function (permissionId, callback) {
-    var sqlQuery = "SELECT * FROM AppPermissions WHERE PermissionId=" + permissionId + ";";
+    var sqlQuery = "SELECT AP.*, U.UserName FROM AppPermissions AP INNER JOIN Users U ON AP.UserId=U.UserId WHERE PermissionId=" + permissionId + ";";
 
     runCommand(sqlQuery, function (result) {
         if(callback)
@@ -68,7 +76,7 @@ var getPermissionByPermissionId = function (permissionId, callback) {
 };
 
 var getPermissionsByAppId = function(appId, callback) {
-    var sqlQuery = "SELECT * FROM AppPermissions WHERE AppId=" + appId + ";";
+    var sqlQuery = "SELECT * FROM AppPermissions AP INNER JOIN Users U ON AP.UserId=U.UserId WHERE AppId=" + appId + ";";
     runCommand(sqlQuery,function(result) {
         if(callback)
             callback(result);
@@ -85,7 +93,7 @@ var getLogByLogId = function (logId, callback) {
 };
 
 var getLogsByAppId = function(appId, callback) {
-    var sqlQuery = "SELECT * FROM Logs WHERE AppId=" + appId + ";";
+    var sqlQuery = "SELECT * FROM AppLogs WHERE AppId=" + appId + ";";
 
     runCommand(sqlQuery,function(result) {
         if(callback)
@@ -127,7 +135,7 @@ var addPermissions = function (appId, userId, groupId, read, write, execute, cal
 };
 
 var addLogs = function (appId, path, logName, callback) {
-    var sqlQuery = "INSERT INTO AppPermissions(LogId, AppId, Path, LogName) " +
+    var sqlQuery = "INSERT INTO AppLogs(AppId, Path, LogName) " +
         "VALUES(" + appId + ", '" + path + "', '" + logName + "');";
     runCommand(sqlQuery, function (result) {
         if(callback)
@@ -162,52 +170,23 @@ var deleteAppLogByLogId = function(logId, callback) {
 
 /* Update functions */
 var updateApp = function (appId, appName, startCommand, callback) {
-    if(appName) {
-        updateAppName(appName,appId,function(result) {
-            updateAppStartCommand(startCommand,appId,function(result) {
-                if(callback)
-                    callback();
-            });
-        });
-    }
-    else {
-        updateAppStartCommand(startCommand,appId,function(result) {
-            if(callback)
-                callback();
-        })
-    }
+    var sqlQuery = "UPDATE Apps SET AppName='" + appName + "', StartCommand='" + startCommand + "' WHERE AppId=" + appId + ";";
+    runCommand(sqlQuery, function (result) {
+        if (callback)
+            callback(result);
+    });
 };
 
-var updateAppName = function(appName, appId, callback) {
-    var sqlQuery = "UPDATE Apps SET AppName='" + appName + "' WHERE appId=" + appId + ";";
+var updatePermissions = function (permissionId, userId, groupId, read, write, execute, callback) {
+    var sqlQuery = "UPDATE AppPermissions SET UserId=" + userId + ", GroupId=" + groupId + ", ReadPermission=" + read + ", WritePermission=" + write + ", ExecutePermission=" + execute + " WHERE PermissionId=" + permissionId + ";";
     runCommand(sqlQuery, function (result) {
         if(callback)
             callback(result);
     });
 };
 
-var updateAppStartCommand = function(appStartCommand, appId, callback) {
-    var sqlQuery = "UPDATE Apps SET StartCommand='" + appStartCommand + "' WHERE appId=" + appId + ";";
-    runCommand(sqlQuery, function (result) {
-        if(callback)
-            callback(result);
-    });
-};
-
-
-var updatePermissions = function (appId, adminId, groupId, read, write, execute, callback) {
-
-    var sqlQuery = "INSERT INTO AppPermissions(AppId, AdminId, GroupId, ReadPermission, WritePermission, ExecutePermission) " +
-        "VALUES(" + appId + ", " + adminId + ", " + groupId + ", " + read + ", " + write + ", " + execute + ");";
-    runCommand(sqlQuery, function (result) {
-        if(callback)
-            callback(result);
-    });
-};
-
-var updateLogs = function (appId, path, logName, callback) {
-    var sqlQuery = "INSERT INTO AppPermissions(LogId, AppId, Path, LogName) " +
-        "VALUES(" + appId + ", '" + path + "', '" + logName + "');";
+var updateLogs = function (logId, path, logName, callback) {
+    var sqlQuery = "UPDATE AppLogs SET Path='" + path + "', LogName='" + logName + "' WHERE LogId=" + logId + ";";
     runCommand(sqlQuery, function (result) {
         if(callback)
             callback(result);
@@ -218,6 +197,7 @@ module.exports = {
     Statuses: Statuses,
     getAppByAppId : getAppByAppId,
     getMostRecentAppByDetails: getMostRecentAppByDetails,
+    getAppsByUserId: getAppsByUserId,
     getAppsByCreatorUserId : getAppsByCreatorUserId,
     getAppsByGroupId : getAppsByGroupId,
     getAllAppsForUserId : getAllAppsForUserId,
@@ -231,5 +211,7 @@ module.exports = {
     deleteAppByAppId: deleteAppByAppId,
     deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
     deleteAppLogByLogId: deleteAppLogByLogId,
-    updateApp: updateApp
+    updateApp: updateApp,
+    updatePermissions: updatePermissions,
+    updateLogs: updateLogs
 };

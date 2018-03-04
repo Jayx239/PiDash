@@ -29,14 +29,17 @@ app.use(function (req, res, next) {
     res.locals.messages = {"errors":[],"success":[]};
     res.locals.messages.errors = [];
     res.locals.messages.success = [];
+    res.locals.admin = false;
 
     if (req.session && req.session.user) {
         req.user = req.session.user;
         req.userId = req.session.userId;
         req.sessionID = req.session.sessionToken;
         res.locals.user = req.session.user;
-        if (req.session.admin)
+        if (req.session.admin) {
             req.admin = req.session.admin;
+            res.locals.admin = true;
+        }
     }
     next();
 });
@@ -76,7 +79,7 @@ function requireAdmin(req, res, next) {
         winston.logSession(req.sessionID, "Admin validation required", 'debug');
 
         provider.getAdminByUserName(req.user, function(result) {
-            if(result.status === provider.Statuses.Error || !result.firstResult) {
+            if(result.status === provider.Statuses.Error || !result.firstResult || result.firstResult.Active == 0) {
                 winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
                 res.redirect(invalidRedirectPath);
             }

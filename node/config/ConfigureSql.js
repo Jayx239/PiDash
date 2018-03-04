@@ -235,7 +235,7 @@ var createAppPermissionsTable = function (sqlConn, callback) {
 
 var createAppLogsTable = function (sqlConn, callback) {
     var query = "CREATE TABLE AppLogs(" +
-        "LogId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
+        "LogId INT AUTO_INCREMENT PRIMARY KEY, " +
         "AppId INT NOT NULL, " +
         "Path VARCHAR(256), " +
         "LogName VARCHAR(256), " +

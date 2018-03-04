@@ -8,7 +8,7 @@ var PiSys = require('./PiSystem');
 var logger = winston.logger;
 var Process = require('./routes/ProcessRoute');
 var logonRegister = require('./routes/LogonRegisterRoute');
-var account = require('./Account');
+var account = require('./routes/AccountRoute');
 var baseProvider = require('./BaseProvider');
 var piDashAppRoutes = require("./routes/PiDashAppRoute");
 

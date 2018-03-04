@@ -51,10 +51,14 @@ angular.module('PiDashApp.ServerManagerController',[])
                 $scope.activeApp.messages = [];
             if(!$scope.activeApp.status)
                 $scope.activeApp.status = Statuses.Stopped;
-            if($scope.activeApp.appPermissions)
-                $scope.activeAppPermissions = $scope.piDashApps[index].appPermissions;
-            if($scope.activeApp.logs)
-                $scope.activeAppLogs = $scope.piDashApps[index].logs;
+            if(!$scope.piDashApps[index].appPermissions)
+                $scope.piDashApps[index].appPermissions = []
+            $scope.activeAppPermissions = $scope.piDashApps[index].appPermissions;
+
+            if(!$scope.piDashApps[index].app.logs)
+                $scope.piDashApps[index].app.logs = []
+            $scope.activeAppLogs = $scope.piDashApps[index].app.logs;
+
 
         };
 
@@ -219,7 +223,9 @@ angular.module('PiDashApp.ServerManagerController',[])
 
         var updatePiDashApp = function(piDashApp) {
             serverManagerService.updatePiDashApp(piDashApp, function(res) {
-
+                if(res.app)
+                    $scope.piDashApps[$scope.activeApp.appId] = buildPiDashAppFromResponse(res.app);
+                $scope.setActiveApp($scope.activeApp.appId);
             });
         };
 

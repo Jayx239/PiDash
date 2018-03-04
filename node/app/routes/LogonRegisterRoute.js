@@ -29,7 +29,7 @@ app.post("/LogonRegister/Logon", function (req, res) {
                 req.session.sessionToken = validation.genRandomString(16);
                 req.body.user = req.body.UserName;
                 provider.getAdminByUserName(req.body.UserName, function (returnObject) {
-                    if (returnObject.Status !== provider.Statuses.Error && returnObject.results.length > 0) {
+                    if (returnObject.Status !== provider.Statuses.Error && returnObject.results.length > 0 && returnObject.firstResult.Active == 1) {
                         req.session.admin = validation.adminCode;
                     }
 

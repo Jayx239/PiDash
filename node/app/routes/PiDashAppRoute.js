@@ -96,9 +96,10 @@ app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
             return;
         }
         else {
-            appManager.updatePiDashApp(piDashApp,function() {
+            appManager.updatePiDashApp(piDashApp,function(updatedPiDashApp) {
                 result.status = "Unknown";
                 result.message = "Validation not yet implemented";
+                result.app = JSON.stringify(updatedPiDashApp);
                 res.json(result);
             });
         }

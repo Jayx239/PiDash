@@ -2,6 +2,7 @@ const process = require('./routes/ProcessRoute');
 const appProvider = require("./AppProvider");
 const logger = require('./Logger').logger;
 const piDashApp = require('../content/js/PiDashApp');
+const credentialProvider = require('./CredentialProvider');
 
 /* Import from shared files */
 var PiDashApp = piDashApp.PiDashApp;
@@ -101,26 +102,26 @@ var getAppPermissionsByAppId = function(appId, callback) {
 
         var appPermissions = [];
         for(var i=0; i<result.results.length; i++) {
-            var user;
-            // TODO: implement logic for getting AppUser from userId
-            if(result.results[i].UserId)
-                user = getAppUserByUserId(result.results[i].UserId);
-            var appPermission = new AppPermission(result.results[i].PermissionId,result.results[i].AppId, user, result.results[i].GroupId, result.results[i].ReadPermission, result.results[i].WritePermission, result.results[i].ExecutePermission);
+            var user = new AppUser(result.results[i].UserName,result.results[i].UserId);
+            var appPermission = new AppPermission(result.results[i].PermissionId,result.results[i].AppId, user, result.results[i].GroupId, databaseBooleanToBoolean(result.results[i].ReadPermission[0]), databaseBooleanToBoolean(result.results[i].WritePermission[0]), databaseBooleanToBoolean(result.results[i].ExecutePermission[0]));
             appPermissions.push(appPermission);
         }
-
         if(callback)
             callback(appPermissions);
     });
 };
 
 // TODO: implement logic for getting full AppUser
-var getAppUserByUserId = function(userId) {
+var getAppUserByUserId = function(userId, callback) {
     return new piDashApp.AppUser(null,userId);
 };
 
+var getAppUserByUserName = function(userName, callback) {
+
+};
+
 var getPiDashAppsByUserId = function(userId, callback) {
-    appProvider.getAppsByCreatorUserId(userId, function(results) {
+    appProvider.getAppsByUserId(userId, function(results) {
         var piDashAppIds = [];
         if(results.results.length > 0) {
             for(var i=0; i<results.results.length; i++) {
@@ -200,7 +201,7 @@ var setAllLogsAppId = function(logs,appId) {
 
 var addApp = function(app, callback) {
     appProvider.addApp(app.creatorUserId, app.name, app.startCommand, function(result) {
-        if(result.Status === appProvider.Statuses.Error)
+        if(result.status === appProvider.Statuses.Error)
             logger.error("Error adding app to db");
         if(callback)
             callback();
@@ -209,7 +210,7 @@ var addApp = function(app, callback) {
 
 var addLog = function(log, callback) {
     appProvider.addLogs(log.appId,log.path,log.name,function(result) {
-        if(result.Status === appProvider.Statuses.Error)
+        if(result.status === appProvider.Statuses.Error)
             logger.error("Error adding log");
         if(callback)
             callback();
@@ -229,9 +230,13 @@ var addAppPermission = function(appPermission, callback) {
 
     var groupId = appPermission.groupId;
     var userId = appPermission.appUser.userId;
+    if(userId && userId > 0)
+        userId = appPermission.appUser.userId;
+    else
+        userId = "(SELECT UserId FROM Users WHERE UserName='" + appPermission.appUser.userName + "' LIMIT 1)";
 
     appProvider.addPermissions(appPermission.appId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write),booleanToDatabaseBoolean(appPermission.execute), function(result){
-        if(result.firstResult === appProvider.Statuses.Error)
+        if(result.status === appProvider.Statuses.Error)
             logger.error("Error adding app permission");
         if(callback)
             callback();
@@ -265,6 +270,13 @@ var booleanToDatabaseBoolean = function(value) {
         return 0;
 };
 
+var databaseBooleanToBoolean = function(value) {
+    if(value == 1)
+        return true;
+    else
+        return false;
+};
+
 /* Delete functions */
 var deleteAppByAppId = function(appId, callback) {
     delete ActiveApps[appId];
@@ -283,19 +295,78 @@ var deleteAppLogByLogId = function(logId, callback) {
 /* Update functions */
 var updatePiDashApp = function(piDashApp,callback) {
     updateApp(piDashApp.app.appId, piDashApp.app.name, piDashApp.app.startCommand, function() {
-        if(callback)
-            callback();
+        var allLogs = piDashApp.app.logs;
+        var newLogs = [];
+        var currentLogs = [];
+        for(var i=0; i<allLogs.length; i++) {
+            if(allLogs[i].id < 0)
+                newLogs.push(allLogs[i]);
+            else
+                currentLogs.push(allLogs[i]);
+        }
+        addLogs(newLogs,0,function() {
+            updateLogs(currentLogs,0,function() {
+                var allPermissions = piDashApp.appPermissions;
+                var newPermissions = [];
+                var currentPermissions = [];
+
+                for(var i=0; i<allPermissions.length; i++) {
+                    if(allPermissions[i].permissionId < 0)
+                        newPermissions.push(allPermissions[i]);
+                    else
+                        currentPermissions.push(allPermissions[i]);
+                }
+                addAppPermissions(newPermissions,0,function() {
+                    updateAppPermissions(currentPermissions,0,function() {
+                        getPiDashAppByAppIdExtended(piDashApp.app.appId, true, function(updatedPiDashApp) {
+                            if(callback)
+                                callback(updatedPiDashApp);
+                        });
+                    })
+                })
+            });
+        });
     });
 };
 
 var updateApp = function(appId, appName, appStartCommand, callback) {
     // TODO: Validate user has permission to update app
     appProvider.updateApp(appId,appName,appStartCommand,function() {
-        getPiDashAppByAppIdExtended(appId, true, function(newPiDashApp) {
         if(callback)
             callback();
-        });
     })
+};
+
+var updateLogs = function(logs,index, callback) {
+    addListOperation(logs,index,updateLog,callback);
+};
+
+var updateLog = function(log,callback) {
+    appProvider.updateLogs(log.id, log.path, log.name,function(result) {
+        if(result.status === appProvider.Statuses.Error)
+            logger.error("Error updating log");
+        if(callback)
+            callback();
+    });
+};
+
+var updateAppPermissions = function(appPermissions, index, callback) {
+    addListOperation(appPermissions,index,updateAppPermission,callback);
+};
+
+var updateAppPermission = function(appPermission, callback) {
+    var userId;
+    if(userId)
+        userId = appPermission.appUser.userId;
+    else
+        userId = "(SELECT UserId FROM Users WHERE UserName='" + appPermission.appUser.userName + "' LIMIT 1)";
+
+    appProvider.updatePermissions(appPermission.permissionId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write), booleanToDatabaseBoolean(appPermission.execute), function(result) {
+        if(result.status === appProvider.Statuses.Error)
+            logger.error("Error updating log");
+        if(callback)
+            callback();
+    });
 };
 
 module.exports = {

@@ -11,4 +11,4 @@ background: #f6f8f9; /* Old browsers */
     padding: 5px;
     border-radius: 10px;
 }
-.success-box {color: #2e6d1b; }
+.success-box {color: #2e6d1b; border-color: #2e6d1b; }

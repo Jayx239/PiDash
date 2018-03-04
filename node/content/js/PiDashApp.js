@@ -8,6 +8,9 @@ function PiDashApp(app,appPermissions, processes) {
 
 PiDashApp.prototype.setAppId = function(appId) {
     this.app.appId = appId;
+    for(var i=0; i<this.app.logs.length; i++) {
+        this.app.logs[i].appId = appId;
+    }
 };
 
 function App(name, appId, creatorUserId, startCommand, logs) {
@@ -15,7 +18,7 @@ function App(name, appId, creatorUserId, startCommand, logs) {
     this.appId = appId;
     this.creatorUserId = creatorUserId;
     this.startCommand = startCommand;
-    this.logs = logs
+    this.logs = logs;
 }
 
 App.prototype.setLogs = function(logs) {
@@ -106,7 +109,7 @@ var buildLogsFromResponse = function(res) {
     var logs = [];
     for(var i=0; i<res.app.logs.length; i++) {
         var log = res.app.logs[i];
-        logs.push(new AppLog(log.logId, res.app.appId, log.path, log.name));
+        logs.push(new AppLog(log.id, res.app.appId, log.path, log.name));
     }
     return logs;
 };

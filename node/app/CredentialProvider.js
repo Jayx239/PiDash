@@ -179,14 +179,31 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
     if (!isActive) {
         isActive = true;
     }
-
     getUserByUserId(userId, function (result) {
         if (result.status === Statuses.Error || result.results.length < 1) {
             logger.log('debug', 'Invalid user id, adding admin failed');
             callback(result);
             return;
         }
-        if (!groupId) {
+        if (groupId) {
+            getGroupByGroupId(groupId, function (result) {
+                if (result.status === Statuses.Error || result.results.length < 1) {
+                    logger.log('debug', 'Invalid group id, adding admin failed');
+                    callback(result);
+                    return;
+                }
+                else {
+                    var sqlQuery = "INSERT INTO Admins(UserId,GroupId,Active)" +
+                        "Values(" + userId + ", " + groupId + ", " + isActive + ");";
+
+                    runCommand(sqlQuery, function (result) {
+                        callback(result);
+
+                    });
+                }
+            });
+        }
+        else {
             var sqlQuery = "INSERT INTO Admins(UserId,GroupId,Active)" +
                 "Values(" + userId + ", " + groupId + ", " + isActive + ");";
 
@@ -195,22 +212,6 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
                 return;
             });
         }
-        getGroupByGroupId(groupId, function (result) {
-            if (result.status === Statuses.Error || result.results.length < 1) {
-                logger.log('debug', 'Invalid group id, adding admin failed');
-                callback(result);
-                return;
-            }
-            else {
-                var sqlQuery = "INSERT INTO Admins(UserId,GroupId,Active)" +
-                    "Values(" + userId + ", " + groupId + ", " + isActive + ");";
-
-                runCommand(sqlQuery, function (result) {
-                    callback(result);
-
-                });
-            }
-        });
     });
 
 };
@@ -224,9 +225,33 @@ var addAdminByUserName = function (userName, groupId, isActive, callback) {
             return;
         }
         else {
-            addAdminByUserId(result.results.UserId, groupId, isActive, callback);
+            addAdminByUserId(result.firstResult.UserId, groupId, isActive, callback);
         }
     })
+};
+
+var activateAdminByAdminId = function(adminId, callback) {
+    var sqlQuery = "UPDATE Admins SET Active = 1 WHERE AdminId=" + adminId + ";";
+    runCommand(sqlQuery,function(result) {
+        if(callback)
+            callback(result)
+    });
+};
+
+var deActivateAdminByAdminId = function(adminId, callback) {
+    var sqlQuery = "UPDATE Admins SET Active = 0 WHERE AdminId=" + adminId + ";";
+    runCommand(sqlQuery,function(result) {
+        if(callback)
+            callback(result)
+    });
+};
+
+var deActivateAdminByUserId = function(userId, callback) {
+    var sqlQuery = "UPDATE Admins SET Active = 0 WHERE UserId=" + userId + ";";
+    runCommand(sqlQuery,function(result) {
+        if(callback)
+            callback(result)
+    });
 };
 
 /* Export */
@@ -244,5 +269,8 @@ module.exports = {
     addCredentialsByUserName: addCredentialsByUserName,
     updateCredentialsForUserById: updateCredentialsForUserById,
     updateCredentialsByUserName: updateCredentialsByUserName,
-    addAdminByUserName: addAdminByUserName
+    addAdminByUserName: addAdminByUserName,
+    activateAdminByAdminId: activateAdminByAdminId,
+    deActivateAdminByAdminId: deActivateAdminByAdminId,
+    deActivateAdminByUserId: deActivateAdminByUserId
 };
