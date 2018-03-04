@@ -1,7 +1,7 @@
 'use strict'
 
     const appManager = require('../app/AppManager');
-    const baseProvider = require('../app/BaseProvider');
+    const baseProvider = require('../app/providers/BaseProvider');
     const chai = require('chai');
     const expect = chai.should();
     var chaiHttp = require('chai-http');

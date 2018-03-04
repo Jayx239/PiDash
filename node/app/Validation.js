@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const winston = require('./Logger');
 const server = require('./Server');
-const provider = require('./CredentialProvider');
+const provider = require('./providers/CredentialProvider');
 
 var logger = winston.logger;
 var app = server.app;

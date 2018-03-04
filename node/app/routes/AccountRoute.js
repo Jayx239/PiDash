@@ -2,7 +2,7 @@ var winston = require('../Logger');
 var logger = winston.logger;
 var server = require('../Server');
 var app = server.app;
-var credentialProvider = require('../CredentialProvider');
+var credentialProvider = require('../providers/CredentialProvider');
 var validation = require('../Validation');
 
 app.get("/Account", validation.requireLogon, function (req, res) {

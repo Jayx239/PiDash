@@ -1,8 +1,8 @@
 const process = require('./routes/ProcessRoute');
-const appProvider = require("./AppProvider");
+const appProvider = require("./providers/AppProvider");
 const logger = require('./Logger').logger;
 const piDashApp = require('../content/js/PiDashApp');
-const credentialProvider = require('./CredentialProvider');
+const credentialProvider = require('./providers/CredentialProvider');
 
 /* Import from shared files */
 var PiDashApp = piDashApp.PiDashApp;

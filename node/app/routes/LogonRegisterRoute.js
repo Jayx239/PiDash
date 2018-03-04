@@ -2,7 +2,7 @@ var winston = require('../Logger');
 var logger = winston.logger;
 var server = require('../Server');
 var app = server.app;
-var provider = require('../CredentialProvider');
+var provider = require('../providers/CredentialProvider');
 var validation = require('../Validation');
 
 

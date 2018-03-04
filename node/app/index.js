@@ -9,7 +9,7 @@ var logger = winston.logger;
 var Process = require('./routes/ProcessRoute');
 var logonRegister = require('./routes/LogonRegisterRoute');
 var account = require('./routes/AccountRoute');
-var baseProvider = require('./BaseProvider');
+var baseProvider = require('./providers/BaseProvider');
 var piDashAppRoutes = require("./routes/PiDashAppRoute");
 
 app.set('view engine', 'ejs');

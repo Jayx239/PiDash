@@ -1,4 +1,4 @@
-const winston = require('./Logger');
+const winston = require('../Logger');
 const fs = require('fs');
 var mysql = require('mysql');
 var pool;
