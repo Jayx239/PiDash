@@ -117,13 +117,15 @@ app.post("/Process/Kill/", function (req, res) {
     var pid = req.body.pid;
     var command = "pkill -P " + pid; //"kill " + pid;
     logger.log('debug', "Killing process, Pid: " + pid);
-    var childProcess = setTimeout(exec(command),killTimeout);
-    var childRetVal = childProcess.returnValue;
-    console.log("killing");
-    var parentCommand = "kill " + pid;
-    var parentProcess = exec(parentCommand);
-    var parentRetVal = parentProcess.returnValue;
-    var response = {"Status": "Unknown" };
-    res.json(response);
+    var childProcess = exec(command);
+    setTimeout(function(){
+        var childRetVal = childProcess.returnValue;
+        console.log("killing");
+        var parentCommand = "kill " + pid;
+        var parentProcess = exec(parentCommand);
+        var parentRetVal = parentProcess.returnValue;
+        var response = {"Status": "Unknown" };
+        res.json(response);
+    },killTimeout);
 
 });

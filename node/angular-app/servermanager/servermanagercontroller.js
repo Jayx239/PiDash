@@ -7,12 +7,14 @@ angular.module('PiDashApp.ServerManagerController',[])
         $scope.piDashApps = new Object();
         $scope.activeApp = [];
         $scope.activeAppPermissions = [];
+        $scope.activeAppLogs = [];
         $scope.activeAppIndex = 0;
         $scope.command = "";
         $scope.startAppButtonText = "Start App";
         $scope.deleteAppButtonText = "Delete App";
         $scope.userId = "";
         $scope.userName = "";
+        $scope.appUser;
         var maxNewApps = 100;
 
         var Statuses = {"Starting":"Starting","Running":"Running","Stopped":"Stopped"};
@@ -22,6 +24,7 @@ angular.module('PiDashApp.ServerManagerController',[])
             serverManagerService.getUser(function(res) {
                 $scope.userId = res.userId;
                 $scope.userName = res.userName;
+                $scope.appUser = new AppUser($scope.userName, $scope.userId);
                 $scope.retrieveApps();
             })
         };
@@ -49,7 +52,9 @@ angular.module('PiDashApp.ServerManagerController',[])
             if(!$scope.activeApp.status)
                 $scope.activeApp.status = Statuses.Stopped;
             if($scope.activeApp.appPermissions)
-                $scope.activeAppPermissions = $scope.activeApp.appPermissions;
+                $scope.activeAppPermissions = $scope.piDashApps[index].appPermissions;
+            if($scope.activeApp.logs)
+                $scope.activeAppLogs = $scope.piDashApps[index].logs;
 
         };
 
@@ -218,6 +223,24 @@ angular.module('PiDashApp.ServerManagerController',[])
             });
         };
 
+        $scope.addActiveAppPermission = function() {
+            if(!$scope.activeAppPermissions)
+                $scope.activeAppPermissions = [];
+            $scope.activeAppPermissions.push(new AppPermission(-1,$scope.activeApp.appId,new AppUser("",-1),-1,false,false,false));
+        };
 
+        $scope.deleteActiveAppPermission = function(index) {
+            $scope.activeAppPermissions.splice(index,1);
+        };
+
+        $scope.addActiveAppLog = function() {
+            if(!$scope.activeAppLogs)
+                $scope.activeAppLogs = [];
+            $scope.activeAppLogs.push(new AppLog(-1,$scope.activeApp.appId,"",""));
+        };
+
+        $scope.deleteActiveAppLog = function(index) {
+            $scope.activeAppLogs.splice(index,1);
+        };
 
     });

@@ -151,5 +151,19 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
+        serverManagerApi.GetLogContents = function(log, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/GetLogContents",
+                data: {json: JSON.stringify(log)},
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
         return serverManagerApi;
     });

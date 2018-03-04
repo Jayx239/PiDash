@@ -176,6 +176,29 @@ app.post("/App/SaveScript", function(req,res) {
     }
 });
 
+app.post("/App/GetLogContents", function(req,res) {
+    var appLog = piDashApp.tryParseJson(req.body.log);
+
+    var result = new Object();
+    if(appLog) {
+        fs.readFile(appLog.path, 'utf-8', function (err, contents) {
+            if(err) {
+                result.status = "Error";
+            }
+            else {
+                result.status = "Success";
+                result.logContents = contents;
+            }
+            res.json(result);
+        });
+    }
+    else {
+        result.status = "Error";
+        result.message = "Invalid log data received";
+        res.json(result);
+    }
+});
+
 var createAppFromRequest = function(req) {
     var jsonReq = JSON.parse(req.body.json);
 

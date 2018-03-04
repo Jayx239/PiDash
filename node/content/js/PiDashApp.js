@@ -163,5 +163,6 @@ if(typeof module != 'undefined' && module.exports)
         buildLogsFromResponse: buildLogsFromResponse,
         buildPermissionsFromResponse: buildPermissionsFromResponse,
         buildProcessesFromResponse: buildProcessesFromResponse,
-        createDefaultPiDashApp: createDefaultPiDashApp
+        createDefaultPiDashApp: createDefaultPiDashApp,
+        tryParseJson: tryParseJson
     };
