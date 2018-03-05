@@ -21,16 +21,19 @@ var getAppById = function (appId, callback) {
 
 var getAppByIdExtended = function(appId, noCache, callback) {
     if(!noCache && ActiveApps[appId]) {
-        callback(ActiveApps[appId].app);
+        if(callback)
+            callback(ActiveApps[appId].app);
         return;
     }
     appProvider.getAppByAppId(appId,function(result) {
         if(result.status === appProvider.Statuses.Error || result.results.length < 1 || result.firstResult.Active[0] == 0) {
-            callback(null);
+            if(callback)
+                callback(null);
         }
         else {
             var app = new App(result.firstResult.AppName, result.firstResult.AppId, result.firstResult.CreatorUserId, result.firstResult.StartCommand);
-            callback(app);
+            if(callback)
+                callback(app);
         }
     });
 };
@@ -41,7 +44,8 @@ var getPiDashAppByAppId = function(appId, callback) {
 
 var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
     if(!noCache && ActiveApps[appId]) {
-        callback(ActiveApps[appId]);
+        if(callback)
+            callback(ActiveApps[appId]);
         return;
     }
     else {
@@ -57,7 +61,8 @@ var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
 
                     var newApp = new PiDashApp(app,permissions,[]);
                     ActiveApps[appId] = newApp;
-                    callback(ActiveApps[appId]);
+                    if(callback)
+                        callback(ActiveApps[appId]);
                 })
             })
         });
@@ -68,11 +73,13 @@ var getPiDashAppByDetails = function(piDashApp, callback) {
     appProvider.getMostRecentAppByDetails(piDashApp.app.name, piDashApp.app.startCommand, piDashApp.app.creatorUserId, function(result) {
         if(result.status === appProvider.Statuses.Error) {
             logger.error("Error retrieving PiDashApp by details");
-            callback(null);
+            if(callback)
+                callback(null);
             return;
         }
         else if(result.firstResult.Active[0] == 0) {
-            callback(null);
+            if(callback)
+                callback(null);
             return;
         }
         else
@@ -83,16 +90,21 @@ var getPiDashAppByDetails = function(piDashApp, callback) {
 var getLogsByAppId = function(appId, callback) {
     appProvider.getLogsByAppId(appId,function(result) {
         if(result.status === appProvider.Statuses.Error) {
-            callback([]);
+            if(callback)
+                callback([]);
             return;
         }
 
         logs = [];
         for(var i=0; i<result.results.length; i++) {
+            if(result.results[i].Active == 0)
+                continue;
             var log = new AppLog(result.results[i].LogId, result.results[i].AppId, result.results[i].Path,result.results[i].LogName);
             logs.push(log);
         }
-        callback(logs);
+
+        if(callback)
+            callback(logs);
 
     });
 };
@@ -102,6 +114,8 @@ var getAppPermissionsByAppId = function(appId, callback) {
 
         var appPermissions = [];
         for(var i=0; i<result.results.length; i++) {
+            if(result.results[i].Active == 0)
+                continue;
             var user = new AppUser(result.results[i].UserName,result.results[i].UserId);
             var appPermission = new AppPermission(result.results[i].PermissionId,result.results[i].AppId, user, result.results[i].GroupId, databaseBooleanToBoolean(result.results[i].ReadPermission[0]), databaseBooleanToBoolean(result.results[i].WritePermission[0]), databaseBooleanToBoolean(result.results[i].ExecutePermission[0]));
             appPermissions.push(appPermission);
@@ -125,22 +139,25 @@ var getPiDashAppsByUserId = function(userId, callback) {
         var piDashAppIds = [];
         if(results.results.length > 0) {
             for(var i=0; i<results.results.length; i++) {
-                if(results.results[i].Active[0] == 1)
+                if(results.results[i].Active == 1)
                     piDashAppIds.push(results.results[i].AppId);
             }
             var piDashApps = [];
             getPiDashAppsByAppIds(piDashAppIds, function(piDashApps) {
-                callback(piDashApps);
+                if(callback)
+                    callback(piDashApps);
             });
         }
         else
+        if(callback)
             callback([]);
     })
 };
 var getPiDashAppsByAppIds = function(piDashAppIds, callback) {
     var outputList = [];
     createListOperation(piDashAppIds, 0, getPiDashAppByAppId, outputList, function(piDashApps) {
-        callback(piDashApps);
+        if(callback)
+            callback(piDashApps);
     });
 };
 
@@ -172,7 +189,8 @@ var addPiDashApp = function(piDashApp, callback) {
             addLogs(logs,0,function() {
                 var appPermissions = piDashApp.appPermissions;
                 addAppPermissions(appPermissions, 0, function() {
-                    callback(piDashApp);
+                    if(callback)
+                        callback(piDashApp);
                 });
             });
         });
@@ -222,11 +240,10 @@ var addLogs = function(logs,index, callback) {
 
 var addAppPermission = function(appPermission, callback) {
     if(!appPermission) {
-        callback();
+        if(callback)
+            callback();
         return;
     }
-
-
 
     var groupId = appPermission.groupId;
     var userId = appPermission.appUser.userId;
@@ -279,17 +296,37 @@ var databaseBooleanToBoolean = function(value) {
 
 /* Delete functions */
 var deleteAppByAppId = function(appId, callback) {
-    delete ActiveApps[appId];
+    ActiveApps.splice(appId,1);
     appProvider.deleteAppByAppId(appId,callback);
 
 };
 
 var deleteAppPermissionByPermissionId = function(permissionId, callback) {
-    appProvider.deleteAppPermissionByPermissionId(permissionId,callback)
+    var response = new Object();
+    appProvider.deleteAppPermissionByPermissionId(permissionId,function(result) {
+        if (result.status === appProvider.Statuses.Error) {
+            response.status = "Error";
+        }
+        else {
+            response.status = "Success";
+        }
+        if(callback)
+            callback(response);
+    });
 };
 
 var deleteAppLogByLogId = function(logId, callback) {
-    appProvider.deleteAppLogByLogId(logId,callback);
+    var response = new Object();
+    appProvider.deleteAppLogByLogId(logId,function(result) {
+        if(result.status === appProvider.Statuses.Error) {
+            response.status = "Error";
+        }
+        else {
+            response.status = "Success";
+        }
+        if(callback)
+            callback(response);
+    });
 };
 
 /* Update functions */
@@ -379,6 +416,7 @@ module.exports = {
     ActiveApps: ActiveApps,
     getAppById: getAppById,
     getPiDashAppByAppId: getPiDashAppByAppId,
+    getPiDashAppByAppIdExtended: getPiDashAppByAppIdExtended,
     getPiDashAppByDetails: getPiDashAppByDetails,
     getLogsByAppId: getLogsByAppId,
     getAppPermissionsByAppId: getAppPermissionsByAppId,

@@ -191,7 +191,7 @@ var createAppsTable = function (sqlConn, callback) {
         "CreatorUserId INT NOT NULL, " +
         "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
-        "Active BIT DEFAULT 1);";
+        "Active BOOL DEFAULT 1);";
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {

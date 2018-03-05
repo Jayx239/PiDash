@@ -110,7 +110,7 @@ app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
     }
 });
 
-app.post("/App/GetApp", validation.requireAdmin, function(req,res) {
+app.post("/App/GetApp", validation.requireLogon, function(req,res) {
 
     var app = new appManager.App("App 1",0,3,"dir",[]);
     var permission = new appManager.AppPermission(0,new appManager.AppUser("admin",0),"Jayx239",true,0,true,true,true);
@@ -120,7 +120,7 @@ app.post("/App/GetApp", validation.requireAdmin, function(req,res) {
     res.json(JSON.stringify(piDashApp));
 });
 
-app.post("/App/GetAppsByUserId", validation.requireAdmin, function(req,res) {
+app.post("/App/GetAppsByUserId", validation.requireLogon, function(req,res) {
     appManager.getPiDashAppsByUserId(req.userId, function(piDashApps) {
         var response = new Object();
         if(piDashApps) {
@@ -148,6 +148,36 @@ app.post("/App/DeleteAppByAppId", validation.requireAdmin, function(req,res) {
         }
         res.json(result);
     })
+});
+
+app.post("/App/DeleteAppPermissionByPermissionId", validation.requireAdmin, function(req,res) {
+    var response = new Object();
+    appManager.deleteAppPermissionByPermissionId(req.body.permissionId,function(result) {
+        if(result.status === "Error") {
+            response.status = "Error";
+        }
+        else {
+            /* Clear Cache */
+            appManager.getPiDashAppByAppIdExtended(req.body.appId, true, null);
+            response.status = "Success";
+        }
+        res.json(response);
+    });
+});
+
+app.post("/App/DeleteAppLogByLogId", validation.requireAdmin, function(req,res) {
+    var response = new Object();
+    appManager.deleteAppLogByLogId(req.body.logId,function(result) {
+        if(result.status === "Error") {
+            response.status = "Error";
+        }
+        else {
+            /* Clear Cache */
+            appManager.getPiDashAppByAppIdExtended(req.body.appId, true, null);
+            response.status = "Success";
+        }
+        res.json(response);
+    });
 });
 
 app.post("/App/SaveScript", function(req,res) {

@@ -25,8 +25,8 @@
         </button>
     </div>
     <div class="col-xs-12 col-md-6 col-lg-6">
-        <button class="btn btn-primary" id="StartAppButton" ng-click="deleteActiveApplication()"
+        <%if(admin){%><button class="btn btn-primary" id="StartAppButton" ng-click="deleteActiveApplication()"
                 ng-bind="deleteAppButtonText">{{deleteAppButtonText}}
-        </button>
+        </button><%}%>
     </div>
 </div>

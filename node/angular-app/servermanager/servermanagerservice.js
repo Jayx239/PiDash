@@ -151,11 +151,39 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
-        serverManagerApi.GetLogContents = function(log, callback) {
+        serverManagerApi.getLogContents = function(log, callback) {
             $.ajax({
                 method: "POST",
                 url: "/App/GetLogContents",
                 data: {json: JSON.stringify(log)},
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+        serverManagerApi.deleteAppPermissionByPermissionId = function(permissionId, appId, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/DeleteAppPermissionByPermissionId",
+                data: {permissionId:permissionId, appId: appId },
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+                if(res.Status === "Error") {
+
+                }
+            })
+        };
+
+        serverManagerApi.deleteAppLogByLogId = function(logId, appId, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/DeleteAppLogByLogId",
+                data: {logId : logId, appId: appId },
                 dataType: 'json'
             }).done(function(res) {
                 callback(res);

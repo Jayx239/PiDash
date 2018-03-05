@@ -52,11 +52,11 @@ angular.module('PiDashApp.ServerManagerController',[])
             if(!$scope.activeApp.status)
                 $scope.activeApp.status = Statuses.Stopped;
             if(!$scope.piDashApps[index].appPermissions)
-                $scope.piDashApps[index].appPermissions = []
+                $scope.piDashApps[index].appPermissions = [];
             $scope.activeAppPermissions = $scope.piDashApps[index].appPermissions;
 
             if(!$scope.piDashApps[index].app.logs)
-                $scope.piDashApps[index].app.logs = []
+                $scope.piDashApps[index].app.logs = [];
             $scope.activeAppLogs = $scope.piDashApps[index].app.logs;
 
 
@@ -236,7 +236,9 @@ angular.module('PiDashApp.ServerManagerController',[])
         };
 
         $scope.deleteActiveAppPermission = function(index) {
-            $scope.activeAppPermissions.splice(index,1);
+            serverManagerService.deleteAppPermissionByPermissionId($scope.piDashApps[$scope.activeApp.appId].appPermissions[index].permissionId, $scope.activeApp.appId, function(){
+                $scope.activeAppPermissions.splice(index,1);
+            });
         };
 
         $scope.addActiveAppLog = function() {
@@ -246,7 +248,9 @@ angular.module('PiDashApp.ServerManagerController',[])
         };
 
         $scope.deleteActiveAppLog = function(index) {
-            $scope.activeAppLogs.splice(index,1);
+            serverManagerService.deleteAppLogByLogId($scope.piDashApps[$scope.activeApp.appId].app.logs[index].id, $scope.activeApp.appId, function(){
+                $scope.piDashApps[$scope.activeApp.appId].app.logs.splice(index,1);
+            });
         };
 
     });

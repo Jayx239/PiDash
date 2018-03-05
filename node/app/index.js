@@ -38,7 +38,7 @@ app.get('/Dashboard/', validation.requireLogon, function (req, res) {
     logger.info("/Dashboard/");
     res.render('dashboard');
 });
-app.get('/ServerManager', validation.requireAdmin, function (req, res) {
+app.get('/ServerManager', validation.requireLogon, function (req, res) {
     res.render('servermanager');
 });
 app.get("/Process/Tester", validation.requireAdmin, function (req, res) {
