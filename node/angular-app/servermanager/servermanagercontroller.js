@@ -30,7 +30,7 @@ angular.module('PiDashApp.ServerManagerController',[])
         };
         initialize();
         $interval(function(){
-            if($scope.activeApp.status === Statuses.Running || $scope.activeApp.status === Statuses.Starting ) {
+            if($scope.activeApp.status === Statuses.Running ) {
                 $scope.refreshConsole($scope.activeApp);
             }
             },refreshRate);
@@ -51,12 +51,14 @@ angular.module('PiDashApp.ServerManagerController',[])
                 $scope.activeApp.messages = [];
             if(!$scope.activeApp.status)
                 $scope.activeApp.status = Statuses.Stopped;
+            $scope.activeApp.pid = $scope.piDashApps[$scope.activeApp.appId].pid;
             if(!$scope.piDashApps[index].appPermissions)
                 $scope.piDashApps[index].appPermissions = [];
             $scope.activeAppPermissions = $scope.piDashApps[index].appPermissions;
 
             if(!$scope.piDashApps[index].app.logs)
                 $scope.piDashApps[index].app.logs = [];
+
             $scope.activeAppLogs = $scope.piDashApps[index].app.logs;
 
 
@@ -109,7 +111,7 @@ angular.module('PiDashApp.ServerManagerController',[])
 
         $scope.refreshConsoles = function() {
             for(var app in $scope.piDashApps) {
-                $scope.refreshConsole(app.app);
+                $scope.refreshConsole(app);
             }
         };
 
@@ -170,7 +172,7 @@ angular.module('PiDashApp.ServerManagerController',[])
 
         $scope.toggleActiveAppStart = function() {
             if($scope.activeApp.status === Statuses.Stopped) {
-                $scope.startActiveApp();
+                $scope.startActivePiDashApp();
                 $scope.startAppButtonText = "Stop App";
 
             }
@@ -250,6 +252,32 @@ angular.module('PiDashApp.ServerManagerController',[])
         $scope.deleteActiveAppLog = function(index) {
             serverManagerService.deleteAppLogByLogId($scope.piDashApps[$scope.activeApp.appId].app.logs[index].id, $scope.activeApp.appId, function(){
                 $scope.piDashApps[$scope.activeApp.appId].app.logs.splice(index,1);
+            });
+        };
+
+        $scope.startActivePiDashApp = function() {
+            startPiDashApp($scope.activeApp.appId,function(response){
+                console.log(response)
+            });
+        };
+
+        var startPiDashApp = function(appId, callback) {
+            $scope.activeApp.status = Statuses.Starting;
+            serverManagerService.startPiDashApp($scope.piDashApps[appId], function(response){
+
+                var piDashAppRes = JSON.parse(response);
+                if(piDashAppRes.piDashApp) {
+                    var updatedPiDashApp = buildPiDashAppFromResponse(piDashAppRes.piDashApp);
+                    if(updatedPiDashApp)
+                        $scope.piDashApps[updatedPiDashApp.app.appId] = updatedPiDashApp;
+                    $scope.setActiveApp(updatedPiDashApp.app.appId);
+                    $scope.activeApp.status = Statuses.Running;
+                }
+                else if(piDashAppRes.Status === "Error") {
+                    //$scope.activeApp.status = Statuses.Stopped;
+                }
+                if(callback)
+                    callback(response);
             });
         };
 

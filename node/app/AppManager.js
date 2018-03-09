@@ -59,7 +59,7 @@ var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
                 app.logs = logs;
                 getAppPermissionsByAppId(appId,function(permissions) {
 
-                    var newApp = new PiDashApp(app,permissions,[]);
+                    var newApp = new PiDashApp(app,permissions,-1);
                     ActiveApps[appId] = newApp;
                     if(callback)
                         callback(ActiveApps[appId]);

@@ -5,6 +5,7 @@ const validation = require('../Validation');
 const app = server.app;
 const script = require("../../content/js/Script");
 const fs = require('fs');
+const process = require('../Process');
 /*
     App.json
     {
@@ -228,6 +229,25 @@ app.post("/App/GetLogContents", function(req,res) {
         result.message = "Invalid log data received";
         res.json(result);
     }
+});
+
+app.post("/App/StartPiDashApp", function(req,res) {
+    var newPiDashApp = createAppFromRequest(req);
+    var response = new Object();
+    process.spawnProcess(newPiDashApp.app.startCommand,function(newProcess) {
+        if(appManager.ActiveApps[newPiDashApp.app.appId]) {
+            appManager.ActiveApps[newPiDashApp.app.appId].pid = newProcess.pid;
+            response.status="Success";
+            response.piDashApp = JSON.stringify(appManager.ActiveApps[newPiDashApp.app.appId]);
+        }
+        else {
+            response.status="Error";
+            response.message="PiDashApp not found";
+        }
+        //if(newProcess && newProcess.pid)
+            //response.pid= newProcess.pid;
+        res.json(JSON.stringify(response));
+    });
 });
 
 var createAppFromRequest = function(req) {
