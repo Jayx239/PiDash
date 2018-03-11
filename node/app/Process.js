@@ -27,8 +27,8 @@ function listenToProcess(process) {
     });
 
     process.process.on('close', function(code) {
-        process.writeClose("Process closed, Pid: " + process.pid + " Exit code: " + code.toString());
-        logger.log('debug', code.toString());
+        process.writeClose("Process closed, Pid: " + process.pid + " Exit code: " + code);
+        logger.log('debug', code);
     });
 
 }
@@ -49,7 +49,7 @@ var killProcess = function(pid, callback) {
     var command = "pkill -P " + pid;
     logger.log('debug', "Killing process, Pid: " + pid);
     var childProcess = exec(command);
-    setTimeout(function(){
+    setImmediate(function(){
         var childRetVal = childProcess.returnValue;
         console.log("killing");
         var parentCommand = "kill " + pid;
@@ -58,7 +58,7 @@ var killProcess = function(pid, callback) {
         var response = {"Status": "Unknown" };
         if(callback)
             callback(response);
-    },killTimeout);
+    });
 };
 
 module.exports = {

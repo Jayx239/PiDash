@@ -235,17 +235,15 @@ app.post("/App/StartPiDashApp", function(req,res) {
     var newPiDashApp = createAppFromRequest(req);
     var response = new Object();
     process.spawnProcess(newPiDashApp.app.startCommand,function(newProcess) {
-        if(appManager.ActiveApps[newPiDashApp.app.appId]) {
-            appManager.ActiveApps[newPiDashApp.app.appId].pid = newProcess.pid;
-            response.status="Success";
-            response.piDashApp = JSON.stringify(appManager.ActiveApps[newPiDashApp.app.appId]);
+        if(!appManager.ActiveApps[newPiDashApp.app.appId]) {
+            appManager.ActiveApps[newPiDashApp.app.appId] = newPiDashApp;
+            response.message="Added PiDashApp";
         }
-        else {
-            response.status="Error";
-            response.message="PiDashApp not found";
-        }
-        //if(newProcess && newProcess.pid)
-            //response.pid= newProcess.pid;
+
+        response.status="Success";
+        appManager.ActiveApps[newPiDashApp.app.appId].process = new piDashApp.PiDashProcess(newProcess.pid,newProcess.startTime,newProcess.messages);
+        appManager.ActiveApps[newPiDashApp.app.appId].pid = newProcess.pid;
+        response.piDashApp = JSON.stringify(appManager.ActiveApps[newPiDashApp.app.appId]);
         res.json(JSON.stringify(response));
     });
 });

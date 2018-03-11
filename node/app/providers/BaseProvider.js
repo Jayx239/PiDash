@@ -1,6 +1,8 @@
 const winston = require('../Logger');
 const fs = require('fs');
 var mysql = require('mysql');
+var sqlString = require('sqlstring');
+
 var pool;
 var logger = winston.logger;
 var configFile = "./config/sql.config";
@@ -88,6 +90,6 @@ module.exports = {
   Statuses: Statuses,
     runCommand: runCommand,
     logger: logger,
-    setConfigFile: setConfigFile
-
+    setConfigFile: setConfigFile,
+    sqlString: sqlString
 };

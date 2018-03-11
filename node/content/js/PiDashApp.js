@@ -1,12 +1,17 @@
 /* Data Structures */
-function PiDashApp(app,appPermissions, process) {
+function PiDashApp(app,appPermissions, piDashProcess) {
     this.app = app;
     this.appPermissions = appPermissions;
-    if(process)
-        if(process.pid)
-            this.pid = process.pid;
-        else
-            this.pid = process;
+
+
+    if(piDashProcess){
+        this.process = piDashProcess;
+        this.pid = piDashProcess.pid;
+    }
+    else {
+        this.process = new PiDashProcess(-1,-1,[]);
+        this.process.running = false;
+    }
 }
 
 
@@ -51,6 +56,36 @@ function AppUser(userName, userId) {
     this.userId = userId;
 }
 
+function PiDashProcess(pid, startTime, messages) {
+    this.pid = pid;
+    this.messages = [];
+    if(pid && pid >= 0)
+        this.running = true;
+    else
+        this.running = false;
+
+    if(messages) {
+        this.messages = messages;
+        this.isRunning();
+    }
+
+    this.startTime = Date.now();
+    if(startTime)
+        this.startTime = startTime;
+
+}
+
+PiDashProcess.prototype.isRunning = function(){
+    if(this.running)
+        for(var message in this.messages) {
+            if(message.Source === CLOSE ) {
+                this.running = false;
+                break;
+            }
+        }
+
+        return this.running;
+};
 
 /* Console signal codes */
 var STDIN = "stdin";//0;
@@ -109,12 +144,19 @@ var buildPiDashAppFromResponse = function(res) {
 
     var app = buildAppFromResponse(jsonRes);
     var permissions;
-    var pid;
+    var process;
+
     if(jsonRes.appPermissions)
         permissions = buildPermissionsFromResponse(jsonRes);
+    if(jsonRes.process)
+        process = new PiDashProcess(jsonRes.process.pid, jsonRes.process.startTime, jsonRes.process.messages);
+
+    var dashApp = new PiDashApp(app,permissions,process);
+
     if(jsonRes.pid)
-        pid = jsonRes.pid;
-    var dashApp = new PiDashApp(app,permissions,pid);
+        dashApp.pid = jsonRes.pid;
+
+
 
     return dashApp;
 };
@@ -175,7 +217,7 @@ var createDefaultPiDashApp = function(userName, userId) {
     var app = new App("",-1,userId,"",[]);
     var appUser = new AppUser(userName, userId);
     var appPermissions = [new AppPermission(-1, -1, appUser, -1, true, true, true)];
-    var piDAshApp = new PiDashApp(app,appPermissions, new Object());
+    var piDAshApp = new PiDashApp(app,appPermissions, null);
     return piDAshApp;
 };
 
@@ -196,6 +238,7 @@ if(typeof module != 'undefined' && module.exports)
         AppLog: AppLog,
         AppPermission: AppPermission,
         AppUser: AppUser,
+        PiDashProcess: PiDashProcess,
         Process: Process,
         ProcessMessage: ProcessMessage,
         STDIN: STDIN,

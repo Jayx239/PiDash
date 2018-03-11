@@ -17,7 +17,7 @@ angular.module('PiDashApp.ServerManagerController',[])
         $scope.appUser;
         var maxNewApps = 100;
 
-        var Statuses = {"Starting":"Starting","Running":"Running","Stopped":"Stopped"};
+        var Statuses = {"Starting":"Starting","Running":"Running","Stopped":"Stopped", "Loading": "Loading"};
         var MessageSourceTypes = {"Out": "stdout", "In":"stdin","Error":"stderr","Close": "close"};
 
         var initialize = function(){
@@ -32,6 +32,8 @@ angular.module('PiDashApp.ServerManagerController',[])
         $interval(function(){
             if($scope.activeApp.status === Statuses.Running ) {
                 $scope.refreshConsole($scope.activeApp);
+                if(!$scope.piDashApps[$scope.activeApp.appId].process.isRunning())
+                    $scope.activeApp.status = Statuses.Stopped;
             }
             },refreshRate);
 
@@ -47,6 +49,7 @@ angular.module('PiDashApp.ServerManagerController',[])
 
         $scope.setActiveApp = function(index) {
             $scope.activeApp = $scope.piDashApps[index].app;
+
             if(!$scope.activeApp.messages)
                 $scope.activeApp.messages = [];
             if(!$scope.activeApp.status)
@@ -60,8 +63,11 @@ angular.module('PiDashApp.ServerManagerController',[])
                 $scope.piDashApps[index].app.logs = [];
 
             $scope.activeAppLogs = $scope.piDashApps[index].app.logs;
-
-
+            if($scope.piDashApps[index].process && $scope.piDashApps[index].process.isRunning())
+                $scope.activeApp.status = Statuses.Running;
+            else
+                $scope.activeApp.status = Statuses.Stopped;
+            updateStartButton();
         };
 
         $scope.addApplication = function() {
@@ -131,12 +137,11 @@ angular.module('PiDashApp.ServerManagerController',[])
 
                     if(isStopped(response)) {
                         app.status = Statuses.Stopped;
-                        $scope.startAppButtonText = "Start App";
                     }
                     else {
                         app.status = Statuses.Running;
-                        $scope.startAppButtonText = "Stop App";
                     }
+                updateStartButton();
 
             });
         };
@@ -155,7 +160,7 @@ angular.module('PiDashApp.ServerManagerController',[])
         var formatMessageOutput = function(messages) {
             var output = "";
             for(var i=0; i<messages.length; i++) {
-                output += messages[i].Message + "\n";
+                output += messages[i].Message;
             }
             return output;
         };
@@ -170,16 +175,22 @@ angular.module('PiDashApp.ServerManagerController',[])
             });
         };
 
+        var updateStartButton = function() {
+            if($scope.activeApp.status === Statuses.Running) {
+                $scope.startAppButtonText = "Stop App";
+            }
+            else
+                $scope.startAppButtonText = "Start App";
+        };
+
         $scope.toggleActiveAppStart = function() {
             if($scope.activeApp.status === Statuses.Stopped) {
                 $scope.startActivePiDashApp();
-                $scope.startAppButtonText = "Stop App";
-
             }
             else {
                 $scope.stopActiveApp();
-                $scope.startAppButtonText = "Start App";
             }
+            updateStartButton();
         };
 
         $scope.startActiveApp = function() {
@@ -218,7 +229,10 @@ angular.module('PiDashApp.ServerManagerController',[])
 
         var addPiDashApp = function(piDashApp) {
             serverManagerService.addPiDashApp(piDashApp, function(res) {
-                $scope.activeApp = buildPiDashAppFromResponse(res.app);
+                delete $scope.piDashApps[piDashApp.app.appId];
+                var newPiDashApp = buildPiDashAppFromResponse(res.app);
+                $scope.piDashApps[newPiDashApp.app.appId] = newPiDashApp;
+                $scope.activeApp = newPiDashApp.app;
                 alert("App Added!");
             });
         };
@@ -274,7 +288,7 @@ angular.module('PiDashApp.ServerManagerController',[])
                     $scope.activeApp.status = Statuses.Running;
                 }
                 else if(piDashAppRes.Status === "Error") {
-                    //$scope.activeApp.status = Statuses.Stopped;
+
                 }
                 if(callback)
                     callback(response);
