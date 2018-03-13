@@ -6,6 +6,7 @@ const helpers = require('../Helpers');
 var winston = require('../Logger');
 var piDashApp = require('../../content/js/PiDashApp');
 var process = require('../Process');
+var validation = require('../Validation');
 
 var logger = winston.logger;
 
@@ -17,7 +18,7 @@ const execFile = require('child_process').execFile;
 var processes = process.processes;
 
 /* Executes command and spawns new process */
-app.post("/Process/Spawn/", function (req, res) {
+app.post("/Process/Spawn/", validation.requireLogon, function (req, res) {
     console.log('debug', "Spawning process Command: " + req.body.Command);
     process.spawnProcess(req.body.Command,function(newProcess){
 
@@ -36,7 +37,7 @@ app.post("/Process/Spawn/", function (req, res) {
 });
 
 /* Action to return console for process with 'pid' */
-app.post("/Process/Console/", function (req, res) {
+app.post("/Process/Console/", validation.requireLogon, function (req, res) {
     var pid = req.body.pid;
     console.log('debug', '/Process/Console for pid=' + pid);
     if(processes[pid])
@@ -45,7 +46,7 @@ app.post("/Process/Console/", function (req, res) {
         res.json("{\"Status\":\"Error\"}");
 });
 
-app.post("/Process/Command/", function (req, res) {
+app.post("/Process/Command/", validation.requireLogon, function (req, res) {
 
     var pid = req.body.pid;
     logger.log('debug', "Command Received Command: " + req.body.command);
@@ -64,7 +65,7 @@ app.post("/Process/Command/", function (req, res) {
 });
 
 /* Action to kill a process */
-app.post("/Process/Kill/", function (req, res) {
+app.post("/Process/Kill/", validation.requireLogon, function (req, res) {
     var pid = req.body.pid;
 
     process.killProcess(pid, function(response){

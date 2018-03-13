@@ -132,6 +132,10 @@ var addPermissions = function (appId, userId, groupId, read, write, execute, cal
 var addPermissionsByUserName = function(appId, userName, groupId, read, write, execute, callback) {
     var sqlQuery = sqlString.format("INSERT INTO AppPermissions(AppId, UserId, GroupId, ReadPermission, WritePermission, ExecutePermission) " +
         "VALUES(?,(SELECT UserId FROM Users WHERE UserName=? LIMIT 1),?,?,?,?);", [appId, userName, groupId, read, write, execute]);
+    runCommand(sqlQuery, function (result) {
+        if(callback)
+            callback(result);
+    });
 };
 
 var addLogs = function (appId, path, logName, callback) {

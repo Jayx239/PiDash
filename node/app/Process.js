@@ -47,9 +47,32 @@ var spawnProcess = function(command, callback) {
 
 var killProcess = function(pid, callback) {
     var command = "pkill -P " + pid;
-    logger.log('debug', "Killing process, Pid: " + pid);
-    var childProcess = exec(command);
-    setImmediate(function(){
+    logger.debug("Killing process, Pid: " + pid);
+    var childProcess = exec(command,function(error,stdout,stderr){
+        var result = new Object();
+        if(error) {
+            logger.debug("Child process not killed")
+        }
+
+        var parentCommand = "kill " + pid;
+        var parentProcess = exec(parentCommand,function(error,stdout,stderr) {
+            if(error) {
+                logger.debug("Error killing parent process Pid: " + pid);
+                result.status = "Error";
+                result.message = "Error killing parent";
+            }
+            else {
+                logger.debug("Process killed Pid: " + pid);
+                result.status = "Success";
+                result.message = "Process killed";
+            }
+            callback(result);
+        });
+
+
+
+    });
+    /*setImmediate(function() {
         var childRetVal = childProcess.returnValue;
         console.log("killing");
         var parentCommand = "kill " + pid;
@@ -58,7 +81,7 @@ var killProcess = function(pid, callback) {
         var response = {"Status": "Unknown" };
         if(callback)
             callback(response);
-    });
+    });*/
 };
 
 module.exports = {

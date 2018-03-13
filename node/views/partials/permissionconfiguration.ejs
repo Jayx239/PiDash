@@ -3,7 +3,7 @@
 </div>
 <div class="row" ng-repeat="appPermission in activeAppPermissions track by $index">
     <div class="col-xs-12">
-        <input type="text" ng-model="appPermission.appUser.userName"/>
+        <input type="text" ng-change="resetPermissionUserId(appPermission)" ng-model="appPermission.appUser.userName"/>
     </div>
     <div class="col-xs-12">
         <div class="col-sm-4 col-xs-12">Read</div>

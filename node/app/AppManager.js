@@ -397,7 +397,7 @@ var updateAppPermissions = function(appPermissions, index, callback) {
 var updateAppPermission = function(appPermission, callback) {
     var userId = appPermission.appUser.userId;
     var sqlFunction;
-    if(userId)
+    if(userId && userId > 0)
         sqlFunction = appProvider.updatePermissions;
     else {
         userId = appPermission.appUser.userName;

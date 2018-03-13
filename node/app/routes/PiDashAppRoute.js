@@ -181,7 +181,7 @@ app.post("/App/DeleteAppLogByLogId", validation.requireAdmin, function(req,res) 
     });
 });
 
-app.post("/App/SaveScript", function(req,res) {
+app.post("/App/SaveScript", validation.requireLogon, function(req,res) {
     var appScript = script.buildScriptFromRequest(req.body);
     var result = Object();
     if(appScript) {
@@ -208,7 +208,7 @@ app.post("/App/SaveScript", function(req,res) {
     }
 });
 
-app.post("/App/GetLogContents", function(req,res) {
+app.post("/App/GetLogContents", validation.requireLogon, function(req,res) {
     var appLog = piDashApp.tryParseJson(req.body.log);
 
     var result = new Object();
@@ -231,7 +231,7 @@ app.post("/App/GetLogContents", function(req,res) {
     }
 });
 
-app.post("/App/StartPiDashApp", function(req,res) {
+app.post("/App/StartPiDashApp", validation.requireLogon, function(req,res) {
     var newPiDashApp = createAppFromRequest(req);
     var response = new Object();
     process.spawnProcess(newPiDashApp.app.startCommand,function(newProcess) {

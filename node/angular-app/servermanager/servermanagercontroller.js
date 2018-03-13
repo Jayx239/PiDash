@@ -294,5 +294,7 @@ angular.module('PiDashApp.ServerManagerController',[])
                     callback(response);
             });
         };
-
+        $scope.resetPermissionUserId = function(appPermission) {
+            appPermission.appUser.userId = -1;
+        }
     });
