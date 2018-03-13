@@ -23,7 +23,7 @@ var getUserByUserId = function (userId, callback) {
 };
 
 var getCredentialsByUserId = function (userId, callback) {
-    var sqlQuery = sqlQuery.format("SELECT * FROM Credentials WHERE UserId=?;", [userId]);
+    var sqlQuery = sqlString.format("SELECT * FROM Credentials WHERE UserId=?;", [userId]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
@@ -75,7 +75,7 @@ var addUserToUsersTable = function (userName, primaryEmail, firstName, middleNam
         }
         else if (returnObject.Status !== Statuses.Error) {
             logger.log('debug', "Valid UserName");
-            var sqlQuery = sqlString.format("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('?','?','?','?','?','?',?,?,?);",[userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear]);
+            var sqlQuery = sqlString.format("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES(?,?,?,?,?,?,?,?);",[userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear]);
             runCommand(sqlQuery, function (result) {
                 callback(result);
             });
