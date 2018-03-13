@@ -216,7 +216,7 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
 };
 
 var addAdminByUserName = function (userName, groupId, isActive, callback) {
-    var sqlQuery = "SELECT * FROM USERS WHERE UserName='" + userName + "';";
+    var sqlQuery = "SELECT * FROM Users WHERE UserName='" + userName + "';";
     runCommand(sqlQuery, function (result) {
         if (result.status === Statuses.Error || result.results.length < 1) {
             logger.log('debug', 'Invalid User name, adding admin failed');
