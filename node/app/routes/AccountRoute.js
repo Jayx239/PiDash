@@ -6,20 +6,20 @@ var credentialProvider = require('../providers/CredentialProvider');
 var validation = require('../Validation');
 
 app.get("/Account", validation.requireLogon, function (req, res) {
-    res.render("Account");
+    res.render("account");
 });
 
 app.post("/Account/ChangePassword", validation.requireLogon, function (req, res) {
     if (!validation.validPassword(req.body.OldPassword) || !validation.validPassword(req.body.NewPassword) || req.body.NewPassword !== req.body.RepeatNewPassword) {
         res.locals.messages.errors.push("Invalid password");
-        res.render("Account");
+        res.render("account");
         return;
     }
     credentialProvider.getCredentialsByUserName(req.user, function (returnObject) {
         if (returnObject.status === credentialProvider.Statuses.Error || returnObject.results.length < 1) {
             logger.error("Error changing password, user not found, UserName: " + req.user);
             res.locals.messages.errors.push("User not found");
-            res.render("Account");
+            res.render("account");
         }
         else {
             if (validation.validateUserPassword(req.body.OldPassword, returnObject.results[0].Hash, returnObject.results[0].Salt)) {
@@ -28,20 +28,20 @@ app.post("/Account/ChangePassword", validation.requireLogon, function (req, res)
                     if (result.status === credentialProvider.Statuses.Error) {
                         logger.error("Error updating User password, UserName: " + req.user);
                         res.locals.messages.errors.push("Error resetting password");
-                        res.render("Account");
+                        res.render("account");
                     }
                     else if (result.status === credentialProvider.Statuses.Success) {
                         logger.info("User password updated, UserName: " + req.user);
                         res.locals.messages.success.push("Password reset successfully")
-                        res.render("Account");
+                        res.render("account");
                     }
                     else {
-                        res.render("Account");
+                        res.render("account");
                     }
                 });
             }
             else{
-                res.render("Account");
+                res.render("account");
             }
         }
     });
@@ -56,7 +56,7 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
             response.status="Error";
             response.message = "Invalid user";
             res.locals.messages.errors.push(response.message);
-            res.render('Account');//res.json(response);
+            res.render('account');//res.json(response);
         }
         else {
             credentialProvider.getAdminByUserName(userName,function(result) {
@@ -73,7 +73,7 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
                             res.locals.messages.success.push(response.message);
                         }
 
-                        res.render('Account');//res.json(response);
+                        res.render('account');//res.json(response);
                     });
                 }
                 else if(result.firstResult && result.firstResult.Active == 0) {
@@ -86,14 +86,14 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
                             response.message = userName + " added as admin";
                             res.locals.messages.success.push(response.message);
                         }
-                        res.render('Account');//res.json(response);
+                        res.render('account');//res.json(response);
                     });
                 }
                 else {
                     response.status = "Error";
                     response.message = "User is already an admin";
                     res.locals.messages.errors.push(response.message);
-                    res.render('Account');//res.json(response);
+                    res.render('account');//res.json(response);
                 }
             });
         }
@@ -110,6 +110,6 @@ app.post("/Account/RevokeMyAdminPrivileges", validation.requireAdmin, function (
             res.locals.admin = false;
             res.locals.messages.success.push("Your admin privileges have been revoked");
         }
-        res.render("Account");
+        res.render("account");
     });
 });
