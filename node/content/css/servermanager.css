@@ -17,3 +17,15 @@ background: #f6f8f9; /* Old browsers */
 .app-list .app-row button.btn.btn-primary:active {background-color: #DEE5E5; border-color: #DEE5E5; color: #011936; }
 body {background-color: #DEE5E5 !important; color: #011936 !important; }
 .app-details-container { margin-bottom: 15px; }
+.footer-bar { margin-top: 15px; padding-top: 15px; }
+.btn { margin-top: 15px; }
+.permission-button-container { padding-top: 10px; margin-top: 10px; padding-bottom: 10px; margin-bottom: 10px; border: #eee solid 2px;
+    background: -moz-linear-gradient(bottom, #465362 0%, #DEE5E5 50%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(bottom, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to top, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
+}
+.permission-button-container .col-xs-4 { border-right: #DEE5E5 solid 1px; }
+.permission-button-container .col-xs-4:last-child { border-right: 0px; }
+/*.menu-body {border: #eee solid 2px; padding-top: 15px; padding-bottom: 15px; }*/
+.permission-button-container .btn { width: 100%;}

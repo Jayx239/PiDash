@@ -68,20 +68,7 @@ var killProcess = function(pid, callback) {
             }
             callback(result);
         });
-
-
-
     });
-    /*setImmediate(function() {
-        var childRetVal = childProcess.returnValue;
-        console.log("killing");
-        var parentCommand = "kill " + pid;
-        var parentProcess = exec(parentCommand);
-        var parentRetVal = parentProcess.returnValue;
-        var response = {"Status": "Unknown" };
-        if(callback)
-            callback(response);
-    });*/
 };
 
 module.exports = {

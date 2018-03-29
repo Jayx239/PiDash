@@ -15,6 +15,17 @@ angular.module('PiDashApp.ServerManagerController',[])
         $scope.userId = "";
         $scope.userName = "";
         $scope.appUser;
+        $scope.selectedConfigMenu;
+        $scope.configMenus = {
+            App: 'App',
+            Permissions: 'Permissions',
+            Log: 'Log'
+        };
+
+        $scope.setMenu = function(menuId) {
+            $scope.selectedConfigMenu = menuId;
+        };
+
         var maxNewApps = 100;
 
         var Statuses = {"Starting":"Starting","Running":"Running","Stopped":"Stopped", "Loading": "Loading"};
@@ -26,6 +37,7 @@ angular.module('PiDashApp.ServerManagerController',[])
                 $scope.userName = res.userName;
                 $scope.appUser = new AppUser($scope.userName, $scope.userId);
                 $scope.retrieveApps();
+                $scope.selectedConfigMenu = $scope.configMenus.App;
             })
         };
         initialize();
