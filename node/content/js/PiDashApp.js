@@ -120,7 +120,6 @@ Process.prototype.writeIn = function(input){
 };
 
 Process.prototype.writeErr = function(input){
-    this.process.stdin.write(input);
     this.messages.push(new ProcessMessage(STDERR,input))
 };
 
