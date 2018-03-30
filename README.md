@@ -85,4 +85,16 @@ node index.js
         1. Navigate to Account page from the top menu.
         2. Enter password details.
         3. Click reset
-        
+    * Granting admin privileges (Requires granting account to be an admin account)
+        1. Navigate to Account page from top menu
+        2. Enter desired admin username in'New Admin' field
+        3. Click Submit
+    * Revoke admin privieges
+        1. Navigate to Account page from top menu
+        2. Click 'Revoke My Privilege' button
+
+Notes:
+* Applications are run from the base directory (PiDash/node/), so any application references to
+    local directories will start from this directory. For example, log files printed to ./logs/ will print to
+    the /PiDash/node/logs.
+    

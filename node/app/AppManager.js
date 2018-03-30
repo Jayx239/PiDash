@@ -59,7 +59,7 @@ var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
                 app.logs = logs;
                 getAppPermissionsByAppId(appId,function(permissions) {
 
-                    var newApp = new PiDashApp(app,permissions,[]);
+                    var newApp = new PiDashApp(app,permissions,null);
                     ActiveApps[appId] = newApp;
                     if(callback)
                         callback(ActiveApps[appId]);
@@ -189,6 +189,7 @@ var addPiDashApp = function(piDashApp, callback) {
             addLogs(logs,0,function() {
                 var appPermissions = piDashApp.appPermissions;
                 addAppPermissions(appPermissions, 0, function() {
+                    ActiveApps[piDashApp.app.appId] = piDashApp;
                     if(callback)
                         callback(piDashApp);
                 });
@@ -247,12 +248,14 @@ var addAppPermission = function(appPermission, callback) {
 
     var groupId = appPermission.groupId;
     var userId = appPermission.appUser.userId;
+    var sqlFunction;
     if(userId && userId > 0)
-        userId = appPermission.appUser.userId;
-    else
-        userId = "(SELECT UserId FROM Users WHERE UserName='" + appPermission.appUser.userName + "' LIMIT 1)";
-
-    appProvider.addPermissions(appPermission.appId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write),booleanToDatabaseBoolean(appPermission.execute), function(result){
+        sqlFunction = appProvider.addPermissions;
+    else {
+        sqlFunction = appProvider.addPermissionsByUserName;
+        userId = appPermission.appUser.userName; //"(SELECT UserId FROM Users WHERE UserName='" + appProvider.sqlString.escape(appPermission.appUser.userName) + "' LIMIT 1)";
+    }
+    sqlFunction(appPermission.appId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write),booleanToDatabaseBoolean(appPermission.execute), function(result){
         if(result.status === appProvider.Statuses.Error)
             logger.error("Error adding app permission");
         if(callback)
@@ -392,13 +395,15 @@ var updateAppPermissions = function(appPermissions, index, callback) {
 };
 
 var updateAppPermission = function(appPermission, callback) {
-    var userId;
-    if(userId)
-        userId = appPermission.appUser.userId;
-    else
-        userId = "(SELECT UserId FROM Users WHERE UserName='" + appPermission.appUser.userName + "' LIMIT 1)";
-
-    appProvider.updatePermissions(appPermission.permissionId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write), booleanToDatabaseBoolean(appPermission.execute), function(result) {
+    var userId = appPermission.appUser.userId;
+    var sqlFunction;
+    if(userId && userId > 0)
+        sqlFunction = appProvider.updatePermissions;
+    else {
+        userId = appPermission.appUser.userName;
+        sqlFunction = appProvider.updatePermissionsByUserName;
+    }
+    sqlFunction(appPermission.permissionId, userId, appPermission.groupId, booleanToDatabaseBoolean(appPermission.read), booleanToDatabaseBoolean(appPermission.write), booleanToDatabaseBoolean(appPermission.execute), function(result) {
         if(result.status === appProvider.Statuses.Error)
             logger.error("Error updating log");
         if(callback)

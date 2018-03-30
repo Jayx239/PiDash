@@ -1,8 +1,17 @@
 /* Data Structures */
-function PiDashApp(app,appPermissions, processes) {
+function PiDashApp(app,appPermissions, piDashProcess) {
     this.app = app;
     this.appPermissions = appPermissions;
-    this.processes = processes;
+
+
+    if(piDashProcess){
+        this.process = piDashProcess;
+        this.pid = piDashProcess.pid;
+    }
+    else {
+        this.process = new PiDashProcess(-1,-1,[]);
+        this.process.running = false;
+    }
 }
 
 
@@ -47,8 +56,47 @@ function AppUser(userName, userId) {
     this.userId = userId;
 }
 
-function Process(pid, startTime) {
+function PiDashProcess(pid, startTime, messages) {
     this.pid = pid;
+    this.messages = [];
+    if(pid && pid >= 0)
+        this.running = true;
+    else
+        this.running = false;
+
+    if(messages) {
+        this.messages = messages;
+        this.isRunning();
+    }
+
+    this.startTime = Date.now();
+    if(startTime)
+        this.startTime = startTime;
+
+}
+
+PiDashProcess.prototype.isRunning = function(){
+    if(this.running)
+        for(var message in this.messages) {
+            if(message.Source === CLOSE ) {
+                this.running = false;
+                break;
+            }
+        }
+
+        return this.running;
+};
+
+/* Console signal codes */
+var STDIN = "stdin";//0;
+var STDOUT = "stdout";//1;
+var STDERR = "stderr";//2;
+var CLOSE = "close";//3;
+
+function Process(process, startTime) {
+    this.process = process;
+    this.pid = process.pid;
+    this.messages = [];
     this.startTime = Date.now();
     if(startTime)
         this.startTime = startTime;
@@ -66,18 +114,48 @@ Process.prototype.getUpTime = function(){
         return Date.now() - this.startTime;
 };
 
+Process.prototype.writeIn = function(input){
+    this.process.stdin.write(input);
+    this.messages.push(new ProcessMessage(STDIN,input))
+};
+
+Process.prototype.writeErr = function(input){
+    this.messages.push(new ProcessMessage(STDERR,input))
+};
+
+Process.prototype.writeOut = function(input){
+    this.messages.push(new ProcessMessage(STDOUT,input))
+};
+
+Process.prototype.writeClose = function(input) {
+    this.messages.push(new ProcessMessage(CLOSE,input))
+};
+
+function ProcessMessage(src,message) {
+    this.Source = src;
+    this.Message = message;
+    this.CreateTime = Date.now();
+}
+
 var buildPiDashAppFromResponse = function(res) {
 
     var jsonRes = tryParseJson(res);
 
     var app = buildAppFromResponse(jsonRes);
     var permissions;
-    var processes;
+    var process;
+
     if(jsonRes.appPermissions)
         permissions = buildPermissionsFromResponse(jsonRes);
-    if(jsonRes.processes)
-        processes = buildProcessesFromResponse(jsonRes);
-    var dashApp = new PiDashApp(app,permissions,processes);
+    if(jsonRes.process)
+        process = new PiDashProcess(jsonRes.process.pid, jsonRes.process.startTime, jsonRes.process.messages);
+
+    var dashApp = new PiDashApp(app,permissions,process);
+
+    if(jsonRes.pid)
+        dashApp.pid = jsonRes.pid;
+
+
 
     return dashApp;
 };
@@ -138,7 +216,7 @@ var createDefaultPiDashApp = function(userName, userId) {
     var app = new App("",-1,userId,"",[]);
     var appUser = new AppUser(userName, userId);
     var appPermissions = [new AppPermission(-1, -1, appUser, -1, true, true, true)];
-    var piDAshApp = new PiDashApp(app,appPermissions, new Object());
+    var piDAshApp = new PiDashApp(app,appPermissions, null);
     return piDAshApp;
 };
 
@@ -159,7 +237,13 @@ if(typeof module != 'undefined' && module.exports)
         AppLog: AppLog,
         AppPermission: AppPermission,
         AppUser: AppUser,
+        PiDashProcess: PiDashProcess,
         Process: Process,
+        ProcessMessage: ProcessMessage,
+        STDIN: STDIN,
+        STDOUT: STDOUT,
+        STDERR:STDERR,
+        CLOSE:CLOSE,
         buildPiDashAppFromResponse: buildPiDashAppFromResponse,
         buildPiDashAppsFromResponse: buildPiDashAppsFromResponse,
         buildAppFromResponse: buildAppFromResponse,

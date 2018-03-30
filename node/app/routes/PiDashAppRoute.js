@@ -5,6 +5,7 @@ const validation = require('../Validation');
 const app = server.app;
 const script = require("../../content/js/Script");
 const fs = require('fs');
+const process = require('../Process');
 /*
     App.json
     {
@@ -180,7 +181,7 @@ app.post("/App/DeleteAppLogByLogId", validation.requireAdmin, function(req,res) 
     });
 });
 
-app.post("/App/SaveScript", function(req,res) {
+app.post("/App/SaveScript", validation.requireLogon, function(req,res) {
     var appScript = script.buildScriptFromRequest(req.body);
     var result = Object();
     if(appScript) {
@@ -207,7 +208,7 @@ app.post("/App/SaveScript", function(req,res) {
     }
 });
 
-app.post("/App/GetLogContents", function(req,res) {
+app.post("/App/GetLogContents", validation.requireLogon, function(req,res) {
     var appLog = piDashApp.tryParseJson(req.body.log);
 
     var result = new Object();
@@ -228,6 +229,23 @@ app.post("/App/GetLogContents", function(req,res) {
         result.message = "Invalid log data received";
         res.json(result);
     }
+});
+
+app.post("/App/StartPiDashApp", validation.requireLogon, function(req,res) {
+    var newPiDashApp = createAppFromRequest(req);
+    var response = new Object();
+    process.spawnProcess(newPiDashApp.app.startCommand,function(newProcess) {
+        if(!appManager.ActiveApps[newPiDashApp.app.appId]) {
+            appManager.ActiveApps[newPiDashApp.app.appId] = newPiDashApp;
+            response.message="Added PiDashApp";
+        }
+
+        response.status="Success";
+        appManager.ActiveApps[newPiDashApp.app.appId].process = new piDashApp.PiDashProcess(newProcess.pid,newProcess.startTime,newProcess.messages);
+        appManager.ActiveApps[newPiDashApp.app.appId].pid = newProcess.pid;
+        response.piDashApp = JSON.stringify(appManager.ActiveApps[newPiDashApp.app.appId]);
+        res.json(JSON.stringify(response));
+    });
 });
 
 var createAppFromRequest = function(req) {

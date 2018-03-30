@@ -3,22 +3,21 @@
 </div>
 <div class="row" ng-repeat="appPermission in activeAppPermissions track by $index">
     <div class="col-xs-12">
-        <input type="text" ng-model="appPermission.appUser.userName"/>
+        <input type="text" ng-change="resetPermissionUserId(appPermission)" ng-model="appPermission.appUser.userName"/>
     </div>
     <div class="col-xs-12">
-        <div class="col-sm-4 col-xs-12">Read</div>
-        <div class="col-sm-4 col-xs-12">Write</div>
-        <div class="col-sm-4 col-xs-12">Execute</div>
+        <div class="col-sm-4 col-xs-4">Read</div>
+        <div class="col-sm-4 col-xs-4">Write</div>
+        <div class="col-sm-4 col-xs-4">Execute</div>
     </div>
     <div class="col-xs-12">
-        <div class="col-sm-4 col-xs-12"><input type="checkbox" ng-model="appPermission.read"></div>
-        <div class="col-sm-4 col-xs-12"><input type="checkbox" ng-model="appPermission.write"></div>
-        <div class="col-sm-4 col-xs-12"><input type="checkbox" ng-model="appPermission.execute"></div>
+        <div class="col-sm-4 col-xs-4"><input type="checkbox" ng-model="appPermission.read"></div>
+        <div class="col-sm-4 col-xs-4"><input type="checkbox" ng-model="appPermission.write"></div>
+        <div class="col-sm-4 col-xs-4"><input type="checkbox" ng-model="appPermission.execute"></div>
     </div>
     <div class="row">
         <div class="col-xs-12">
-            <div class="col-sm-6 col-xs-12"><button class="btn">Save</button></div>
-            <div class="col-sm-6 col-xs-12"><button class="btn btn-default" ng-click="deleteActiveAppPermission($index)">Delete Permission</button></div>
+            <div class="col-xs-12"><button class="btn btn-default" ng-click="deleteActiveAppPermission($index)">Delete Permission</button></div>
         </div>
     </div>
     <hr/>

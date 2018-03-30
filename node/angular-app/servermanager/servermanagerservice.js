@@ -193,5 +193,16 @@ angular.module('PiDashApp.ServerManagerService',[])
             })
         };
 
+        serverManagerApi.startPiDashApp = function(piDashApp, callback) {
+            $.ajax({
+                method: "POST",
+                url: "/App/StartPiDashApp",
+                data: {json: JSON.stringify(piDashApp)},
+                dataType: 'json'
+            }).done(function(res) {
+                callback(res);
+            })
+        };
+
         return serverManagerApi;
     });

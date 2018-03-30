@@ -1,7 +1,7 @@
 const baseProvider = require('./BaseProvider');
 var logger = baseProvider.logger;
 var validation = require('../Validation');
-
+var sqlString = baseProvider.sqlString;
 var Statuses = baseProvider.Statuses;
 
 /* Function for running sql commands */
@@ -9,31 +9,31 @@ var runCommand = baseProvider.runCommand;
 
 /* Database get provider functions */
 var getUserByUserName = function (userName, callback) {
-    var sqlQuery = "SELECT * FROM Users WHERE UserName='" + userName + "';";
+    var sqlQuery = sqlString.format("SELECT * FROM Users WHERE UserName=?;", [userName]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
 };
 
 var getUserByUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Users WHERE UserId=" + userId + ";";
+    var sqlQuery = sqlString.format("SELECT * FROM Users WHERE UserId=?;", [userId]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
 };
 
 var getCredentialsByUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Credentials WHERE UserId=" + userId + ";";
+    var sqlQuery = sqlString.format("SELECT * FROM Credentials WHERE UserId=?;", [userId]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
 };
 
 var getCredentialsByUserName = function (userName, callback) {
-    var sqlQuery = "SELECT * FROM Users AS U " +
+    var sqlQuery = sqlString.format("SELECT * FROM Users AS U " +
         "INNER JOIN Credentials AS C " +
         "ON U.UserId = C.UserId " +
-        "WHERE U.UserName='" + userName + "';";
+        "WHERE U.UserName=?;", [userName]);
 
     runCommand(sqlQuery, function (result) {
         callback(result);
@@ -41,24 +41,24 @@ var getCredentialsByUserName = function (userName, callback) {
 };
 
 var getGroupByGroupId = function (groupId, callback) {
-    var sqlQuery = "SELECT * FROM Groups WHERE GroupId='" + groupId + "';";
+    var sqlQuery = sqlString.format("SELECT * FROM Groups WHERE GroupId=?;", [groupId]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
 };
 
 var getAdminByUserId = function (userId, callback) {
-    var sqlQuery = "SELECT * FROM Admins WHERE UserId=" + userId + ";";
+    var sqlQuery = sqlString.format("SELECT * FROM Admins WHERE UserId=?;", [userId]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
 };
 
 var getAdminByUserName = function (userName, callback) {
-    var sqlQuery = "SELECT * FROM Users AS U " +
+    var sqlQuery = sqlString.format("SELECT * FROM Users AS U " +
         "INNER JOIN Admins AS A " +
         "ON U.UserId = A.UserId " +
-        "WHERE U.UserName='" + userName + "';";
+        "WHERE U.UserName=?;", [userName]);
     runCommand(sqlQuery, function (result) {
         callback(result);
     });
@@ -75,7 +75,7 @@ var addUserToUsersTable = function (userName, primaryEmail, firstName, middleNam
         }
         else if (returnObject.Status !== Statuses.Error) {
             logger.log('debug', "Valid UserName");
-            var sqlQuery = "INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('" + userName + "','" + primaryEmail + "','" + firstName + "','" + middleName + "','" + lastName + "'," + birthDay + "," + birthMonth + "," + birthYear + ");";
+            var sqlQuery = sqlString.format("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES(?,?,?,?,?,?,?,?);",[userName, primaryEmail, firstName, middleName, lastName, birthDay, birthMonth, birthYear]);
             runCommand(sqlQuery, function (result) {
                 callback(result);
             });
@@ -100,8 +100,8 @@ var addCredentialsForUserById = function (userId, passwordHash, salt, callback) 
                 getCredentialsByUserId(userId, function (result) {
                     if (result.error === Statuses.Error || result.results.length < 1) {
 
-                        var sqlQuery = "INSERT INTO Credentials(UserId,Salt,Hash) " +
-                            "VALUES('" + userId + "','" + salt + "','" + passwordHash + "');";
+                        var sqlQuery = sqlString.format("INSERT INTO Credentials(UserId,Salt,Hash) " +
+                            "VALUES(?,?,?);", [userId, salt, passwordHash]);
                         runCommand(sqlQuery, function (result) {
                             callback(result);
                         });
@@ -137,10 +137,10 @@ var addCredentialsByUserName = function(userName, passwordHash, salt, callback) 
 var updateCredentialsForUserById = function (userId, passwordHash, salt, callback) {
     getCredentialsByUserId(userId, function (result) {
         if (result.status !== Statuses.Error && result.results.length > 0 ) {
-                        var sqlQuery = "UPDATE Credentials " +
-                            "SET Salt='" + salt + "', " +
-                            "Hash='" + passwordHash + "' " +
-                            "WHERE UserId=" + userId + ";";
+                        var sqlQuery = sqlString.format("UPDATE Credentials " +
+                            "SET Salt=?, " +
+                            "Hash=? " +
+                            "WHERE UserId=?;", [salt, passwordHash, userId]);
 
                         runCommand(sqlQuery, function (result) {
                             callback(result);
@@ -193,8 +193,7 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
                     return;
                 }
                 else {
-                    var sqlQuery = "INSERT INTO Admins(UserId,GroupId,Active)" +
-                        "Values(" + userId + ", " + groupId + ", " + isActive + ");";
+                    var sqlQuery = sqlString.format("INSERT INTO Admins(UserId,GroupId,Active) Values(?,?,?);", [userId, groupId, isActive]);
 
                     runCommand(sqlQuery, function (result) {
                         callback(result);
@@ -204,8 +203,8 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
             });
         }
         else {
-            var sqlQuery = "INSERT INTO Admins(UserId,GroupId,Active)" +
-                "Values(" + userId + ", " + groupId + ", " + isActive + ");";
+            var sqlQuery = sqlString.format("INSERT INTO Admins(UserId,GroupId,Active) " +
+                "Values(?,?,?);", [userId, groupId, isActive]);
 
             runCommand(sqlQuery, function (result) {
                 callback(result);
@@ -217,7 +216,7 @@ var addAdminByUserId = function (userId, groupId, isActive, callback) {
 };
 
 var addAdminByUserName = function (userName, groupId, isActive, callback) {
-    var sqlQuery = "SELECT * FROM USERS WHERE UserName='" + userName + "';";
+    var sqlQuery = "SELECT * FROM Users WHERE UserName='" + userName + "';";
     runCommand(sqlQuery, function (result) {
         if (result.status === Statuses.Error || result.results.length < 1) {
             logger.log('debug', 'Invalid User name, adding admin failed');
@@ -231,7 +230,7 @@ var addAdminByUserName = function (userName, groupId, isActive, callback) {
 };
 
 var activateAdminByAdminId = function(adminId, callback) {
-    var sqlQuery = "UPDATE Admins SET Active = 1 WHERE AdminId=" + adminId + ";";
+    var sqlQuery = sqlString.format("UPDATE Admins SET Active = 1 WHERE AdminId=?;",[adminId]);
     runCommand(sqlQuery,function(result) {
         if(callback)
             callback(result)
@@ -239,7 +238,7 @@ var activateAdminByAdminId = function(adminId, callback) {
 };
 
 var deActivateAdminByAdminId = function(adminId, callback) {
-    var sqlQuery = "UPDATE Admins SET Active = 0 WHERE AdminId=" + adminId + ";";
+    var sqlQuery = sqlString.format("UPDATE Admins SET Active = 0 WHERE AdminId=?;",[adminId]);
     runCommand(sqlQuery,function(result) {
         if(callback)
             callback(result)
@@ -247,7 +246,7 @@ var deActivateAdminByAdminId = function(adminId, callback) {
 };
 
 var deActivateAdminByUserId = function(userId, callback) {
-    var sqlQuery = "UPDATE Admins SET Active = 0 WHERE UserId=" + userId + ";";
+    var sqlQuery = sqlString.format("UPDATE Admins SET Active = 0 WHERE UserId=?;", [userId]);
     runCommand(sqlQuery,function(result) {
         if(callback)
             callback(result)
@@ -272,5 +271,6 @@ module.exports = {
     addAdminByUserName: addAdminByUserName,
     activateAdminByAdminId: activateAdminByAdminId,
     deActivateAdminByAdminId: deActivateAdminByAdminId,
-    deActivateAdminByUserId: deActivateAdminByUserId
+    deActivateAdminByUserId: deActivateAdminByUserId,
+    sqlString: sqlString
 };

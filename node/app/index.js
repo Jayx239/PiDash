@@ -6,11 +6,7 @@ var winston = require('./Logger');
 var PiSys = require('./PiSystem');
 /* Get configured winston logger */
 var logger = winston.logger;
-var Process = require('./routes/ProcessRoute');
-var logonRegister = require('./routes/LogonRegisterRoute');
-var account = require('./routes/AccountRoute');
 var baseProvider = require('./providers/BaseProvider');
-var piDashAppRoutes = require("./routes/PiDashAppRoute");
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -22,9 +18,20 @@ app.use('/content', express.static(__dirname + '/../content'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-app', express.static(__dirname + '/../angular-app'));
 
+/* Don't morgan log these */
+var Process = require('./routes/ProcessRoute');
+var piDashAppRoutes = require("./routes/PiDashAppRoute");
+
+app.use(require("morgan")("combined", { "stream": logger.stream }));
+
+
+var logonRegister = require('./routes/LogonRegisterRoute');
+var account = require('./routes/AccountRoute');
+
+
 app.get('/', function (req, res) {
     if (req.user)
-        res.redirect("/Dashboard")
+        res.redirect("/Dashboard");
     else
         res.redirect("/LogonRegister/Logon");
 });
@@ -66,6 +73,7 @@ server.startServer(function(success) {
     }
 
 });
+
 baseProvider.configureDatabase(function(success) {
     if(!success)
         logger.error("Error configuring database...");
