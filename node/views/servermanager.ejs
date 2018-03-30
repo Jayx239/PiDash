@@ -27,17 +27,17 @@
                     <%if(admin){%>
                     <div ng-switch="selectedConfigMenu" >
                     <div class="col-xs-12 permission-button-container">
-                        <div class="col-xs-4" ><button class="btn" ng-click="setMenu(configMenus.App)">App</button></div>
-                        <div class="col-xs-4" ng-click="setMenu(configMenus.Permissions)"><button class="btn">Permissions</button></div>
-                        <div class="col-xs-4" ><button ng-click="setMenu(configMenus.Log)" class="btn">Logs</button></div>
+                        <div class="col-xs-4" ><button class="btn btn-primary" ng-click="setMenu(configMenus.App)">App</button></div>
+                        <div class="col-xs-4" ng-click="setMenu(configMenus.Permissions)"><button class="btn btn-primary">Permissions</button></div>
+                        <div class="col-xs-4" ><button ng-click="setMenu(configMenus.Log)" class="btn btn-primary">Logs</button></div>
                     </div>
 
-                    <div class="row menu-body">
-                        <div class="col-xs-12">
+                    <div class="menu-body col-xs-12">
+
                     <div class="col-xs-12" ng-switch-when="App"><% include partials/appconfiguration%></div>
                     <div class="col-xs-12" ng-switch-when="Permissions"><% include partials/permissionconfiguration %></div>
                     <div class="col-xs-12" ng-switch-when="Log"><% include partials/logconfigurator %></div>
-                    </div>
+
                     </div>
                     </div>
                     <div class="col-xs-12 footer-bar">
