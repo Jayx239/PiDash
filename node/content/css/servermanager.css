@@ -28,4 +28,4 @@ body {background-color: #DEE5E5 !important; color: #011936 !important; }
 .permission-button-container .col-xs-4 { border-right: #DEE5E5 solid 1px; }
 .permission-button-container .col-xs-4:last-child { border-right: 0px; }
 /*.menu-body {border: #eee solid 2px; padding-top: 15px; padding-bottom: 15px; }*/
-.permission-button-container .btn { width: 100%;}
+.permission-button-container .btn { width: 100%; text-overflow: ellipsis; overflow: hidden; }

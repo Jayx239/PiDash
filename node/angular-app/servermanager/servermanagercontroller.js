@@ -22,6 +22,8 @@ angular.module('PiDashApp.ServerManagerController',[])
             Log: 'Log'
         };
 
+
+
         $scope.setMenu = function(menuId) {
             $scope.selectedConfigMenu = menuId;
         };
@@ -242,9 +244,7 @@ angular.module('PiDashApp.ServerManagerController',[])
         var addPiDashApp = function(piDashApp) {
             serverManagerService.addPiDashApp(piDashApp, function(res) {
                 delete $scope.piDashApps[piDashApp.app.appId];
-                var newPiDashApp = buildPiDashAppFromResponse(res.app);
-                $scope.piDashApps[newPiDashApp.app.appId] = newPiDashApp;
-                $scope.activeApp = newPiDashApp.app;
+                $scope.retrieveApps();
                 alert("App Added!");
             });
         };
