@@ -12,41 +12,54 @@ var port = defaultPort;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-fs.readFile('./config/server.config', 'utf-8', function (err, contents) {
-    port = defaultPort;
-    var ip = IP.address();
+var startServer = function(callback) {
+    fs.readFile('./config/server.config', 'utf-8', function (err, contents) {
+        port = defaultPort;
+        var ip = IP.address();
 
-    if (err) {
-        app.listen(port, function () {
-            logger.info("PiDash Server Started: Listening at " + ip + ":" + port + " ...");
-        });
-        return;
-    }
-    else {
-        var configuration = JSON.parse(contents);
-
-        if (!helpers.isNullOrWhitespace(configuration.port)) {
-            port = configuration.port;
-        }
-
-        if (!helpers.isNullOrWhitespace(configuration.ip)) {
-            ip = configuration.ip;
+        if (err) {
             app.listen(port, function () {
                 logger.info("PiDash Server Started: Listening at " + ip + ":" + port + " ...");
             });
+            if(callback)
+                callback(false);
+            return;
         }
         else {
-            app.listen(port, function () {
-                logger.info("PiDash Server Started: Listening at " + ip + ":" + port + " ...");
-            });
+            var configuration = JSON.parse(contents);
+
+            if (!helpers.isNullOrWhitespace(configuration.port)) {
+                port = configuration.port;
+            }
+
+            if (!helpers.isNullOrWhitespace(configuration.ip)) {
+                ip = configuration.ip;
+                app.listen(port, function () {
+                    logger.info("PiDash Server Started: Listening at " + ip + ":" + port + " ...");
+
+                    if(callback)
+                        callback(true);
+                });
+            }
+            else {
+                app.listen(port, function () {
+                    logger.info("PiDash Server Started: Listening at " + ip + ":" + port + " ...");
+
+                    if(callback)
+                        callback(true);
+                });
+            }
+
+
         }
+    });
+};
 
 
-    }
-});
 
 /* Export */
 module.exports = {
+    startServer: startServer,
     app: app,
     express: express,
     IP: IP,

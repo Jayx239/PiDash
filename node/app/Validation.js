@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const winston = require('./Logger');
 const server = require('./Server');
-const provider = require('./Provider');
+const provider = require('./providers/CredentialProvider');
 
 var logger = winston.logger;
 var app = server.app;
@@ -12,7 +12,7 @@ var session = require('client-sessions');
 var helmet = require('helmet');
 
 var invalidRedirectPath = "/";
-
+var adminCode = "Granted";
 app.use(helmet());
 
 app.use(session({
@@ -29,19 +29,16 @@ app.use(function (req, res, next) {
     res.locals.messages = {"errors":[],"success":[]};
     res.locals.messages.errors = [];
     res.locals.messages.success = [];
+    res.locals.admin = false;
 
     if (req.session && req.session.user) {
         req.user = req.session.user;
+        req.userId = req.session.userId;
         req.sessionID = req.session.sessionToken;
         res.locals.user = req.session.user;
-        if (req.session.admin)
+        if (req.session.admin) {
             req.admin = req.session.admin;
-        if (req.session.sesh && req.session.expires && req.session.sessionToken) {
-            var cookieExp = new Date(req.session.expires)
-            if (cookieExp.getTime() < new Date(Date.now()).getTime()) {
-                delete req.session.sesh;
-                delete req.session.sessionToken;
-            }
+            res.locals.admin = true;
         }
     }
     next();
@@ -49,9 +46,8 @@ app.use(function (req, res, next) {
 
 /* Determines if a username is in the database */
 function validUser(req, res, next) {
-    provider.getCredentialsByUserName(req.body.userName, function (response) {
-        if (response.status === provider.Statuses.Error) {
-
+    provider.getCredentialsByUserName(req.body.UserName, function (response) {
+        if (response.status === provider.Statuses.Error || response.results.length == 0) {
             return next(false);
         }
         else
@@ -67,7 +63,7 @@ function validateUserPassword(userPassword, passwordHash, salt) {
         return true;
     }
 
-    winston.logSession(req.sessionID, "Invalid password", 'error');
+    logger.error("Invalid creds");
     return false;
 }
 
@@ -81,14 +77,17 @@ function requireLogon(req, res, next) {
 function requireAdmin(req, res, next) {
     requireLogon(req, res, function () {
         winston.logSession(req.sessionID, "Admin validation required", 'debug');
-        if (req.admin) {
-            winston.logSession(req.sessionID, "Admin validation successful", 'debug');
-            next();
-        }
-        else {
-            winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
-            res.redirect(invalidRedirectPath);
-        }
+
+        provider.getAdminByUserName(req.user, function(result) {
+            if(result.status === provider.Statuses.Error || !result.firstResult || result.firstResult.Active == 0) {
+                winston.logSession((req.sessionID, "Admin validation failed"), 'debug');
+                res.redirect(invalidRedirectPath);
+            }
+            else {
+                winston.logSession(req.sessionID, "Admin validation successful", 'debug');
+                next();
+            }
+        });
     });
 }
 
@@ -136,8 +135,13 @@ function saltHashPassword(userpassword) {
     return passwordData;
 }
 
+/* TODO: Add password requirements */
+var validPassword = function(password){
+    return true;
+};
 
-module.exports = {
+    module.exports = {
+    adminCode: adminCode,
     validUser: validUser,
     validateUserPassword: validateUserPassword,
     requireLogon: requireLogon,
@@ -145,5 +149,6 @@ module.exports = {
     genRandomString: getRandomString,
     sha512: sha512,
     getRandomString: getRandomString,
-    saltHashPassword: saltHashPassword
+    saltHashPassword: saltHashPassword,
+    validPassword: validPassword
 };

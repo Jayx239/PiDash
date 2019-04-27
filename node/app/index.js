@@ -4,10 +4,9 @@ const app = server.app;
 var validation = require('./Validation');
 var winston = require('./Logger');
 var PiSys = require('./PiSystem');
-var logger = winston.logger;
 /* Get configured winston logger */
-var Process = require('./Process');
-var logonRegister = require('./LogonRegister');
+var logger = winston.logger;
+var baseProvider = require('./providers/BaseProvider');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -19,9 +18,20 @@ app.use('/content', express.static(__dirname + '/../content'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-app', express.static(__dirname + '/../angular-app'));
 
+/* Don't morgan log these */
+var Process = require('./routes/ProcessRoute');
+var piDashAppRoutes = require("./routes/PiDashAppRoute");
+
+app.use(require("morgan")("combined", { "stream": logger.stream }));
+
+
+var logonRegister = require('./routes/LogonRegisterRoute');
+var account = require('./routes/AccountRoute');
+
+
 app.get('/', function (req, res) {
     if (req.user)
-        res.redirect("/Dashboard")
+        res.redirect("/Dashboard");
     else
         res.redirect("/LogonRegister/Logon");
 });
@@ -35,12 +45,12 @@ app.get('/Dashboard/', validation.requireLogon, function (req, res) {
     logger.info("/Dashboard/");
     res.render('dashboard');
 });
-app.get('/ServerManager', validation.requireAdmin, function (req, res) {
+app.get('/ServerManager', validation.requireLogon, function (req, res) {
     res.render('servermanager');
-})
+});
 app.get("/Process/Tester", validation.requireAdmin, function (req, res) {
     res.render('processtester');
-})
+});
 
 /* PiSystem API */
 app.get('/App/System/GetCpus', validation.requireLogon, function (req, res) {
@@ -55,3 +65,16 @@ app.get('/App/System/LoadAverage', validation.requireLogon, function (req, res) 
     res.json(PiSys.getLoadAverage());
 });
 
+/* Start App */
+server.startServer(function(success) {
+    if(!success) {
+        logger.error("Error starting server, shutting down app...");
+        process.exit(-1);
+    }
+
+});
+
+baseProvider.configureDatabase(function(success) {
+    if(!success)
+        logger.error("Error configuring database...");
+});

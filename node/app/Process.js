@@ -1,125 +1,98 @@
-const server = require('./Server');
-const express = server.express;
-const app = server.app;
-const fs = require('fs');
-const helpers = require('./Helpers');
 var winston = require('./Logger');
 var logger = winston.logger;
+var piDashApp = require('../content/js/PiDashApp')
 
-const {exec} = require('child_process');
-
-const execFile = require('child_process').execFile;
+const childProc = require('child_process');
 
 /* Stores process information for spawned processes */
-var processes = [];
+var processes = new Object();
 
-/* Console signal codes */
-var STDIN = "stdin";//0;
-var STDOUT = "stdout";//1;
-var STDERR = "stderr";//2;
-var CLOSE = "close";//3;
+/* Timeout for killing child process's */
+var killTimeout = 3000;
 
+/* Function for listening to shell outputs */
+function listenToProcess(process) {
+    logger.log('Debug', "Started listening Pid" + process.pid);
+    var pid = process.pid;
+    process.process.stdout.on('data', function(data) {
+        logger.log('debug', "Writing to process, Pid: " + process.process.pid + " Command: " + data.toString());
+        process.writeOut(data.toString());
+        logger.log('debug', data.toString());
 
-/* Writes the 'command' to the input of 'proccess' */
-function writeToProcessIn(process, command) {
-    logger.log('debug', "Writing to process, Pid: " + process.pid + " Command: " + command);
-    process.stdin.write(command);
-    processes[process.pid].messages.push(createMessage(STDIN, command));
-}
+    });
 
-/* Packages response with source type */
-function createMessage(src, message) {
-    return {"Source": src, "Message": message};
-}
+    process.process.stderr.on('data', function(data) {
+        process.writeErr(data.toString());
+        logger.log('debug', "Process Error Code: Pid: " + pid + "Error Code: " + data.toString() );
+    });
 
-/* Funtion for listening to shell outputs */
-function listenToProcess(childProcess) {
-    var pid = childProcess.pid;
-    logger.log('Debug', "Started listening Pid" + pid);
-
-
-    childProcess.stdout.on('data', (data) => {
-        var message = createMessage(STDOUT, data.toString());
-    logger.log('debug', message);
-    processes[pid]['messages'].push(message);
-})
-    ;
-    childProcess.stderr.on('data', (data) => {
-        var message = createMessage(STDERR, data.toString());
-    logger.log('debug', message);
-    processes[pid]['messages'].push(message);
-})
-    ;
-    childProcess.on('close', (code) => {
-        var message = createMessage(CLOSE, "Process closed, Pid: " + pid + " Exit code: " + code);
-    processes[pid]['messages'].push(message);
-    logger.log('debug', message);
-})
-    ;
+    process.process.on('close', function(code) {
+        process.writeClose("Process closed, Pid: " + process.pid + " Exit code: " + code);
+        logger.log('debug', code);
+    });
+    process.process.on('error', function(code) {
+        logger.log('debug', 'Process Error: Pid: ' + pid + " Error Code: " + code);
+    });
 
 }
 
-/* Executes command and spawns new process */
-app.post("/Process/Spawn/", function (req, res) {
-    console.log('debug', "Spawning process Command: " + req.body.Command);
-    var childProcess = exec(req.body.Command);
+var spawnProcess = function(command, callback) {
+    try {
+        var childProcess = childProc.exec(command);
+    } catch(err){
+        logger.error("Error spawining process - Command: " + command);
+        callback(err);
+        return;
+    }
 
     var pid = childProcess.pid;
-    processes.push(pid);
-    processes[pid] = [];
-    processes[pid]['messages'] = [];
-    processes[pid]['process'] = childProcess;
-
-    listenToProcess(childProcess);
-
-    var response;
-    if (childProcess.error) {
-        logger.error("Error starting process, Pid: " + childProcess.pid);
-        response = {"Status": "Error", "Pid": childProcess.pid};
-        res.json(response);
+    var newProcess = new piDashApp.Process(childProcess,false);
+    if(childProcess.error) {
+        console.error("Error spawinging process: Command: " + command + " Error: " + childProcess.error );
+        callback(newProcess);
+        return;
     }
-    else {
-        logger.log('debug', "Process started, Pid: " + childProcess.pid);
-        response = {"Status": "Success", "Pid": childProcess.pid};
-        res.json(response);
+    processes[pid] = newProcess;
+
+    try {
+    listenToProcess(newProcess);
     }
-
-});
-
-/* Action to return console for process with 'pid' */
-app.post("/Process/Console/", function (req, res) {
-    var pid = req.body.pid;
-    console.log('debug', '/Process/Console for pid=' + pid);
-    res.json(processes[pid].messages);
-});
-
-app.post("/Process/Command/", function (req, res) {
-
-    var pid = req.body.pid;
-    logger.log('debug', "Command Received Command: " + req.body.command);
-
-    if (processes[pid]) {
-        logger.log('debug', "Valid pid: " + pid);
-        var currentProcess = processes[pid]['process'];
-        writeToProcessIn(currentProcess, req.body.command + '\n');
-        var response = {"Status": "Success", "Message": "Command executed"};
-        res.json(response)
+    catch(err) {
+        logger.error("Error listening to process - Pid: " + pid + " Error: " + err);
     }
-    else {
-        logger.log('debug', "Invalid pid: " + pid);
-        var response = {"Status": "Error", "Message": "Invalid pid, process not found"};
-        res.json(response);
-    }
-});
+    if(callback)
+        callback(newProcess);
+};
 
-/* Action to kill a process */
-app.post("/Process/Kill/", function (req, res) {
-    var pid = req.body.pid;
-    var command = "kill " + pid;
-    logger.log('debug', "Killing process, Pid: " + pid);
-    var childProcess = exec(command);
-    var retVal = childProcess.returnValue;
-    var response = {"Status": retVal};
-    res.json(response);
+var killProcess = function(pid, callback) {
+    var command = "pkill -P " + pid;
+    logger.debug("Killing process, Pid: " + pid);
+    var childProcess = childProc.exec(command,function(error,stdout,stderr){
+        var result = new Object();
+        if(error) {
+            logger.debug("Child process not killed")
+        }
 
-});
+        var parentCommand = "kill " + pid;
+        var parentProcess = childProc.exec(parentCommand,function(error,stdout,stderr) {
+            if(error) {
+                logger.debug("Error killing parent process Pid: " + pid);
+                result.status = "Error";
+                result.message = "Error killing parent";
+            }
+            else {
+                logger.debug("Process killed Pid: " + pid);
+                result.status = "Success";
+                result.message = "Process killed";
+            }
+            callback(result);
+        });
+    });
+};
+
+module.exports = {
+    listenToProcess: listenToProcess,
+    spawnProcess: spawnProcess,
+    killProcess: killProcess,
+    processes: processes
+};

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>PiDash</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <% include bundles/bundle %>
+</head>
+<body>
+<% include partials/header %>
+<% include partials/errors %>
+<% include partials/success %>
+<div class="panel">
+    <div class="panel-body">
+        <% include partials/resetpassword %>
+    <% if(admin) { %>
+        <% include partials/adminprivileges%>
+        <%}%>
+    </div>
+</div>
+<% include partials/footer %>
+
+</body>
+
+</html>

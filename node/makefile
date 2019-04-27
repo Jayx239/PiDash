@@ -1,4 +1,5 @@
-all: makedirs npminstall
+.SILENT:
+all: makedirs npminstall configurator
 
 npminstall:
 	npm install
@@ -30,7 +31,13 @@ programsdir:
 	else \
 		mkdir programs; \
         echo "programs directory created"; \
-	fi \
+	fi; \
+	if [ -d "programs/scripts" ]; then \
+	    echo "Copy Canceled - programs/scripts directory already exists"; \
+    else \
+        mkdir programs/scripts; \
+        echo "programs/scripts directory created"; \
+    fi; \
 
 .PHONY : configurator
 configurator:

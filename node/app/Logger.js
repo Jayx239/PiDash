@@ -35,7 +35,13 @@ var logSession = function (sessionId, message, logType) {
         logger.log(logType, message);
     else
         logger.info(message);
-}
+};
+
+logger.stream = {
+    write: function(message, encoding){
+        logger.info(message);
+    }
+};
 
 /* Export */
 module.exports = {

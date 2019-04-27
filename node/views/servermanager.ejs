@@ -13,110 +13,45 @@
 </head>
 <body>
 <% include partials/header %>
-<div class="container">
+<div class="container server-manager-container">
     <div ng-app="PiDashApp" ng-controller="serverManagerController">
         <h1>Server Manager</h1>
         <div class="container container-fluid">
             <div class="row">
-                <div class="col-xs-12 col-sm-6 col-lg-3 app-list">
-                    <div class="row" ng-repeat="app in apps track by $index">
-                        <div class="col-xs-12 app-row" ng-click="setActiveApp($index);">
-                            <h4>{{app.appName}}</h4>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12 app-row">
-                            <button ng-click="addApplication()" class="col-xs-12">Add App</button>
-                        </div>
-                    </div>
+                <div class="col-xs-12 col-sm-4 col-lg-3">
+                    <% include partials/applist %>
                 </div>
-                <div class="col-xs-12 col-sm-6 col-lg-9">
-                    <div class="col-xs-12 col-sm-6 col-sm-4 col-lg-3">
-                        <label for="Status">Status</label>
-                        <h3 name="AppStatus" ng-bind="activeApp.status">{{activeApp.status}}</h3>
+                <div class="col-xs-12 col-sm-8 col-lg-9">
+                    <% include partials/appdetails %>
+                    <div class="col-xs-12"><% include partials/appconsole %></div>
+                    <%if(admin){%>
+                    <div ng-switch="selectedConfigMenu" >
+                    <div class="col-xs-12 permission-button-container">
+                        <div class="col-xs-4" ><button class="btn btn-primary" ng-click="setMenu(configMenus.App)">App</button></div>
+                        <div class="col-xs-4" ng-click="setMenu(configMenus.Permissions)"><button class="btn btn-primary">Permissions</button></div>
+                        <div class="col-xs-4" ><button ng-click="setMenu(configMenus.Log)" class="btn btn-primary">Logs</button></div>
                     </div>
-                    <div class="col-xs-12 col-sm-6 col-sm-8 col-lg-9">
-                        <div class="col-xs-12 col-md-6 col-lg-4">
-                            <label for="AppName">App Name</label>
-                            <h3 name="AppName" ng-bind="activeApp.appName">{{activeApp.appName}}</h3>
-                        </div>
-                        <div class="col-xs-12 col-md-6 col-lg-4">
-                            <label for="AppUpTime">UpTime</label>
-                            <h3 name="AppUpTime">{{activeApp.upTime}}</h3>
-                        </div>
-                        <div class="col-xs-12 col-md-6 col-lg-4">
-                            <label for="AppName">Process ID</label>
-                            <h3 name="AppName">{{activeApp.pid}}</h3>
-                        </div>
-                        <div class="col-xs-12 col-md-6 col-lg-4">
-                            <button class="btn btn-primary" id="StartAppButton" ng-click="toggleActiveAppStart()"
-                                    ng-bind="startAppButtonText">{{startAppButtonText}}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="ConsoleArea" class="row">
-                <label clas="col-xs-12">Console</label>
-                <textarea class="col-xs-12" id="Console" ng-bind="activeApp.console">{{activeApp.console}}</textarea>
-                <input type="text" placeholder="Command" class="col-xs-12" id="CommandInput" ng-model="command"/>
-                <button class="col-xs-6 btn btn-primary" id="ExecuteButton" ng-click="executeCommandActive()">Execute
-                </button>
-                <button class="col-xs-6 btn btn-primary" id="RefreshButton" ng-click="refreshConsole(activeApp)">Refresh
-                    Console
-                </button>
-            </div>
-            <div id="ApplicationSettings" class="row">
-                <div class="col-xs-12 col-sm-6 col-sm-4 col-lg-3">
-                    <label for="Status">Status</label>
-                    <h3 name="AppStatus">{{activeApp.status}}</h3>
-                </div>
-                <div class="col-xs-12 col-sm-6 col-sm-8 col-lg-9">
-                    <div class="col-xs-12 col-md-6 col-lg-4">
-                        <label for="EditAppName">App Name</label>
-                        <input ng-model="activeApp.appName" name="EditAppName"/>
-                    </div>
-                    <div class="col-xs-12 col-md-6 col-lg-4">
-                        <label for="EditAppStartCommand">Start Command</label>
-                        <input name="EditStartCommand" ng-model="activeApp.startCommand"/>
-                    </div>
-                    <div class="col-xs-12 col-md-6 col-lg-4">
-                        <label>Log Path</label>
-                        <input name="LogPath" ng-model="activeApp.logPath"/>
-                    </div>
-                    <div clas="col-xs-12 col-md-6 col-lg-8">
-                        <div class="col-xs-12">
-                            <select ng-model="activeApp" ng-options="app.logFiles for app in apps" class="col-xs-12">
-                            </select>
-                        </div>
 
-                        <div class="col-xs-12">
-                            <label for="AddLogName">Log Name</label>
-                            <input ng-model="addLogName" id="AddLogName" name="AddLogName"/>
-                        </div>
-                        <div class="col-xs-12">
-                            <label for="AddLogPath">Path</label>
-                            <input ng-model="addLogPath" id="AddLogPath" name="AddLogPath"/>
-                        </div>
-                        <div class="col-xs-12">
-                            <div class="col-xs-6">
-                                <button>Add Log</button>
-                            </div>
-                            <div class="col-xs-6">
-                                <button>Delete Log</button>
-                            </div>
-                        </div>
+                    <div class="menu-body col-xs-12">
+
+                    <div class="col-xs-12" ng-switch-when="App"><% include partials/appconfiguration%></div>
+                    <div class="col-xs-12" ng-switch-when="Permissions"><% include partials/permissionconfiguration %></div>
+                    <div class="col-xs-12" ng-switch-when="Log"><% include partials/logconfigurator %></div>
+
                     </div>
-                    <div class="col-xs-12 col-md-6 col-lg-4">
-                        <button class="btn btn-primary" id="AddAppButton" ng-click="addApplication()">Add App</button>
                     </div>
+                    <div class="col-xs-12 footer-bar">
+                        <hr>
+                        <button class="btn btn-primary" id="SaveAppButton" ng-click="addPiDashApp()">Save App</button>
+                        <button class="btn btn-primary" id="AddAppButton" ng-click="retrieveApps()">Retrieve Apps</button>
+                    </div>
+                    <% }%>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <% include partials/footer %>
-
 </body>
 
 </html>
