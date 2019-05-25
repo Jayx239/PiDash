@@ -48,7 +48,7 @@ var spawnProcess = function(command, callback) {
     var pid = childProcess.pid;
     var newProcess = new piDashApp.Process(childProcess,false);
     if(childProcess.error) {
-        console.error("Error spawinging process: Command: " + command + " Error: " + childProcess.error );
+        console.error("Error spawning process: Command: " + command + " Error: " + childProcess.error );
         callback(newProcess);
         return;
     }

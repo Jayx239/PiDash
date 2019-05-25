@@ -19,6 +19,7 @@ background: #f6f8f9; /* Old browsers */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
     padding-top: 15px; padding-bottom: 15px; border-radius: 15px; min-height: 300px!important; height: auto;}
 .app-list .app-row {border-top: #011936 2px solid; border-bottom: #011936 2px solid ; background-color: #313D5A; color: #DEE5E5;}
+.app-list .app-row.active {border-top: #011936 2px solid; border-bottom: #011936 2px solid ; background-color: #4D7A97; color: #DEE5E5;}
 .app-list .app-row button {float: right;}
 .app-list .app-row button.btn.btn-primary {background-color: #011936; border-color: #DEE5E5; color: #DEE5E5; }
 .app-list .app-row button.btn.btn-primary:active {background-color: #DEE5E5; border-color: #DEE5E5; color: #011936; }
