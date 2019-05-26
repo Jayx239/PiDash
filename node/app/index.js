@@ -18,6 +18,12 @@ app.use('/content', express.static(__dirname + '/../content'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-app', express.static(__dirname + '/../angular-app'));
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 /* Don't morgan log these */
 var Process = require('./routes/ProcessRoute');
 var piDashAppRoutes = require("./routes/PiDashAppRoute");
