@@ -12,6 +12,10 @@ import {NavigationStart, Router} from '@angular/router';
 export class DashboardComponent implements OnInit {
 
   constructor(private dashboardService: DashboardService, private router: Router) {
+
+    this.pollingInterval = 1000;
+    this.cpu = [];
+    this.memory = {};
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.stopListening();
@@ -23,9 +27,10 @@ export class DashboardComponent implements OnInit {
   memory: any;
   pollingInterval: number;
   cpuSubscription: Subscription;
+  memorySubscription: Subscription;
 
   ngOnInit() {
-    this.pollingInterval = 1000;
+
     this.listen();
   }
 
@@ -45,14 +50,29 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  listenMemory() {
+    this.stopListeningMemory();
+    this.memorySubscription = timer(this.pollingInterval, 1000).pipe().subscribe(x => {
+      this.dashboardService.getMemory().pipe().subscribe((val) => {
+        this.memory = val.memory;
+      }, (error) => { }, () => { });
+    });
+  }
+
+  stopListeningMemory() {
+    if (this.memorySubscription != null && !this.memorySubscription.closed) {
+      this.memorySubscription.unsubscribe();
+    }
+  }
+
   listen() {
     this.listenCpu();
+    this.listenMemory();
   }
 
   stopListening() {
     this.stopListeningCpu();
+    this.stopListeningMemory();
   }
-
-
 
 }

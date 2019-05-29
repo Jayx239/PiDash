@@ -19,6 +19,7 @@ export class LogonComponent implements OnInit {
   }
 
   logon() {
+
     this.logonService.logon(this.userName, this.password).subscribe((response) => {
       if (response.successful) {
         // redirect

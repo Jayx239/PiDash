@@ -23,7 +23,8 @@ app.post("/LogonRegister/Logon", function (req, res) {
 
             responseEngine.render(res,"logon", {
                 successful: false,
-                message: "Unexpected error"
+                message: "Unexpected error",
+                token: token
             });
 
             //res.render("logon");
@@ -40,9 +41,9 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     }
 
                     res.locals.messages.success.push("Logon Successful");
-                    //res.redirect("/");
                     responseEngine.redirect(res,"/", {
-                        successful: true
+                        successful: true,
+                        token: null
                     });
                 });
             }

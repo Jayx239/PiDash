@@ -5,8 +5,12 @@
   <div class="row">
     <div class="col-xs-12">
       <div name="cpu" class="CPU details">
-        {{cpu}}
+        {{cpu[0]?.model}}
+      </div>
+      <div name="memory">
 
+        {{memory?.total-memory?.free}}/{{memory?.total}}
+        {{memory?.usage}}
       </div>
     </div>
   </div>
