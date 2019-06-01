@@ -13,12 +13,29 @@ import {InSessionRouteActivatorService} from '../common/in-session-route-activat
 import {AppComponent} from '../app.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { HeaderBarComponent } from './header-bar/header-bar.component';
+import {AccountComponent} from '../account/account.component';
+import {ServerManagerComponent} from '../server-manager/server-manager.component';
+import {AppListComponent} from '../server-manager/app-list/app-list.component';
+import {AppDetailsComponent} from '../server-manager/app-details/app-details.component';
+import {AppConsoleComponent} from '../server-manager/app-console/app-console.component';
+import {AppConfigurationComponent} from '../server-manager/app-configuration/app-configuration.component';
+import {PermissionConfigurationComponent} from '../server-manager/permission-configuration/permission-configuration.component';
+import {LogConfigurationComponent} from '../server-manager/log-configuration/log-configuration.component';
 
 @NgModule({
   declarations: [
     InSessionComponent,
     DashboardComponent,
-    HeaderBarComponent
+    HeaderBarComponent,
+    AccountComponent,
+    ServerManagerComponent,
+    ServerManagerComponent,
+    AppListComponent,
+    AppDetailsComponent,
+    AppConsoleComponent,
+    AppConfigurationComponent,
+    PermissionConfigurationComponent,
+    LogConfigurationComponent
   ],
   imports: [
     CommonModule,

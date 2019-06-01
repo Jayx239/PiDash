@@ -29,7 +29,7 @@ export class ServerManagerComponent implements OnInit {
     Permissions: 'Permissions',
     Log: 'Log'
   };
-
+  isAdmin: boolean;
   maxNewApps = 100;
 
   Statuses = {Starting: 'Starting', Running: 'Running', Stopped: 'Stopped', Loading: 'Loading'};
@@ -52,7 +52,7 @@ export class ServerManagerComponent implements OnInit {
     // this.appUser;
     // this.selectedConfigMenu;
     this.maxNewApps = 100;
-
+    this.isAdmin = false;
   }
 
   setMenu(menuId) {
