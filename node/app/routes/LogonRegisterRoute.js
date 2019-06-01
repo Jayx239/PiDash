@@ -4,7 +4,7 @@ var server = require('../Server');
 var app = server.app;
 var provider = require('../providers/CredentialProvider');
 var validation = require('../Validation');
-
+const responseEngine = require('../ResponseEngine');
 
 app.get("/LogonRegister", function (req, res) {
     res.redirect("/LogonRegister/Logon");
@@ -20,7 +20,14 @@ app.post("/LogonRegister/Logon", function (req, res) {
         if (returnObject.status === provider.Statuses.Error || returnObject.results.length < 1) {
             logger.error("User not found, UserName: " + req.body.UserName);
             res.locals.messages.errors.push("Invalid Credentials");
-            res.render("logon");
+
+            responseEngine.render(res,"logon", {
+                successful: false,
+                message: "Unexpected error",
+                token: token
+            });
+
+            //res.render("logon");
         }
         else {
             if (validation.validateUserPassword(req.body.Password, returnObject.results[0].Hash, returnObject.results[0].Salt)) {
@@ -34,12 +41,20 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     }
 
                     res.locals.messages.success.push("Logon Successful");
-                    res.redirect("/");
+                    responseEngine.redirect(res,"/", {
+                        successful: true,
+                        userName: req.session.userId
+                    });
                 });
             }
             else {
                 res.locals.messages.errors.push("Invalid Credentials");
-                res.render("logon");
+
+                responseEngine.render(res,"logon", {
+                    successful: false,
+                    message: "Invalid credentials"
+                });
+                //res.render("logon");
             }
         }
     });
@@ -56,7 +71,11 @@ app.post("/LogonRegister/Register", function (req, res) {
                     logger.error("Error registering user Error message: " + result.message);
                     logger.error("Unable to create user credentials, registration failed");
                     res.locals.messages.errors.push(result.message);
-                    res.render("register");
+                    //res.render("register");
+                    responseEngine.render(res,"register", {
+                        successful: false,
+                        message: "Error registering user"
+                    });
                     return;
                 }
                 else {
@@ -66,12 +85,20 @@ app.post("/LogonRegister/Register", function (req, res) {
                         if (result.status === provider.Statuses.Error) {
                             logger.error("Unable to create user credentials, registration failed");
                             res.locals.messages.errors.push(result.message);
-                            res.render("register.ejs");
+                            //res.render("register.ejs");
+                            responseEngine.render(res,"register", {
+                                successful: false,
+                                message: "User name already "
+                            });
                             return;
                         }
                         else {
                             res.locals.messages.success.push("Registration Successful");
-                            res.render("logon");
+                            responseEngine.render(res,"logon", {
+                                successful: true,
+                                message: "Logon successful"
+                            });
+                            //res.render("logon");
                         }
 
                     });
@@ -93,37 +120,5 @@ app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
     response.userName = req.user;
     response.userId = req.userId;
     res.json(response);
-
-    /*
-    if(req.user) {
-        provider.getUserByUserId(req.user,function(result) {
-            if(result.status === provider.Statuses.Error || result.results.length < 1) {
-                logger.error("/LogonRegister/User: Error getting user details");
-                res.json({status:'error'});
-            }
-            else {
-                var response = new Object();
-                response.userName = result.firstResult.UserName;
-                response.userId = req.user;
-                res.json(response);
-            }
-        });
-    }
-    else if(req.) {
-        provider.getUserByUserName(req.body.UserName,function(result) {
-            if(result.status === provider.Statuses.Error || result.results.length < 1) {
-                logger.error("/LogonRegister/User: Error getting user details");
-                res.json({status:'error'});
-            }
-            else {
-                var response = new Object();
-                response.userName = req.body.UserName;
-                response.userId = result.firstResult.UserId;
-                res.json(response);
-            }
-        });
-    }
-    else {
-        res.json({status:"error"});
-    }*/
 });
+

@@ -18,6 +18,14 @@ app.use('/content', express.static(__dirname + '/../content'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-app', express.static(__dirname + '/../angular-app'));
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT");
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
+
 /* Don't morgan log these */
 var Process = require('./routes/ProcessRoute');
 var piDashAppRoutes = require("./routes/PiDashAppRoute");
@@ -28,6 +36,17 @@ app.use(require("morgan")("combined", { "stream": logger.stream }));
 var logonRegister = require('./routes/LogonRegisterRoute');
 var account = require('./routes/AccountRoute');
 
+// Is the users session dead
+app.get('/notripped', function(req,res) {
+    if(req.user) {
+        res.send(true);
+        // return success
+    }
+    else {
+        // return false;
+        res.send(false);
+    }
+});
 
 app.get('/', function (req, res) {
     if (req.user)

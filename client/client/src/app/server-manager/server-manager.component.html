@@ -1,0 +1,40 @@
+<div class="container server-manager-container">
+  <div>
+    <h1>Server Manager</h1>
+    <div class="container container-fluid">
+      <div class="row">
+        <div class="col-xs-12 col-sm-4 col-lg-3">
+          <app-app-list></app-app-list>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-lg-9">
+          <app-app-details></app-app-details>
+          <div class="col-xs-12"><app-app-console></app-app-console></div>
+          <!--<%if(admin){%>-->
+          <div *ngIf="isAdmin">
+                    <div [ngSwitch]="selectedConfigMenu">
+                    <div class="col-xs-12 permission-button-container">
+                        <div class="col-xs-4" ><button class="btn btn-primary" ng-click="setMenu(configMenus.App)">App</button></div>
+                        <div class="col-xs-4" ng-click="setMenu(configMenus.Permissions)"><button class="btn btn-primary">Permissions</button></div>
+                        <div class="col-xs-4" ><button ng-click="setMenu(configMenus.Log)" class="btn btn-primary">Logs</button></div>
+                    </div>
+
+                    <div class="menu-body col-xs-12">
+
+                      <div class="col-xs-12" *ngSwitchCase="'App'"><app-app-configuration></app-app-configuration></div>
+                      <div class="col-xs-12" *ngSwitchCase="'Permissions'"><app-permission-configuration></app-permission-configuration></div>
+                      <div class="col-xs-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
+
+                    </div>
+                    </div>
+                    <div class="col-xs-12 footer-bar">
+                        <hr>
+                        <button class="btn btn-primary" id="SaveAppButton" (click)="addPiDashApp()">Save App</button>
+                        <button class="btn btn-primary" id="AddAppButton" (click)="retrieveApps()">Retrieve Apps</button>
+                    </div>
+          </div>
+          <!--<% }%>-->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
