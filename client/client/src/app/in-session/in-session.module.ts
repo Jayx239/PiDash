@@ -12,11 +12,13 @@ import {ServerManagerService} from '../server-manager/server-manager.service';
 import {InSessionRouteActivatorService} from '../common/in-session-route-activator.service';
 import {AppComponent} from '../app.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { HeaderBarComponent } from './header-bar/header-bar.component';
 
 @NgModule({
   declarations: [
     InSessionComponent,
-    DashboardComponent
+    DashboardComponent,
+    HeaderBarComponent
   ],
   imports: [
     CommonModule,

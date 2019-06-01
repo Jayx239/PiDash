@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {HeaderBarComponent} from './header-bar/header-bar.component';
 
 @Component({
   selector: 'app-in-session',
