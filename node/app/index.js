@@ -36,6 +36,17 @@ app.use(require("morgan")("combined", { "stream": logger.stream }));
 var logonRegister = require('./routes/LogonRegisterRoute');
 var account = require('./routes/AccountRoute');
 
+// Is the users session dead
+app.get('/notripped', function(req,res) {
+    if(req.user) {
+        res.send(true);
+        // return success
+    }
+    else {
+        // return false;
+        res.send(false);
+    }
+});
 
 app.get('/', function (req, res) {
     if (req.user)

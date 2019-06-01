@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {DashboardService} from './dashboard.service';
 import {from, Subscription, timer} from 'rxjs';
 import {NavigationStart, Router} from '@angular/router';
+import {AuthService} from '../common/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,7 +12,7 @@ import {NavigationStart, Router} from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private dashboardService: DashboardService, private router: Router) {
+  constructor(private dashboardService: DashboardService, private router: Router, private authService: AuthService) {
 
     this.pollingInterval = 1000;
     this.cpu = [];
@@ -30,8 +31,7 @@ export class DashboardComponent implements OnInit {
   memorySubscription: Subscription;
 
   ngOnInit() {
-
-    this.listen();
+      this.listen();
   }
 
   listenCpu() {

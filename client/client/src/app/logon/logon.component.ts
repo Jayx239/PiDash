@@ -23,7 +23,7 @@ export class LogonComponent implements OnInit {
     this.logonService.logon(this.userName, this.password).subscribe((response) => {
       if (response.successful) {
         // redirect
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dash/dashboard']);
       } else {
         // display errors
       }

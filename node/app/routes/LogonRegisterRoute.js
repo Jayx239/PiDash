@@ -43,7 +43,7 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     res.locals.messages.success.push("Logon Successful");
                     responseEngine.redirect(res,"/", {
                         successful: true,
-                        token: null
+                        userName: req.session.userId
                     });
                 });
             }

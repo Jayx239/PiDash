@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpClientModule, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs/index';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,6 @@ export class LogonService {
       }),
       withCredentials: true
     };
-    return this.http.post<any>('http://localhost:4656/LogonRegister/logon', data, httpOptions);
+    return this.http.post<any>(environment.baseApiUrl + '/LogonRegister/logon', data, httpOptions);
   }
 }
