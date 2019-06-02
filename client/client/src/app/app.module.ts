@@ -16,6 +16,7 @@ import {ServerManagerService} from './server-manager/server-manager.service';
 import {InSessionRouteActivatorService} from './common/in-session-route-activator.service';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from './common/auth.service';
+import { AlertComponent } from './common/alert/alert.component';
 
 
 
@@ -26,6 +27,7 @@ import {AuthService} from './common/auth.service';
     ConsoleInputComponent,
     LogonComponent,
     RegisterComponent,
+    AlertComponent,
   ],
   imports: [
     BrowserModule,

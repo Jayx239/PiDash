@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LogonService } from './logon.service';
 import {Router} from '@angular/router';
+import {Alert, IAlert} from '../common/alert/alert.component';
 
 @Component({
   selector: 'app-logon',
@@ -11,8 +12,10 @@ export class LogonComponent implements OnInit {
 
   userName: string;
   password: string;
-
-  constructor(private logonService: LogonService, private router: Router) { }
+  alert: IAlert;
+  constructor(private logonService: LogonService, private router: Router) {
+    this.alert = new Alert(false, '', 'danger');
+  }
 
   ngOnInit() {
 
@@ -26,8 +29,17 @@ export class LogonComponent implements OnInit {
         this.router.navigate(['/dash/dashboard']);
       } else {
         // display errors
+        this.alert.message = 'Logon failed, please try again';
+        this.alert.type = 'danger';
+        this.alert.enabled = true;
+        this.alert.setCloseIn(5000);
       }
-    }, (response) => {}, () => {});
+    }, (response) => {
+      this.alert.type = 'danger';
+      this.alert.message = 'Logon failed, please try again';
+      this.alert.enabled = true;
+      this.alert.setCloseIn(5000);
+      }, () => {});
   }
 
   navigateToRegister() {

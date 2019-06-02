@@ -20,11 +20,11 @@
   </div>
 
   <div class="col-xs-6 col-md-6 col-lg-6">
-    <button class="btn btn-primary" id="StartAppButton" ngClick="toggleActiveAppStart()">{{startAppButtonText}}
+    <button class="btn btn-primary" id="StartAppButton" (click)="toggleActiveAppStart()">{{startAppButtonText}}
     </button>
   </div>
   <div class="col-xs-6 col-md-6 col-lg-6">
-    <!--<%if(admin){%>--><button class="btn btn-primary" id="DeleteAppButton" ngClick="deleteActiveApplication()">{{deleteAppButtonText}}
+    <!--<%if(admin){%>--><button class="btn btn-primary" id="DeleteAppButton" (click)="deleteActiveApplication()">{{deleteAppButtonText}}
     </button><!--<%}%>-->
   </div>
 </div>

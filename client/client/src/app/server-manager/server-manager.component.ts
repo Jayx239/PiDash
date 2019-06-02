@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ServerManagerService} from './server-manager.service';
 import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../common/pi-dash-app';
-import {debug} from "util";
+import {debug} from 'util';
 
 @Component({
   selector: 'app-server-manager',
@@ -46,8 +46,8 @@ export class ServerManagerComponent implements OnInit {
     this.activeAppLogs = [];
     this.activeAppIndex = 0;
     this.command = '';
-    // this.startAppButtonText = 'Start App';
-    // this.deleteAppButtonText = 'Delete App';
+    this.startAppButtonText = 'Start App';
+    this.deleteAppButtonText = 'Delete App';
     this.userId = '';
     this.userName = '';
     // this.appUser;
@@ -167,13 +167,13 @@ refreshApps() {
   }
 
 refreshConsoles() {
-    for(const app in this.piDashApps) {
+    for (const app in this.piDashApps) {
       this.refreshConsole(app);
     }
   }
 
 isStopped(messages) {
-    for(let i = 0; i < messages.length; i++) {
+    for (let i = 0; i < messages.length; i++) {
       console.log(messages[i].Source);
       if (messages[i].Source ===  this.MessageSourceTypes.Close) {
         return true;
@@ -210,7 +210,7 @@ spawnProcess(app) {
 
 formatMessageOutput(messages) {
     let output = '';
-    for(let i = 0; i < messages.length; i++) {
+    for (let i = 0; i < messages.length; i++) {
       output += messages[i].Message;
     }
     return output;
@@ -265,7 +265,7 @@ retrieveApps() {
     if (res) {
         const userApps = PiDashAppFactory.buildPiDashAppsFromResponse(res);
         if (userApps) {
-          for( const i in userApps) {
+          for ( const i in userApps) {
             this.piDashApps[userApps[i].app.appId] = userApps[i];
           }
         }
@@ -289,7 +289,7 @@ addPiDashApp() {
 updatePiDashApp(piDashApp) {
   this.serverManagerService.updatePiDashApp(piDashApp((res) => {
       if (res.app) {
-        this.piDashApps[this.activeApp.appId] = this.buildPiDashAppFromResponse(res.app);
+        this.piDashApps[this.activeApp.appId] = PiDashAppFactory.buildPiDashAppFromResponse(res.app);
       }
       this.setActiveApp(this.activeApp.appId);
     }));
@@ -324,29 +324,24 @@ deleteActiveAppLog(index) {
   }
 */
 startActivePiDashApp() {
-  // this.startPiDashApp(this.activeApp.appId).subscribe((response) {
-    //  console.log(response);
-    // });
-  }
+this.startPiDashApp(this.activeApp.appId);
+}
 
-startPiDashApp(appId, callback) {
+startPiDashApp(appId) {
   this.activeApp.status = this.Statuses.Starting;
-  this.serverManagerService.startPiDashApp(this.piDashApps[appId]).subscribe((response) => {
-
+  return this.serverManagerService.startPiDashApp(this.piDashApps[appId]).subscribe((response: string) => {
       const piDashAppRes = JSON.parse(response);
       if (piDashAppRes.piDashApp) {
-        const updatedPiDashApp = this.buildPiDashAppFromResponse(piDashAppRes.piDashApp);
+        const updatedPiDashApp: PiDashApp = PiDashAppFactory.buildPiDashAppFromResponse(piDashAppRes.piDashApp);
         if (updatedPiDashApp) {
-          this.piDashApps[updatedPiDashApp.app.appId] = updatedPiDashApp;
+          this.piDashApps[updatedPiDashApp.appId] = updatedPiDashApp;
         }
-        this.setActiveApp(updatedPiDashApp.app.appId);
+        this.setActiveApp(updatedPiDashApp.appId);
         this.activeApp.status = this.Statuses.Running;
       } else if (piDashAppRes.Status === 'Error') {
 
       }
-      if (callback) {
-        callback(response);
-      }
+      return response;
     });
   }
   /*resetPermissionUserId(appPermission) {

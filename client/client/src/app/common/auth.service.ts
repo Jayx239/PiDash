@@ -13,6 +13,7 @@ export class AuthService {
   isLoggedIn(): Observable<boolean> {
     return this.httpClient.get<boolean>(environment.baseApiUrl + '/notripped', {withCredentials: true});
   }
+
 }
 
 export class User {

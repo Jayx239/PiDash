@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {PiDashApp} from '../../common/pi-dash-app';
 
 @Component({
@@ -8,12 +8,25 @@ import {PiDashApp} from '../../common/pi-dash-app';
 })
 export class AppDetailsComponent implements OnInit {
   @Input() activeApp: PiDashApp;
-  startAppButtonText = 'Start App';
-  deleteAppButtonText = 'Delete App';
 
-  constructor() { }
+  @Output() toggleActiveAppStartClicked: EventEmitter<any>;
+  @Output() deleteActiveAppClicked: EventEmitter<any>;
+  @Input() startAppButtonText: string;
+  @Input() deleteAppButtonText: string;
+
+  constructor() {
+    this.toggleActiveAppStartClicked = new EventEmitter<any>();
+    this.deleteActiveAppClicked = new EventEmitter<any>();
+
+  }
 
   ngOnInit() {
   }
 
+  toggleActiveAppStart() {
+    this.toggleActiveAppStartClicked.emit();
+  }
+  deleteActiveApplication() {
+    this.deleteActiveAppClicked.emit();
+  }
 }

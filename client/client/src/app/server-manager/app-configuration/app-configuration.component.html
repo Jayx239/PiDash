@@ -5,9 +5,9 @@
 </div>
 <div class="col-xs-12 col-md-6">
   <label for="EditAppName">App Name</label>
-  <input ngModel="activeApp.name" name="EditAppName"/>
+  <input *ngIf="activeApp" [(ngModel)]="activeApp.app.name" name="EditAppName"/>
 </div>
 <div class="col-xs-12 col-md-6">
   <label for="EditAppStartCommand">Start Command</label>
-  <input name="EditStartCommand" ngModel="activeApp.startCommand"/>
+  <input *ngIf="activeApp" name="EditStartCommand" [(ngModel)]="activeApp.app.startCommand"/>
 </div>

@@ -2,6 +2,9 @@
   <div class="row">
     <div class="col-xs-12"><h1>Login</h1></div>
   </div>
+  <ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
+    {{alert.message}}
+  </ngb-alert>
   <div>
     <div class="row">
       <div class="col-xs-0 col-sm-2 col-md-3 col-lg-5">

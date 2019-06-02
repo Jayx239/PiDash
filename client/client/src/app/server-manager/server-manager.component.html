@@ -8,7 +8,7 @@
           <app-app-list [piDashApps]="piDashApps" (addAppClicked)="addApplication()" (setActiveAppClicked)="setActiveApp($event)"></app-app-list>
         </div>
         <div class="col-xs-12 col-sm-8 col-lg-9">
-          <app-app-details [activeApp]="activeApp"></app-app-details>
+          <app-app-details [activeApp]="activeApp" (deleteActiveAppClicked)="deleteActiveApplication()" (toggleActiveAppStartClicked)="toggleActiveAppStart()" [deleteAppButtonText]="deleteAppButtonText" [startAppButtonText]="startAppButtonText"></app-app-details>
           <div class="col-xs-12"><app-app-console [activeApp]="activeApp"></app-app-console></div>
           <!--<%if(admin){%>-->
           <div *ngIf="isAdmin">
@@ -21,7 +21,7 @@
                     <div class="menu-body col-xs-12">
 
                       <div class="col-xs-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
-                      <div class="col-xs-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.app?.appId"></app-permission-configuration></div>
+                      <div class="col-xs-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
                       <div class="col-xs-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
 
                     </div>

@@ -204,9 +204,9 @@ export class PiDashAppFactory {
 
     const jsonRes = this.tryParseJson(res);
 
-    const app = this.buildAppFromResponse(jsonRes);
-    let permissions;
-    let process;
+    const app: App = this.buildAppFromResponse(jsonRes);
+    let permissions: AppPermission[];
+    let process: PiDashProcess;
 
     if (jsonRes.appPermissions) {
       permissions = this.buildPermissionsFromResponse(jsonRes);

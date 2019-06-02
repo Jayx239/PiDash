@@ -22,6 +22,7 @@ import {AppConfigurationComponent} from '../server-manager/app-configuration/app
 import {PermissionConfigurationComponent} from '../server-manager/permission-configuration/permission-configuration.component';
 import {LogConfigurationComponent} from '../server-manager/log-configuration/log-configuration.component';
 import { ResetPasswordComponent } from '../account/reset-password/reset-password.component';
+import {FormsModule} from '@angular/forms';
 @NgModule({
   declarations: [
     InSessionComponent,
@@ -41,7 +42,8 @@ import { ResetPasswordComponent } from '../account/reset-password/reset-password
   imports: [
     CommonModule,
     NgbModule,
-    RouterModule.forChild(inSessionRoutes)
+    RouterModule.forChild(inSessionRoutes),
+    FormsModule
   ],
   providers: [
     LogonService,
