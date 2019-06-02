@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {PiDashApp, PiDashAppFactory} from '../../common/pi-dash-app';
 
 @Component({
   selector: 'app-app-list',
@@ -6,10 +7,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app-list.component.css']
 })
 export class AppListComponent implements OnInit {
-
-  constructor() { }
+  @Input() piDashApps: PiDashApp[];
+  @Output() addAppClicked: EventEmitter<any>;
+  @Output() setActiveAppClicked: EventEmitter<any>;
+  constructor() {
+    this.addAppClicked = new EventEmitter();
+    this.setActiveAppClicked = new EventEmitter();
+  }
 
   ngOnInit() {
   }
 
+  setActiveApp(piDashAppId) {
+    this.setActiveAppClicked.emit(piDashAppId);
+  }
+  addApplication() {
+    this.addAppClicked.emit('ADDAPP');
+  }
 }

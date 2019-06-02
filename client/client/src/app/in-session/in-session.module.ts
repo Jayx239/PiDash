@@ -21,7 +21,7 @@ import {AppConsoleComponent} from '../server-manager/app-console/app-console.com
 import {AppConfigurationComponent} from '../server-manager/app-configuration/app-configuration.component';
 import {PermissionConfigurationComponent} from '../server-manager/permission-configuration/permission-configuration.component';
 import {LogConfigurationComponent} from '../server-manager/log-configuration/log-configuration.component';
-
+import { ResetPasswordComponent } from '../account/reset-password/reset-password.component';
 @NgModule({
   declarations: [
     InSessionComponent,
@@ -35,7 +35,8 @@ import {LogConfigurationComponent} from '../server-manager/log-configuration/log
     AppConsoleComponent,
     AppConfigurationComponent,
     PermissionConfigurationComponent,
-    LogConfigurationComponent
+    LogConfigurationComponent,
+    ResetPasswordComponent
   ],
   imports: [
     CommonModule,

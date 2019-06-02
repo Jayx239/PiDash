@@ -8,9 +8,12 @@ export class PiDashApp {
   appPermissions: AppPermission[];
   process: PiDashProcess;
   pid: number;
-
+  appId: number;
+  messages: any[]; // TODO: figure out what this is
+  status: any;
   constructor(app, appPermissions, piDashProcess) {
     this.app = app;
+    this.appId = app ? app.appId : -1;
     this.appPermissions = appPermissions;
     if (piDashProcess) {
       this.process = piDashProcess;

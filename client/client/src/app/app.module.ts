@@ -18,6 +18,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from './common/auth.service';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -32,10 +33,14 @@ import {AuthService} from './common/auth.service';
     FormsModule,
     NgbModule,
     RouterModule.forRoot([
-      { path: '', component: LogonComponent, pathMatch: 'full' },
-      { path: 'logon', component: LogonComponent, pathMatch: 'full' },
-      { path: 'register', component: RegisterComponent, pathMatch: 'full' },
-      { path: 'dash', loadChildren: './in-session/in-session.module#InSessionModule', canActivate: [InSessionRouteActivatorService]},
+      {path: '', component: LogonComponent, pathMatch: 'full'},
+      {path: 'logon', component: LogonComponent, pathMatch: 'full'},
+      {path: 'register', component: RegisterComponent, pathMatch: 'full'},
+      {
+        path: 'dash',
+        loadChildren: './in-session/in-session.module#InSessionModule',
+        canActivate: [InSessionRouteActivatorService]
+      },
     ])
   ],
   providers: [
@@ -46,6 +51,7 @@ import {AuthService} from './common/auth.service';
     InSessionRouteActivatorService,
     AuthService
   ],
+  exports: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

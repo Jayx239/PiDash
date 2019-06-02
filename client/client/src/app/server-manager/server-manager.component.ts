@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ServerManagerService} from './server-manager.service';
-import {AppLog, AppPermission, AppUser, PiDashAppFactory} from '../common/pi-dash-app';
+import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../common/pi-dash-app';
 
 @Component({
   selector: 'app-server-manager',
@@ -13,7 +13,7 @@ export class ServerManagerComponent implements OnInit {
   processes: any[];
   apps: any[];
   piDashApps: any;
-  activeApp: any;
+  activeApp: PiDashApp;
   activeAppPermissions: any[];
   activeAppLogs: any[];
   activeAppIndex: number;
@@ -40,19 +40,19 @@ export class ServerManagerComponent implements OnInit {
     this.processes = [];
     this.apps = [];
     this.piDashApps = new Object();
-    this.activeApp = [];
+    // this.activeApp = PiDashAppFactory.createDefaultPiDashApp();
     this.activeAppPermissions = [];
     this.activeAppLogs = [];
     this.activeAppIndex = 0;
     this.command = '';
-    this.startAppButtonText = 'Start App';
-    this.deleteAppButtonText = 'Delete App';
+    // this.startAppButtonText = 'Start App';
+    // this.deleteAppButtonText = 'Delete App';
     this.userId = '';
     this.userName = '';
     // this.appUser;
     // this.selectedConfigMenu;
     this.maxNewApps = 100;
-    this.isAdmin = false;
+    this.isAdmin = true;
   }
 
   setMenu(menuId) {
@@ -295,21 +295,21 @@ updatePiDashApp(piDashApp) {
       this.setActiveApp(this.activeApp.appId);
     }));
   }
-
+/*
 addActiveAppPermission() {
     if (!this.activeAppPermissions) {
       this.activeAppPermissions = [];
     }
     this.activeAppPermissions.push(new AppPermission(-1, this.activeApp.appId, new AppUser('', -1), -1, false, false, false));
-  }
-
+  }*/
+/*
 deleteActiveAppPermission(index) {
     this.serverManagerService.deleteAppPermissionByPermissionId
     (this.piDashApps[this.activeApp.appId].appPermissions[index].permissionId, this.activeApp.appId).subscribe(() => {
       this.activeAppPermissions.splice(index, 1);
     });
-  }
-
+  }*/
+/*
 addActiveAppLog() {
     if (!this.activeAppLogs) {
       this.activeAppLogs = [];
@@ -323,7 +323,7 @@ deleteActiveAppLog(index) {
       this.piDashApps[this.activeApp.appId].app.logs.splice(index, 1);
     });
   }
-
+*/
 startActivePiDashApp() {
   // this.startPiDashApp(this.activeApp.appId).subscribe((response) {
     //  console.log(response);
@@ -350,9 +350,9 @@ startPiDashApp(appId, callback) {
       }
     });
   }
-  resetPermissionUserId(appPermission) {
+  /*resetPermissionUserId(appPermission) {
     appPermission.appUser.userId = -1;
-  }
+  }*/
 
   buildPiDashAppFromResponse(app): any {
     return {};
