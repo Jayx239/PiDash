@@ -1,6 +1,6 @@
 <div id="ConsoleArea" class="row">
   <label clas="col-xs-12">Console</label>
-  <textarea class="col-xs-12" id="Console" ng-bind="activeApp.console" readonly>{{activeApp.console}}</textarea>
+  <textarea class="col-xs-12" id="Console" readonly>{{activeApp?.console}}</textarea>
   <input type="text" placeholder="Command" class="col-xs-12" id="CommandInput" ngModel="command"/>
   <button class="col-xs-6 btn btn-primary" id="ExecuteButton" ngClick="executeCommandActive()">Execute
   </button>

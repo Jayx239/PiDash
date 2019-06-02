@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {PiDashApp} from '../../common/pi-dash-app';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-app-configuration',
@@ -6,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app-configuration.component.css']
 })
 export class AppConfigurationComponent implements OnInit {
-
+  @Input() activeApp: PiDashApp;
   constructor() { }
 
   ngOnInit() {

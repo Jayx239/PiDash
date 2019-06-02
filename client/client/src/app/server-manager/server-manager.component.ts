@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ServerManagerService} from './server-manager.service';
 import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../common/pi-dash-app';
+import {debug} from "util";
 
 @Component({
   selector: 'app-server-manager',
@@ -12,7 +13,7 @@ export class ServerManagerComponent implements OnInit {
   refreshRate: number;
   processes: any[];
   apps: any[];
-  piDashApps: any;
+  piDashApps: PiDashApp[];
   activeApp: PiDashApp;
   activeAppPermissions: any[];
   activeAppLogs: any[];
@@ -39,7 +40,7 @@ export class ServerManagerComponent implements OnInit {
     this.refreshRate = 1000; // ms, TODO: abstract this
     this.processes = [];
     this.apps = [];
-    this.piDashApps = new Object();
+    this.piDashApps = [];
     // this.activeApp = PiDashAppFactory.createDefaultPiDashApp();
     this.activeAppPermissions = [];
     this.activeAppLogs = [];
@@ -92,7 +93,7 @@ getNextNewAppId() {
   }
 
 setActiveApp(index) {
-    this.activeApp = this.piDashApps[index].app;
+    this.activeApp = this.piDashApps[index];
 
     if (!this.activeApp.messages) {
       this.activeApp.messages = [];
@@ -260,7 +261,8 @@ killApp(app) {
 
 retrieveApps() {
   this.serverManagerService.getPiDashApps().subscribe((res) => {
-      if (res) {
+
+    if (res) {
         const userApps = PiDashAppFactory.buildPiDashAppsFromResponse(res);
         if (userApps) {
           for( const i in userApps) {
@@ -271,21 +273,17 @@ retrieveApps() {
     });
   }
 
-/*addPiDashApp() {
+addPiDashApp() {
     const activePiDashApp = this.piDashApps[this.activeApp.appId];
     if (activePiDashApp.app.appId <= 0) {
-      this.addPiDashApp(activePiDashApp);
-    } else {
-      this.updatePiDashApp(activePiDashApp);
-    }
-  }
-*/
-addPiDashApp(piDashApp) {
-  this.serverManagerService.addPiDashApp(piDashApp).subscribe((res) => {
-      delete this.piDashApps[piDashApp.app.appId];
+      this.serverManagerService.addPiDashApp(activePiDashApp).subscribe((res) => {
+      delete this.piDashApps[activePiDashApp.app.appId];
       this.retrieveApps();
       alert('App Added!');
     });
+    } else {
+      this.updatePiDashApp(activePiDashApp);
+    }
   }
 
 updatePiDashApp(piDashApp) {

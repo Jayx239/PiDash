@@ -1,0 +1,53 @@
+#AppList {margin-top: 50px; contain: content;}
+#ConsoleArea {margin-top: 20px; }
+.app-details-container { margin-top: 20px; padding: 10px; border: #eee 2px solid;
+  border-radius: 10px;
+  background: -moz-linear-gradient(bottom, #465362 0%, #DEE5E5 50%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(bottom, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to top, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
+}
+#ConsoleArea #Console {resize: vertical; background-color: black; color: #2e6d1b; min-height: 300px; }
+/*#ExecuteButton, #RefreshButton { margin-top: 15px; }*/
+#ConsoleArea label{margin-bottom: 15px; }
+.app-list {border: 2px solid #2c4557;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f6f8f9+0,e5ebee+50 */
+background: #f6f8f9; /* Old browsers */
+  background: -moz-linear-gradient(bottom, #465362 0%, #DEE5E5 50%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(bottom, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to top, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
+  padding-top: 15px; padding-bottom: 15px; border-radius: 15px; min-height: 300px!important; height: auto;}
+.app-list .app-row {border-top: #011936 2px solid; border-bottom: #011936 2px solid ; background-color: #313D5A; color: #DEE5E5;}
+.app-list .app-row.active {border-top: #011936 2px solid; border-bottom: #011936 2px solid ; background-color: #4D7A97; color: #DEE5E5;}
+.app-list .app-row button {float: right;}
+.app-list .app-row button.btn.btn-primary {background-color: #011936; border-color: #DEE5E5; color: #DEE5E5; }
+.app-list .app-row button.btn.btn-primary:active {background-color: #DEE5E5; border-color: #DEE5E5; color: #011936; }
+body {background-color: #DEE5E5 !important; color: #011936 !important; }
+.app-details-container { margin-bottom: 15px; }
+.footer-bar { margin-top: 15px; padding-top: 15px; }
+.btn { margin-top: 15px; }
+.permission-button-container { padding-top: 10px; margin-top: 10px; padding-bottom: 10px;
+  border: #eee 2px solid;
+  border-bottom-width: 0px;
+  background: -moz-linear-gradient(top, #465362 0%, #DEE5E5 50%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
+}
+.permission-button-container .col-xs-4 { border-right: #DEE5E5 solid 1px; padding: 0px;  }
+.permission-button-container .col-xs-4:last-child { border-right: 0px; }
+.menu-body { padding-top: 15px; padding-bottom: 30px;
+  border: #eee 2px solid;
+  border-top-width: 0px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  background: -moz-linear-gradient(bottom, #465362 0%, #DEE5E5 50%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(bottom, #465362 0%,#DEE5E5 50%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to top, #465362 0%,#DEE5E5 50%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#DEE5E5', endColorstr='#465362',GradientType=0 ); /* IE6-9 */
+}
+.permission-button-container .btn { width: 100%; text-overflow: ellipsis; overflow: hidden; height: 100%; margin-top: 0px; min-height:70px; margin-left: 0px; margin-right: 0px;
+  background: -moz-linear-gradient(top, #465362 28%, #DEE5E5 94%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #465362 28%,#DEE5E5 94%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to top, #465362 28%,#DEE5E5 94%)}

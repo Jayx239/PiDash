@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {PiDashApp} from "../../common/pi-dash-app";
+import {Component, Input, OnInit} from '@angular/core';
+import {PiDashApp} from '../../common/pi-dash-app';
 
 @Component({
   selector: 'app-app-details',
@@ -7,7 +7,7 @@ import {PiDashApp} from "../../common/pi-dash-app";
   styleUrls: ['./app-details.component.css']
 })
 export class AppDetailsComponent implements OnInit {
-  activeApp: any;
+  @Input() activeApp: PiDashApp;
   startAppButtonText = 'Start App';
   deleteAppButtonText = 'Delete App';
 
