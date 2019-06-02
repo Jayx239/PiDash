@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {PiDashApp} from '../../common/pi-dash-app';
+import {ServerManagerService} from '../server-manager.service';
 
 @Component({
   selector: 'app-app-console',
@@ -7,9 +9,21 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppConsoleComponent implements OnInit {
 
-  constructor() { }
+  @Input() activeApp: PiDashApp;
+  command: string;
+  constructor(private serverManagerService: ServerManagerService) { }
 
   ngOnInit() {
   }
+  executeCommandActive(command) {
+    //    this.executeCommand(this.activeApp, command).subscribe((response) => {
+    //    this.refreshConsole(this.activeApp);
+    // });
+  }
+  executeCommand(app, command) {
+    this.serverManagerService.runCommand(app.pid, command);
+  }
 
+  refreshConsole(activeApp: PiDashApp) {
+  }
 }

@@ -215,6 +215,7 @@ formatMessageOutput(messages) {
     return output;
   }
 
+  /*
 executeCommand(app, command) {
     this.serverManagerService.runCommand(app.pid, command);
   }
@@ -224,7 +225,7 @@ executeCommandActive(command) {
   //    this.refreshConsole(this.activeApp);
     // });
   }
-
+*/
 updateStartButton() {
     if (this.activeApp.status === this.Statuses.Running) {
       this.startAppButtonText = 'Stop App';

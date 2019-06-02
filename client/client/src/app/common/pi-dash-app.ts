@@ -11,6 +11,7 @@ export class PiDashApp {
   appId: number;
   messages: any[]; // TODO: figure out what this is
   status: any;
+  console: any;
   constructor(app, appPermissions, piDashProcess) {
     this.app = app;
     this.appId = app ? app.appId : -1;

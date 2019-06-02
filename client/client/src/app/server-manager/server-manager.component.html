@@ -1,3 +1,4 @@
+<app-header-bar [activeIndex]="2"></app-header-bar>
 <div class="container server-manager-container">
   <div>
     <h1>Server Manager</h1>
@@ -8,7 +9,7 @@
         </div>
         <div class="col-xs-12 col-sm-8 col-lg-9">
           <app-app-details></app-app-details>
-          <div class="col-xs-12"><app-app-console></app-app-console></div>
+          <div class="col-xs-12"><app-app-console [activeApp]="activeApp"></app-app-console></div>
           <!--<%if(admin){%>-->
           <div *ngIf="isAdmin">
                     <div [ngSwitch]="selectedConfigMenu">
