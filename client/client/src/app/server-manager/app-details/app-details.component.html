@@ -1,29 +1,29 @@
-<div class="app-details-container clearfix">
-  <div class="col-xs-6 col-md-6 col-lg-6">
+<div class="app-details-container row clearfix">
+  <div class="col-12 col-lg-6">
     <label for="Status">Status</label>
     <h3 name="AppStatus">{{activeApp?.status}}</h3>
   </div>
 
-  <div class="col-xs-6 col-md-6 col-lg-6">
+  <div class="col-12 col-lg-6">
     <label for="AppName">App Name</label>
     <h3 name="AppName">{{activeApp?.app?.name}}</h3>
   </div>
 
-  <div class="col-xs-6 col-md-6 col-lg-6">
+  <div class="col-12 col-lg-6">
     <label for="AppUpTime">UpTime</label>
     <h3 name="AppUpTime">{{activeApp?.process?.startTime}}</h3>
   </div>
 
-  <div class="col-xs-6 col-md-6 col-lg-6">
+  <div class="col-12 col-lg-6">
     <label for="AppName">Process ID</label>
     <h3 name="AppName">{{activeApp?.pid}}</h3>
   </div>
 
-  <div class="col-xs-6 col-md-6 col-lg-6">
+  <div class="col-12 col-lg-6">
     <button class="btn btn-primary" id="StartAppButton" (click)="toggleActiveAppStart()">{{startAppButtonText}}
     </button>
   </div>
-  <div class="col-xs-6 col-md-6 col-lg-6">
+  <div class="col-12 col-lg-6">
     <!--<%if(admin){%>--><button class="btn btn-primary" id="DeleteAppButton" (click)="deleteActiveApplication()">{{deleteAppButtonText}}
     </button><!--<%}%>-->
   </div>

@@ -1,10 +1,20 @@
-<div id="ConsoleArea" class="row">
-  <label clas="col-xs-12">Console</label>
-  <textarea class="col-xs-12" id="Console" readonly>{{activeApp?.console}}</textarea>
-  <input type="text" placeholder="Command" class="col-xs-12" id="CommandInput" ngModel="command"/>
-  <button class="col-xs-6 btn btn-primary" id="ExecuteButton" ngClick="executeCommandActive()">Execute
-  </button>
-  <button class="col-xs-6 btn btn-primary" id="RefreshButton" ngClick="refreshConsole(activeApp)">Refresh
-    Console
-  </button>
+<div id="ConsoleArea">
+  <div class="row">
+    <label class="col-xs-12">Console</label>
+  </div>
+  <div class="row">
+      <textarea class="col-xs-12" id="Console" readonly>{{activeApp?.console}}</textarea>
+  </div>
+  <div class="row">
+      <input type="text" placeholder="Command" class="col-xs-12" id="CommandInput" [(ngModel)]="command"/>
+    <button class="col-xs-6 btn btn-primary" id="ExecuteButton" (click)="executeCommandActive()">Execute
+    </button>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <button class="btn btn-primary" id="RefreshButton" (click)="refreshConsole(activeApp)">
+        Refresh Console
+      </button>
+    </div>
+  </div>
 </div>

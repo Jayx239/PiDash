@@ -8,8 +8,10 @@ import {PiDashApp, PiDashAppFactory} from '../../common/pi-dash-app';
 })
 export class AppListComponent implements OnInit {
   @Input() piDashApps: PiDashApp[];
+  @Input() activeApp: PiDashApp;
   @Output() addAppClicked: EventEmitter<any>;
   @Output() setActiveAppClicked: EventEmitter<any>;
+
   constructor() {
     this.addAppClicked = new EventEmitter();
     this.setActiveAppClicked = new EventEmitter();
@@ -23,5 +25,14 @@ export class AppListComponent implements OnInit {
   }
   addApplication() {
     this.addAppClicked.emit('ADDAPP');
+  }
+  appList(piDashApps): PiDashApp[] {
+    const appList: PiDashApp[] = [];
+    for(const app of piDashApps) {
+      if (app) {
+        appList.push(app);
+      }
+    }
+    return appList;
   }
 }

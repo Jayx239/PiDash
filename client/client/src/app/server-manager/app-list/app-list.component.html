@@ -1,16 +1,14 @@
 <div class="app-list col-xs-12">
-  <div class="row">
     <div class="col-xs-12"><h2>Apps</h2></div>
-  </div>
-  <div class="row"  *ngFor="let piDashApp of piDashApps">
-    <div ng-class="{'col-xs-12': true, 'app-row': true, 'active': activeApp == piDashApp.app}" (click)="setActiveApp(piDashApp?.app?.appId);">
+  <div class="col-xs-12"  *ngFor="let piDashApp of appList(piDashApps)">
+    <div [ngClass]="{'col-12': true, 'app-row': true, 'active': activeApp == piDashApp}" (click)="setActiveApp(piDashApp?.app?.appId);">
       <h4>{{piDashApp?.app?.name}}</h4>
     </div>
   </div>
   <!--<% if(admin){%>-->
-    <div class="row">
-        <div class="col-xs-12 app-row">
-            <button (click)="addApplication()" class="col-xs-12 btn btn-primary">Add App</button>
+    <div class="row" >
+        <div class="col-12">
+            <button (click)="addApplication()" class="app-row col-12 btn btn-primary">Add App</button>
         </div>
     </div>
 

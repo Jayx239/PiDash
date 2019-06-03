@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {ServerManagerService} from './server-manager.service';
 import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../common/pi-dash-app';
 import {debug} from 'util';
+import {interval, Observable, timer} from 'rxjs';
+import {NavigationStart, Router} from '@angular/router';
 
 @Component({
   selector: 'app-server-manager',
@@ -36,7 +38,9 @@ export class ServerManagerComponent implements OnInit {
   Statuses = {Starting: 'Starting', Running: 'Running', Stopped: 'Stopped', Loading: 'Loading'};
   MessageSourceTypes = {Out: 'stdout', In: 'stdin', Error: 'stderr', Close: 'close'};
 
-  constructor(private serverManagerService: ServerManagerService) {
+  refreshTimer;
+
+  constructor(private serverManagerService: ServerManagerService, private router: Router) {
     this.refreshRate = 1000; // ms, TODO: abstract this
     this.processes = [];
     this.apps = [];
@@ -68,6 +72,22 @@ export class ServerManagerComponent implements OnInit {
       this.appUser = new AppUser(this.userName, this.userId);
       this.retrieveApps();
       this.selectedConfigMenu = this.configMenus.App;
+      this.refreshTimer = timer(this.refreshRate, 1000).subscribe(() => {
+        if (!this.activeApp) {
+          return;
+        }
+        if (this.activeApp.status === this.Statuses.Running ) {
+          this.refreshConsole(this.activeApp);
+          if (!this.piDashApps[this.activeApp.appId].process.isRunning()) {
+            this.activeApp.status = this.Statuses.Stopped;
+          }
+        }
+      });
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationStart) {
+          this.refreshTimer.kill();
+        }
+      });
     });
   }
 
