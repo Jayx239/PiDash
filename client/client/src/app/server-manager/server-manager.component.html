@@ -8,8 +8,9 @@
           <app-app-list [piDashApps]="piDashApps" (addAppClicked)="addApplication()" (setActiveAppClicked)="setActiveApp($event)" [activeApp]="activeApp"></app-app-list>
           </div>
         </div>
-        <div class="col-xs-12 col-sm-8 col-lg-9">
-          <div class="container">
+        <div *ngIf="!activeApp" class="col-12 col-sm-8 col-lg-9"><div class="col-12 alert alert-info"><span>Select or add an app</span></div></div>
+        <div *ngIf="activeApp" class="col-xs-12 col-sm-8 col-lg-9">
+          <div class="container app-controls">
             <div class="row">
               <div class="container">
                 <app-app-details [activeApp]="activeApp" (deleteActiveAppClicked)="deleteActiveApplication()" (toggleActiveAppStartClicked)="toggleActiveAppStart()" [deleteAppButtonText]="deleteAppButtonText" [startAppButtonText]="startAppButtonText"></app-app-details>
@@ -26,16 +27,19 @@
                     <div [ngSwitch]="selectedConfigMenu">
                     <div class="menu-body row">
 
-                      <div class="col-xs-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
-                      <div class="col-xs-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
-                      <div class="col-xs-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
+                      <div class="col-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
+                      <div class="col-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
+                      <div class="col-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
 
                     </div>
                     </div>
-                    <div class="col-xs-12 footer-bar">
+                    <div class="col-12 footer-bar">
                         <hr>
-                        <button class="btn btn-primary" id="SaveAppButton" (click)="addPiDashApp()">Save App</button>
-                        <button class="btn btn-primary" id="AddAppButton" (click)="retrieveApps()">Retrieve Apps</button>
+                      <div class="row">
+                        <div class="col-6 col-md-2"><button class="btn btn-primary" id="SaveAppButton" (click)="addPiDashApp()">Save App</button></div>
+                        <div class="col-0 col-md-1">
+                        <div class="col-6 col-md-6"><button class="btn btn-primary" id="AddAppButton" (click)="retrieveApps()">Retrieve Apps</button></div>
+                      </div>
                     </div>
           </div>
           <!--<% }%>-->

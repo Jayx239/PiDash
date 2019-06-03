@@ -303,16 +303,17 @@ addPiDashApp() {
     });
     } else {
       this.updatePiDashApp(activePiDashApp);
+      alert('App updated!');
     }
   }
 
 updatePiDashApp(piDashApp) {
-  this.serverManagerService.updatePiDashApp(piDashApp((res) => {
+  this.serverManagerService.updatePiDashApp(piDashApp).subscribe((res) => {
       if (res.app) {
         this.piDashApps[this.activeApp.appId] = PiDashAppFactory.buildPiDashAppFromResponse(res.app);
       }
       this.setActiveApp(this.activeApp.appId);
-    }));
+    });
   }
 /*
 addActiveAppPermission() {
