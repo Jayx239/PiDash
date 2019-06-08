@@ -3,11 +3,25 @@
     <h2>App Configuration</h2>
   </div>
 </div>
-<div class="col-xs-12 col-md-6">
-  <label for="EditAppName">App Name</label>
-  <input *ngIf="activeApp" [(ngModel)]="activeApp.app.name" name="EditAppName"/>
+<div class="row">
+  <div class="col-12 col-md-6">
+    <label for="EditAppName">App Name: </label>
+  </div>
 </div>
-<div class="col-xs-12 col-md-6">
-  <label for="EditAppStartCommand">Start Command</label>
-  <input *ngIf="activeApp" name="EditStartCommand" [(ngModel)]="activeApp.app.startCommand"/>
+<div class="row">
+  <div class="col-12 col-md-6">
+    <input *ngIf="activeApp" [(ngModel)]="activeApp.app.name" name="EditAppName"/>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-md-6">
+    <label for="EditAppStartCommand">Start Command: </label>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-md-6">
+    <input *ngIf="activeApp" name="EditStartCommand" [(ngModel)]="activeApp.app.startCommand"/>
+  </div>
 </div>

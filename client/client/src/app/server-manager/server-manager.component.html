@@ -26,11 +26,11 @@
             </div>
                     <div [ngSwitch]="selectedConfigMenu">
                     <div class="menu-body row">
-
-                      <div class="col-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
-                      <div class="col-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
-                      <div class="col-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
-
+                      <div class="container">
+                        <div class="col-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
+                        <div class="col-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
+                        <div class="col-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
+                      </div>
                     </div>
                     </div>
                     <div class="col-12 footer-bar">

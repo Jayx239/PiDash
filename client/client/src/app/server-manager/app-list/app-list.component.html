@@ -1,7 +1,7 @@
 <div class="app-list col-xs-12">
-    <div class="col-xs-12"><h2>Apps</h2></div>
+    <div class="col-xs-12"><h2 class="text-center">Apps</h2></div>
   <div class="col-xs-12"  *ngFor="let piDashApp of appList(piDashApps)">
-    <div [ngClass]="{'col-12': true, 'app-row': true, 'active': activeApp == piDashApp}" (click)="setActiveApp(piDashApp?.app?.appId);">
+    <div [ngClass]="{'col-12': true, 'app-row': true, 'active': activeApp == piDashApp, 'text-center': true}" (click)="setActiveApp(piDashApp?.app?.appId);">
       <h4>{{piDashApp?.app?.name}}</h4>
     </div>
   </div>

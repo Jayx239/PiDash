@@ -1,18 +1,26 @@
 <div class="row">
   <div class="col-xs-12"><h2>App Logs</h2></div>
 </div>
-<div class="row" ng-repeat="appLog in activeAppLogs track by $index">
-  <div class="col-xs-12">
-    <label for="LogName">Log Name</label><input type="text" ng-model="appLog.name" id="LogName"/>
-  </div>
-  <div class="col-xs-12">
-    <label for="LogPath">Log Path</label><input type="text" ng-model="appLog.path" id="LogPath"/>
+<div class="container" ng-repeat="appLog in activeAppLogs track by $index">
+  <div class="row">
+    <div class="col-12 col-md-3">
+      <label for="LogName">Log Name</label>
+    </div>
+    <div class="col-12 col-md-9">
+      <input type="text" ng-model="appLog.name" id="LogName"/>
+    </div>
   </div>
   <div class="row">
-    <div class="col-xs-12">
+    <div class="col-12 col-md-3">
+      <label for="LogPath">Log Path</label>
+    </div>
+    <div class="col-12 col-md-9">
+      <input type="text" ng-model="appLog.path" id="LogPath"/>
+    </div>
+  </div>
+  <div class="row">
       <div class="col-sm-6 col-xs-12"><button class="btn">Save</button></div>
       <div class="col-sm-6 col-xs-12"><button class="btn btn-default" ng-click="deleteActiveAppLog($index)">Delete Log</button></div>
-    </div>
   </div>
   <hr/>
 </div>
