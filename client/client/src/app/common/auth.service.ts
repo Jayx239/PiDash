@@ -7,21 +7,30 @@ import {environment} from '../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  User: User;
+
   constructor(private httpClient: HttpClient) { }
 
   isLoggedIn(): Observable<boolean> {
     return this.httpClient.get<boolean>(environment.baseApiUrl + '/notripped', {withCredentials: true});
   }
 
+  logout(): Observable<any> {
+    return this.httpClient.get<boolean>(environment.baseApiUrl + '/Logout', {withCredentials: true});
+  }
+
+  getUser(): Observable<User> {
+    return this.httpClient.get<User>(environment.baseApiUrl + '/LogonRegister/User', {withCredentials: true});
+  }
 }
 
 export class User {
   userName: string;
   userNumber: number;
+  isAdmin: boolean;
 
-  User(userName: string, userNumber: number) {
+  constructor(userName: string, userNumber: number, isAdmin: boolean) {
     this.userName = userName;
     this.userNumber = userNumber;
+    this.isAdmin = isAdmin;
   }
 }

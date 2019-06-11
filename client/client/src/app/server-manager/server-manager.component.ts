@@ -4,6 +4,8 @@ import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../co
 import {debug} from 'util';
 import {interval, Observable, timer} from 'rxjs';
 import {NavigationStart, Router} from '@angular/router';
+import {Alert, IAlert} from '../common/alert/alert.component';
+import {AuthService} from "../common/auth.service";
 
 @Component({
   selector: 'app-server-manager',
@@ -39,8 +41,9 @@ export class ServerManagerComponent implements OnInit {
   MessageSourceTypes = {Out: 'stdout', In: 'stdin', Error: 'stderr', Close: 'close'};
 
   refreshTimer;
-
-  constructor(private serverManagerService: ServerManagerService, private router: Router) {
+  alert: IAlert;
+  alertTimeout;
+  constructor(private serverManagerService: ServerManagerService, private router: Router, private authService: AuthService) {
     this.refreshRate = 1000; // ms, TODO: abstract this
     this.processes = [];
     this.apps = [];
@@ -57,7 +60,8 @@ export class ServerManagerComponent implements OnInit {
     // this.appUser;
     // this.selectedConfigMenu;
     this.maxNewApps = 100;
-    this.isAdmin = true;
+    this.alert = new Alert(false, '', 'danger');
+    this.alertTimeout = 5000;
   }
 
   setMenu(menuId) {
@@ -69,6 +73,7 @@ export class ServerManagerComponent implements OnInit {
     this.serverManagerService.getUser().subscribe((res) => {
       this.userId = res.userId;
       this.userName = res.userName;
+      this.isAdmin = res.isAdmin;
       this.appUser = new AppUser(this.userName, this.userId);
       this.retrieveApps();
       this.selectedConfigMenu = this.configMenus.App;
@@ -154,9 +159,9 @@ deleteActiveApplication() {
     this.serverManagerService.deletePiDashApp(this.activeApp.appId).subscribe((response) => {
       if (response.status === 'Success') {
         this.deleteActiveAppLocally();
-        alert('App Deleted');
+        this.showSuccessMessage('App Deleted');
       } else {
-        alert('Error Deleting App');
+        this.showErrorMessage('Error Deleting App');
       }
 
     });
@@ -169,10 +174,6 @@ deleteActiveAppLocally() {
 deleteAppLocally(appId) {
     delete this.piDashApps[appId];
 }
-
-/*deleteApplication() {
-    delete this.piDashApps[this.appId];
-  }*/
 
 deleteApplication(appId) {
     delete this.piDashApps[appId];
@@ -299,11 +300,11 @@ addPiDashApp() {
       this.serverManagerService.addPiDashApp(activePiDashApp).subscribe((res) => {
       delete this.piDashApps[activePiDashApp.app.appId];
       this.retrieveApps();
-      alert('App Added!');
+      this.showSuccessMessage('App Added!');
     });
     } else {
       this.updatePiDashApp(activePiDashApp);
-      alert('App updated!');
+      this.showSuccessMessage('App updated!');
     }
   }
 
@@ -315,42 +316,14 @@ updatePiDashApp(piDashApp) {
       this.setActiveApp(this.activeApp.appId);
     });
   }
-/*
-addActiveAppPermission() {
-    if (!this.activeAppPermissions) {
-      this.activeAppPermissions = [];
-    }
-    this.activeAppPermissions.push(new AppPermission(-1, this.activeApp.appId, new AppUser('', -1), -1, false, false, false));
-  }*/
-/*
-deleteActiveAppPermission(index) {
-    this.serverManagerService.deleteAppPermissionByPermissionId
-    (this.piDashApps[this.activeApp.appId].appPermissions[index].permissionId, this.activeApp.appId).subscribe(() => {
-      this.activeAppPermissions.splice(index, 1);
-    });
-  }*/
-/*
-addActiveAppLog() {
-    if (!this.activeAppLogs) {
-      this.activeAppLogs = [];
-    }
-    this.activeAppLogs.push(new AppLog(-1, this.activeApp.appId, '', ''));
-  }
 
-deleteActiveAppLog(index) {
-  this.serverManagerService.deleteAppLogByLogId(this.piDashApps[this.activeApp.appId].app.logs[index].id,
-    this.activeApp.appId).subscribe(() => {
-      this.piDashApps[this.activeApp.appId].app.logs.splice(index, 1);
-    });
-  }
-*/
 startActivePiDashApp() {
 this.startPiDashApp(this.activeApp.appId);
 }
 
 startPiDashApp(appId) {
   this.activeApp.status = this.Statuses.Starting;
-  return this.serverManagerService.startPiDashApp(this.piDashApps[appId]).subscribe((response: string) => {
+  return this.serverManagerService.startPiDashApp(appId).subscribe((response: string) => {
       const piDashAppRes = JSON.parse(response);
       if (piDashAppRes.piDashApp) {
         const updatedPiDashApp: PiDashApp = PiDashAppFactory.buildPiDashAppFromResponse(piDashAppRes.piDashApp);
@@ -368,6 +341,19 @@ startPiDashApp(appId) {
   /*resetPermissionUserId(appPermission) {
     appPermission.appUser.userId = -1;
   }*/
+  showErrorMessage(message) {
+    this.alert.message = message;
+    this.alert.type = 'danger';
+    this.alert.enabled = true;
+    this.alert.setCloseIn(this.alertTimeout);
+  }
+
+  showSuccessMessage(message) {
+    this.alert.message = message;
+    this.alert.type = 'success';
+    this.alert.enabled = true;
+    this.alert.setCloseIn(this.alertTimeout);
+  }
 
   buildPiDashAppFromResponse(app): any {
     return {};

@@ -23,6 +23,7 @@ import {PermissionConfigurationComponent} from '../server-manager/permission-con
 import {LogConfigurationComponent} from '../server-manager/log-configuration/log-configuration.component';
 import { ResetPasswordComponent } from '../account/reset-password/reset-password.component';
 import {FormsModule} from '@angular/forms';
+import {AdminComponent} from '../account/admin/admin.component';
 @NgModule({
   declarations: [
     InSessionComponent,
@@ -37,7 +38,8 @@ import {FormsModule} from '@angular/forms';
     AppConfigurationComponent,
     PermissionConfigurationComponent,
     LogConfigurationComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    AdminComponent
   ],
   imports: [
     CommonModule,

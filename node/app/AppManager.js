@@ -49,7 +49,7 @@ var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
         return;
     }
     else {
-        getAppByIdExtended(appId, true, function(app) {
+        getAppByIdExtended(appId, noCache, function(app) {
             if(!app) {
                 if(callback)
                     callback(app);

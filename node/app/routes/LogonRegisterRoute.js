@@ -16,6 +16,16 @@ app.get("/LogonRegister/Logon", function (req, res) {
 
 app.post("/LogonRegister/Logon", function (req, res) {
     logger.log('debug', "Validation started, UserName: " + req.body.UserName);
+    if(!req.body.UserName || !req.body.Password) {
+        logger.error("Invalid user name, UserName: " + req.body.UserName);
+        res.locals.messages.errors.push("Invalid Credentials");
+
+        responseEngine.render(res,"logon", {
+            successful: false,
+            message: "Unexpected error"
+        });
+        return;
+    }
     provider.getCredentialsByUserName(req.body.UserName, function (returnObject) {
         if (returnObject.status === provider.Statuses.Error || returnObject.results.length < 1) {
             logger.error("User not found, UserName: " + req.body.UserName);
@@ -23,8 +33,7 @@ app.post("/LogonRegister/Logon", function (req, res) {
 
             responseEngine.render(res,"logon", {
                 successful: false,
-                message: "Unexpected error",
-                token: token
+                message: "Unexpected error"
             });
 
             //res.render("logon");
@@ -43,7 +52,9 @@ app.post("/LogonRegister/Logon", function (req, res) {
                     res.locals.messages.success.push("Logon Successful");
                     responseEngine.redirect(res,"/", {
                         successful: true,
-                        userName: req.session.userId
+                        userName: req.session.user,
+                        userId: req.session.userId,
+                        isAdmin: !!req.session.admin
                     });
                 });
             }
@@ -110,6 +121,7 @@ app.get("/LogonRegister/User", validation.requireLogon, function(req,res) {
     var response = new Object();
     response.userName = req.user;
     response.userId = req.userId;
+    response.isAdmin = !!req.session.admin;
     res.json(response);
 });
 
@@ -119,6 +131,16 @@ app.post("/LogonRegister/User", validation.requireLogon, function(req,res) {
     var response = new Object();
     response.userName = req.user;
     response.userId = req.userId;
+    response.isAdmin = !!req.session.admin;
     res.json(response);
 });
 
+app.get('/LogonRegister/Logout',function(req,res) {
+    req.session = {};
+    req.user = null;
+    req.userId = null;
+    responseEngine.redirect(res,'logon',{
+        successful: true,
+        message: "User logged out"
+    })
+});

@@ -27,7 +27,7 @@ import { AlertComponent } from './common/alert/alert.component';
     ConsoleInputComponent,
     LogonComponent,
     RegisterComponent,
-    AlertComponent,
+    AlertComponent
   ],
   imports: [
     BrowserModule,
@@ -53,7 +53,8 @@ import { AlertComponent } from './common/alert/alert.component';
     InSessionRouteActivatorService,
     AuthService
   ],
-  exports: [],
+  exports: [
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

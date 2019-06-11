@@ -8,7 +8,8 @@ import {Observable} from 'rxjs/index';
 export class RegisterService {
 
   constructor(private http: HttpClient) { }
-  register(firstName: string, middleName: string, lastName: string, birthDay: number, birthMonth: number, birthYear: number, userName: string, password: string): Observable<any> {
+  register(firstName: string, middleName: string, lastName: string, birthDay: number, birthMonth: number,
+           birthYear: number, userName: string, password: string): Observable<any> {
     const data = {
       FirstName: firstName,
       MiddleName: middleName,

@@ -1,11 +1,14 @@
 <app-header-bar [activeIndex]="2"></app-header-bar>
+<ngb-alert [ngClass]="{fixed: true}" [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
+  {{alert.message}}
+</ngb-alert>
 <div class="server-manager-container">
   <div class="mt-5">
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-lg-3">
           <div class="container">
-          <app-app-list [piDashApps]="piDashApps" (addAppClicked)="addApplication()" (setActiveAppClicked)="setActiveApp($event)" [activeApp]="activeApp"></app-app-list>
+          <app-app-list [piDashApps]="piDashApps" (addAppClicked)="addApplication()" (setActiveAppClicked)="setActiveApp($event)" [activeApp]="activeApp" [isAdmin]="isAdmin"></app-app-list>
           </div>
         </div>
         <div *ngIf="!activeApp" class="col-12 col-sm-8 col-lg-9"><div class="col-12 alert alert-info"><span>Select or add an app</span></div></div>

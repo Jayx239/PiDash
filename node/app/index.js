@@ -7,6 +7,7 @@ var PiSys = require('./PiSystem');
 /* Get configured winston logger */
 var logger = winston.logger;
 var baseProvider = require('./providers/BaseProvider');
+var responseEngine = require('./ResponseEngine');
 
 app.set('view engine', 'ejs');
 app.set('views', './views');
@@ -57,7 +58,10 @@ app.get('/', function (req, res) {
 
 app.get('/Logout', function (req, res) {
     req.session.reset();
-    res.redirect("/")
+    responseEngine.redirect(res,'/',{
+        successful: true,
+        message: "User logged out"
+    })
 });
 
 app.get('/Dashboard/', validation.requireLogon, function (req, res) {

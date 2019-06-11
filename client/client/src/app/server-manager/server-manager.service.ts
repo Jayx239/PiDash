@@ -110,10 +110,16 @@ export class ServerManagerService {
       withCredentials: true });
   }
 
-  startPiDashApp(piDashApp): Observable<any> {
+  startPiDashAppOld(piDashApp): Observable<any> {
      return this.http.post(environment.baseApiUrl + '/App/StartPiDashApp', {json: JSON.stringify(piDashApp)}, { headers: new HttpHeaders({
          'Content-Type':  'application/json'
        }),
        withCredentials: true});
+  }
+  startPiDashApp(piDashAppIp): Observable<any> {
+    return this.http.post(environment.baseApiUrl + '/App/StartPiDashAppByAppId', {appId: piDashAppIp}, { headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      }),
+      withCredentials: true});
   }
 }

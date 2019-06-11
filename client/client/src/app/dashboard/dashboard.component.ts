@@ -75,4 +75,8 @@ export class DashboardComponent implements OnInit {
     this.stopListeningMemory();
   }
 
+  memoryUsageStyle() {
+    return this.memory ? this.memory.usage + 'px;' : '0px;';
+  }
+
 }

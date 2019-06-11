@@ -1,0 +1,2 @@
+.widget-body-container .memory-usage-bar-container {max-width: 300px; width: 100%;border-color: black; border-style: solid; background-color: white; border-radius: 5px;}
+.widget-body-container .memory-usage-bar-container .memory-usage-bar  {background-color: red; height: 30px; border-radius: 2px;}

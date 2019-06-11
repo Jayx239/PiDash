@@ -6,7 +6,7 @@
     </div>
   </div>
   <!--<% if(admin){%>-->
-    <div class="row" >
+    <div class="row" *ngIf="isAdmin">
         <div class="col-12">
             <button (click)="addApplication()" class="app-row col-12 btn btn-primary">Add App</button>
         </div>

@@ -8,6 +8,7 @@ import {PiDashApp, PiDashAppFactory} from '../../common/pi-dash-app';
 })
 export class AppListComponent implements OnInit {
   @Input() piDashApps: PiDashApp[];
+  @Input() isAdmin: boolean;
   @Input() activeApp: PiDashApp;
   @Output() addAppClicked: EventEmitter<any>;
   @Output() setActiveAppClicked: EventEmitter<any>;
