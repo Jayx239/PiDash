@@ -4,7 +4,7 @@
   </div>
 </div>
 <div class="alert-container">
-  <ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
+  <ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
     {{alert.message}}
   </ngb-alert>
 </div>
@@ -67,7 +67,7 @@
        class="alert alert-danger">
     Password is required
   </div>
-  <label for="PasswordConfirmation">Password</label>
+  <label for="PasswordConfirmation">Confirm Password</label>
   <input [(ngModel)]="model.passwordConfirmation" id="PasswordConfirmation" name="PasswordConfirmation" type="password" class="form-control" placeholder="Confirm Password" #passwordConfirmation="ngModel"/>
   <div [hidden]="(passwordConfirmation.valid || passwordConfirmation.pristine) || passwordConfirmation.value !== password.value"
        class="alert alert-danger">

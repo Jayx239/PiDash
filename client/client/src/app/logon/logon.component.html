@@ -1,6 +1,6 @@
 
 <div class="alert-container">
-<ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
+<ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
   {{alert.message}}
 </ngb-alert>
 </div>
@@ -9,7 +9,7 @@
 
   <div class="form-signin">
 
-  <img class="mb-4" src="../../assets/img/PiDashMonoEyeFull.png" alt="" width="72" height="72">
+  <img class="mb-4" src="../../assets/img/PiDashClean.png" alt="" width="72" height="72">
   <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
   <label for="UserName" class="sr-only">User Name</label>
   <input [(ngModel)]="userName" id="UserName" name="UserName" type="text" class="form-control" placeholder="User Name"/>

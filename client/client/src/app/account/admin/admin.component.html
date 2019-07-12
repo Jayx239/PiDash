@@ -1,3 +1,7 @@
-<p>
-  admin works!
-</p>
+<h2 class="mb-5 mt-5">Admin Privileges</h2>
+<ngb-alert [dismissible]="true" (close)="alert.close()" [type]="alert.type" *ngIf="alert.enabled">{{alert.message}}</ngb-alert>
+<form name="adminForm">
+  <input [(ngModel)]="newAdminName" class="form-control" type="text" id="userName" name="userName" placeholder="User Name"/>
+  <br>
+  <button class="btn btn-danger mt-3 reset-btn" (click)="submitForm()">Grant Admin Privileges</button>
+</form>
