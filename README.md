@@ -99,6 +99,10 @@ node index.js
         2. Click 'Revoke My Privilege' button
 
 Notes:
+* This application depends on MySQL 5.x authentication support.
+If you upgrade to MySQL > 5.x, you will need to enable legacy authentication support.
+
+
 * Applications are run from the base directory (PiDash/node/), so any application references to
     local directories will start from this directory. For example, log files printed to ./logs/ will print to
     the /PiDash/node/logs.
