@@ -15,6 +15,13 @@ export class AccountService {
       { OldPassword: currentPassword, NewPassword: newPassword, RepeatNewPassword: repeatNewPassword},
       {headers: {'Content-Type': 'application/json'}, withCredentials: true});
   }
+
+  grantAdminPrivileges(userName: string): Observable<Response> {
+    return this.httpClient.post<Response>(environment.baseApiUrl + '/Account/GrantAdminPrivileges',
+      { NewAdminUserName: userName},
+      {headers: {'Content-Type': 'application/json'}, withCredentials: true});
+  }
+
 }
 
 export class Response {

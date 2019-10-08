@@ -1,5 +1,5 @@
 <app-header-bar [activeIndex]="2"></app-header-bar>
-<ngb-alert [ngClass]="{fixed: true}" [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
+<ngb-alert [ngClass]="{fixed: true}" [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
   {{alert.message}}
 </ngb-alert>
 <div class="server-manager-container">

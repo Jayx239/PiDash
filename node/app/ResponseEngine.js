@@ -1,7 +1,7 @@
 const Globals = require('./Globals');
 module.exports = {
-    redirect: function render(res,viewName,apiResponseObject) {
-        if(Globals.useApiResponse) {
+    redirect: function redirect(res,viewName,apiResponseObject) {
+        if(Globals.useApiResponse(res.req)) {
             res.send(apiResponseObject);
         }
         else {
@@ -9,7 +9,7 @@ module.exports = {
         }
     },
     render: function render(res,viewName,apiResponseObject) {
-        if(Globals.useApiResponse) {
+        if(Globals.useApiResponse(res.req)) {
             res.send(apiResponseObject);
         }
         else {

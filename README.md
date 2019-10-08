@@ -48,19 +48,24 @@ PiDash is a remote web server management application that allows a user to view 
     ```
 5. Create Database
     ```bash
-    #Navigate to config directory
+    # Navigate to config directory
     cd config/
-    #Run config file
+    # Run config file
     node ConfigureSql.js
     ```
 6. Create default admin
+    ```
+    # Navigate to config directory
+    cd config/
+    # Run CreateDefaultAdmin.js
+    node CreateDefaultAdmin.js
+    ```
 #### Running PiDash
 In the project node directory run:
 ```bash
 node index.js
 ```
-
-### User Manual
+### User Manual - Legacy
 * Registering
     1. Navigate to url:port/LogonRegister/Register
     2. Enter in registration details.
@@ -94,7 +99,10 @@ node index.js
         2. Click 'Revoke My Privilege' button
 
 Notes:
+* This application depends on MySQL 5.x authentication support.
+If you upgrade to MySQL > 5.x, you will need to enable legacy authentication support.
+
+
 * Applications are run from the base directory (PiDash/node/), so any application references to
     local directories will start from this directory. For example, log files printed to ./logs/ will print to
     the /PiDash/node/logs.
-    

@@ -1,26 +1,28 @@
 
 <div class="alert-container">
-<ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.onClose()">
-  {{alert.message}}
-</ngb-alert>
+  <ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
+    {{alert.message}}
+  </ngb-alert>
 </div>
 
 <div class="body text-center">
 
   <div class="form-signin">
 
-  <img class="mb-4" src="../../assets/img/PiDashMonoEyeFull.png" alt="" width="72" height="72">
-  <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-  <label for="UserName" class="sr-only">User Name</label>
-  <input [(ngModel)]="userName" id="UserName" name="UserName" type="text" class="form-control" placeholder="User Name"/>
-  <label for="Password" class="sr-only">Password</label>
-  <input [(ngModel)]="password" id="Password" name="Password" type="password" class="form-control" placeholder="Password"/>
-  <div class="checkbox mb-3">
-    <label>
-      <input type="checkbox" value="remember-me"> Remember me
-    </label>
+    <img class="mb-4" src="../../assets/img/PiDashClean.png" alt="" width="72" height="72">
+    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <label for="UserName" class="sr-only">User Name</label>
+    <form name="logonForm" #logonForm="ngForm" id="LogonForm" class="logon-form">
+      <input [(ngModel)]="userName" id="UserName" name="UserName" type="text" class="form-control" placeholder="User Name"/>
+      <label for="Password" class="sr-only">Password</label>
+      <input [(ngModel)]="password" id="Password" name="Password" type="password" class="form-control" placeholder="Password"/>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit" (click)="logon()">Sign in</button>
+    </form>
+    <button class="mt-3 mb-3 btn" (click)="navigateToRegister()">Register</button>
   </div>
-  <button class="btn btn-lg btn-primary btn-block" type="submit" (click)="logon()">Sign in</button>
-  <button class="mt-3 mb-3 btn" (click)="navigateToRegister()">Register</button>
-</div>
 </div>
