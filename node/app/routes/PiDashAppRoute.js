@@ -99,12 +99,23 @@ app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
             return;
         }
         else {
-            appManager.updatePiDashApp(piDashApp,function(updatedPiDashApp) {
-                result.status = "Unknown";
-                result.message = "Validation not yet implemented";
-                result.app = JSON.stringify(updatedPiDashApp);
-                res.json(result);
-            });
+            // Check if user has write permissions
+            appManager.hasWritePermission(piDashApp.app.appId, req.userId, function(hasWritePermission) {
+
+                   if(!hasWritePermission) {
+                       result.status = "Error";
+                       result.message = "Invalid permissions";
+                       res.json(result);
+                       return;
+                   }
+                    // Update app
+                    appManager.updatePiDashApp(piDashApp,function(updatedPiDashApp) {
+                        result.status = "Success";
+                        result.message = "App Updated";
+                        result.app = JSON.stringify(updatedPiDashApp);
+                        res.json(result);
+                    });
+            })
         }
     }
     else {
@@ -113,6 +124,7 @@ app.post("/App/UpdateApp", validation.requireAdmin, function(req,res) {
     }
 });
 
+// TODO: Pretty sure this was just for testing, remove?
 app.post("/App/GetApp", validation.requireLogon, function(req,res) {
 
     var app = new appManager.App("App 1",0,3,"dir",[]);
@@ -139,17 +151,26 @@ app.post("/App/GetAppsByUserId", validation.requireLogon, function(req,res) {
 
 app.post("/App/DeleteAppByAppId", validation.requireAdmin, function(req,res) {
     var appId = req.body.appId;
-    appManager.deleteAppByAppId(appId,function(result) {
+    appManager.hasWritePermission(appId,req.userId,function(hasWritePermission) {
         var result = new Object();
-
-        // TODO: don't hardcode error
-        if(result.status === "Error") {
+        if(!hasWritePermission) {
             result.status = "Error";
+            result.message = "Invalid permissions";
+            res.json(result);
+        } else {
+            appManager.deleteAppByAppId(appId,function(result) {
+                // TODO: don't hardcode error
+                if(result.status === "Error") {
+                    result.status = "Error";
+                    result.message = "Error deleting app";
+                }
+                else {
+                    result.status = "Success";
+                    result.message = "App Deleted"
+                }
+                res.json(result);
+            })
         }
-        else {
-            result.status = "Success";
-        }
-        res.json(result);
     })
 });
 
@@ -289,8 +310,6 @@ app.post("/App/StartPiDashAppByAppId", validation.requireLogon, function(req,res
             res.json(JSON.stringify(response));
         });
     });
-
-
 });
 
 var createAppFromRequest = function(req) {

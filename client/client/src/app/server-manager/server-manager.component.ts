@@ -159,9 +159,9 @@ deleteActiveApplication() {
     this.serverManagerService.deletePiDashApp(this.activeApp.appId).subscribe((response) => {
       if (response.status === 'Success') {
         this.deleteActiveAppLocally();
-        this.showSuccessMessage('App Deleted');
+        this.showSuccessMessage(response.message);
       } else {
-        this.showErrorMessage('Error Deleting App');
+        this.showErrorMessage(response.message);
       }
 
     });
@@ -304,7 +304,6 @@ addPiDashApp() {
     });
     } else {
       this.updatePiDashApp(activePiDashApp);
-      this.showSuccessMessage('App updated!');
     }
   }
 
@@ -312,6 +311,12 @@ updatePiDashApp(piDashApp) {
   this.serverManagerService.updatePiDashApp(piDashApp).subscribe((res) => {
       if (res.app) {
         this.piDashApps[this.activeApp.appId] = PiDashAppFactory.buildPiDashAppFromResponse(res.app);
+        this.showSuccessMessage('App updated!');
+      }
+      if ( res.status === 'Error') {
+        this.showErrorMessage(res.message);
+      } else {
+        this.showSuccessMessage(res.message);
       }
       this.setActiveApp(this.activeApp.appId);
     });
@@ -325,15 +330,17 @@ startPiDashApp(appId) {
   this.activeApp.status = this.Statuses.Starting;
   return this.serverManagerService.startPiDashApp(appId).subscribe((response: string) => {
       const piDashAppRes = JSON.parse(response);
-      if (piDashAppRes.piDashApp) {
+      if (piDashAppRes.status === 'Error') {
+        this.activeApp.status = this.Statuses.Stopped;
+        this.setActiveApp(appId);
+        this.showErrorMessage(piDashAppRes.message);
+      } else if (piDashAppRes.piDashApp) {
         const updatedPiDashApp: PiDashApp = PiDashAppFactory.buildPiDashAppFromResponse(piDashAppRes.piDashApp);
         if (updatedPiDashApp) {
           this.piDashApps[updatedPiDashApp.appId] = updatedPiDashApp;
         }
         this.setActiveApp(updatedPiDashApp.appId);
         this.activeApp.status = this.Statuses.Running;
-      } else if (piDashAppRes.Status === 'Error') {
-
       }
       return response;
     });
