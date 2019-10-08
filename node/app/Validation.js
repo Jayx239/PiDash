@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const winston = require('./Logger');
 const server = require('./Server');
 const provider = require('./providers/CredentialProvider');
+const globals = require('./Globals');
 
 var logger = winston.logger;
 var app = server.app;
@@ -17,12 +18,12 @@ app.use(helmet());
 
 app.use(session({
     cookieName: 'session',
-    secret: getRandomString(32),
+    secret: globals.sessionConfig.secret,
     genid: function (req) {
         return sha512(genRandomString(16), genRandomString(16)).passwordHash;
     },
-    duration: sessionTimeout,
-    activeDuration: sessionTimeout
+    duration: globals.sessionConfig.sessionTimeout,
+    activeDuration: globals.sessionConfig.activeDuration
 }));
 
 app.use(function (req, res, next) {

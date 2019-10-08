@@ -42,8 +42,16 @@ PiDash is a remote web server management application that allows a user to view 
     server.config -
     ```json
     {
-        "ip":"<host_address(optional)>",
-        "port":"<port_no>"
+        "ip": "<host_address(optional)>",
+        "port": "<port_no>"
+    }
+    ```
+    session.config -
+    ```json
+    {
+        "secret": "<random secret string>",
+        "sessionTimeout": "<length of session in ms>",
+        "activeDuration": "<if expiresIn < activeDuration, extend by this in ms>"
     }
     ```
 5. Create Database
