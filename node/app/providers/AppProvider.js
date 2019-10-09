@@ -27,7 +27,7 @@ var getMostRecentAppByDetails = function(appName,startCommand, creatorUserId, ca
 };
 
 var getAppsByUserId = function(userId, callback) {
-    var sqlQuery = sqlString.format("SELECT A.* FROM Apps A INNER JOIN AppPermissions P ON P.AppId=A.AppId WHERE P.UserId=?;", [userId]);
+    var sqlQuery = sqlString.format("SELECT A.* FROM Apps A INNER JOIN AppPermissions P ON P.AppId=A.AppId WHERE P.UserId=? AND P.Active = 1;", [userId]);
     runCommand(sqlQuery, function (result) {
         if(callback)
             callback(result);

@@ -1,0 +1,41 @@
+<!--<% include partials/header %>-->
+<!--<% include partials/errors %>-->
+<!--<% include partials/success %>-->
+<app-header-bar [activeIndex]="3"></app-header-bar>
+
+<div class="container-fluid">
+  <div class="row">
+  <div class="col-xl-2 col-md-4 col-sm-5">
+    <div class="sidebar-sticky account-sidebar">
+      <ul class="nav flex-column text-center">
+        <li class="nav-item" [ngClass]="{active: activePanel == 0}" (click)="activePanel=0">
+          <span (click)="activePanel = 0" class="glyphicon glyphicon-sunglasses">Reset Password</span>
+        </li>
+        <li class="nav-item" [ngClass]="{active: activePanel == 1}" *ngIf="user?.isAdmin" (click)="activePanel=1">
+          Admin
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-xl-10 col-md-8 col-sm-7">
+    <div class="container container-fluid">
+<div class="panel">
+  <div class="panel-body" [ngSwitch]="activePanel">
+
+    <div *ngSwitchCase="0">
+      <app-reset-password></app-reset-password>
+    </div>
+    <div *ngIf="user?.isAdmin">
+      <div *ngSwitchCase="1">
+        <app-admin></app-admin>
+      </div>
+    </div>
+
+    <!--
+    <% if(admin) { %>
+        <% include partials/adminprivileges%>
+        <%}%>-->
+  </div>
+</div>
+</div></div>
+</div></div>

@@ -1,0 +1,54 @@
+<app-header-bar [activeIndex]="2"></app-header-bar>
+<ngb-alert [ngClass]="{fixed: true}" [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
+  {{alert.message}}
+</ngb-alert>
+<div class="server-manager-container">
+  <div class="mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-sm-4 col-lg-3">
+          <div class="container">
+          <app-app-list [piDashApps]="piDashApps" (addAppClicked)="addApplication()" (setActiveAppClicked)="setActiveApp($event)" [activeApp]="activeApp" [isAdmin]="isAdmin"></app-app-list>
+          </div>
+        </div>
+        <div *ngIf="!activeApp" class="col-12 col-sm-8 col-lg-9"><div class="col-12 alert alert-info"><span>Select or add an app</span></div></div>
+        <div *ngIf="activeApp" class="col-xs-12 col-sm-8 col-lg-9">
+          <div class="container app-controls">
+            <div class="row">
+              <div class="container">
+                <app-app-details [activeApp]="activeApp" (deleteActiveAppClicked)="deleteActiveApplication()" (toggleActiveAppStartClicked)="toggleActiveAppStart()" [deleteAppButtonText]="deleteAppButtonText" [startAppButtonText]="startAppButtonText"></app-app-details>
+              </div>
+              <div class="container"><app-app-console [activeApp]="activeApp"></app-app-console></div>
+            </div>
+          <!--<%if(admin){%>-->
+          <div *ngIf="isAdmin">
+            <div class="row permission-button-container">
+              <div class="col-4" ><button class="btn btn-primary" (click)="setMenu(configMenus.App)">App</button></div>
+              <div class="col-4" (click)="setMenu(configMenus.Permissions)"><button class="btn btn-primary">Permissions</button></div>
+              <div class="col-4" ><button (click)="setMenu(configMenus.Log)" class="btn btn-primary">Logs</button></div>
+            </div>
+                    <div [ngSwitch]="selectedConfigMenu">
+                    <div class="menu-body row">
+                      <div class="container">
+                        <div class="col-12" *ngSwitchCase="'App'"><app-app-configuration [activeApp]="activeApp"></app-app-configuration></div>
+                        <div class="col-12" *ngSwitchCase="'Permissions'"><app-permission-configuration [activeAppPermissions]="activeApp?.appPermissions" [appId]="activeApp?.appId"></app-permission-configuration></div>
+                        <div class="col-12" *ngSwitchCase="'Log'"><app-log-configuration></app-log-configuration></div>
+                      </div>
+                    </div>
+                    </div>
+                    <div class="col-12 footer-bar">
+                        <hr>
+                      <div class="row">
+                        <div class="col-6 col-md-2"><button class="btn btn-primary" id="SaveAppButton" (click)="addPiDashApp()">Save App</button></div>
+                        <div class="col-0 col-md-1">
+                        <div class="col-6 col-md-6"><button class="btn btn-primary" id="AddAppButton" (click)="retrieveApps()">Retrieve Apps</button></div>
+                      </div>
+                    </div>
+          </div>
+          <!--<% }%>-->
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,83 @@
+<div class="row">
+  <div class="col-12 text-center">
+    <h1 class="text-center">Register</h1>
+  </div>
+</div>
+<div class="alert-container">
+  <ngb-alert [dismissible]="true" [type]="alert.type" *ngIf="alert.enabled" (close)="alert.close()">
+    {{alert.message}}
+  </ngb-alert>
+</div>
+<div class="container">
+<form name="registerForm" #registerForm="ngForm" id="RegisterForm" class="register-form">
+  <label for="FirstName">First Name</label>
+  <input [(ngModel)]="model.firstName" id="FirstName" name="FirstName" type="text" class="form-control" placeholder="First Name" required #firstName='ngModel'/>
+  <div [hidden]="firstName.valid || firstName.pristine"
+       class="alert alert-danger">
+    First Name is required
+  </div>
+
+  <label for="MiddleName">Middle Name</label>
+  <input [(ngModel)]="model.middleName" id="MiddleName" name="MiddleName" type="text" class="form-control" placeholder="Middle Name"/>
+
+  <label for="LastName">Last Name</label>
+  <input [(ngModel)]="model.lastName" id="LastName" name="LastName" type="text" class="form-control" placeholder="Last Name" required #lastName='ngModel'/>
+  <div [hidden]="lastName.valid || lastName.pristine"
+       class="alert alert-danger">
+    Last Name is required
+  </div>
+
+  <label for="BirthDay">Birthday</label>
+  <div class="form-group">
+    <div class="row">
+    <div class="col-4">
+      <input [(ngModel)]="model.birthDay" id="BirthDay" name="BirthDay" type="text" class="form-control" placeholder="Birth Day" required #birthDay="ngModel"/>
+      <div [hidden]="birthDay.valid || birthDay.pristine"
+           class="alert alert-danger">
+        Required
+      </div>
+    </div>
+    <div class="col-4">
+      <input [(ngModel)]="model.birthMonth" id="BirthMonth" name="BirthMonth" type="text" class="form-control" placeholder="Birth Month" required #birthMonth="ngModel"/>
+      <div [hidden]="birthMonth.valid || birthMonth.pristine"
+           class="alert alert-danger">
+        Required
+      </div>
+    </div>
+    <div class="col-4">
+      <input [(ngModel)]="model.birthYear" id="BirthYear" name="BirthYear" type="text" class="form-control" placeholder="Birth Year" required #birthYear="ngModel"/>
+      <div [hidden]="birthYear.valid || birthYear.pristine"
+           class="alert alert-danger">
+        Required
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <label for="UserName">User Name</label>
+  <input [(ngModel)]="model.userName" id="UserName" name="UserName" type="text" class="form-control" placeholder="User Name" required #userName="ngModel"/>
+  <div [hidden]="userName.valid || userName.pristine"
+       class="alert alert-danger">
+    User Name is required
+  </div>
+
+  <label for="Password">Password</label>
+  <input [(ngModel)]="model.password" id="Password" name="Password" type="password" class="form-control" placeholder="Password" required #password="ngModel"/>
+  <div [hidden]="password.valid || password.pristine"
+       class="alert alert-danger">
+    Password is required
+  </div>
+  <label for="PasswordConfirmation">Confirm Password</label>
+  <input [(ngModel)]="model.passwordConfirmation" id="PasswordConfirmation" name="PasswordConfirmation" type="password" class="form-control" placeholder="Confirm Password" #passwordConfirmation="ngModel"/>
+  <div [hidden]="(passwordConfirmation.valid || passwordConfirmation.pristine) || passwordConfirmation.value !== password.value"
+       class="alert alert-danger">
+    Password is required
+  </div>
+  <div [hidden]="(passwordConfirmation.pristine || passwordConfirmation.untouched) || passwordConfirmation.value === password.value"
+       class="alert alert-danger">
+    Passwords do not match
+  </div>
+
+  <input id="SubmitButton" type="submit" class="btn btn-primary col-xs-12" value="Register" (click)="register(registerForm)"/>
+</form>
+</div>

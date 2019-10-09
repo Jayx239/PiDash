@@ -1,0 +1,22 @@
+.account-sidebar {
+  border-right: solid #DEE5E5;
+  height: 100%;
+}
+
+.sidebar-sticky ul li.nav-item {
+  padding: 15px;
+  border-bottom: 1px solid;
+}
+
+.sidebar-sticky ul li.nav-item.active {
+  background-color: #f5f5f5;
+}
+
+.account-sidebar > ul > li {
+  margin-left: -15px;
+}
+
+.sidebar-sticky ul li.nav-item:hover {
+  background-color: #DEE5E5;
+  cursor: pointer;
+}

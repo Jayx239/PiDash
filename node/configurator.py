@@ -52,7 +52,23 @@ class Sql:
         f.write(json.dumps(self.__dict__))
         f.close()
 
-configTypes = ["Server","Sql"]
+class Session:
+    def __init__(self):
+        self.secret = ""
+        self.sessionTimeout = ""
+        self.activeDuration = ""
+    def generate(self):
+        print("Server configurator")
+        self.secret = prompt("Enter session secret: ")
+        self.sessionTimeout = prompt("Enter session timeout: ")
+        self.activeDuration = prompt("Enter active duration: ")
+    def export(self):
+        fullPath = configPath + "session.config"
+        f = open(fullPath,'w')
+        f.write(json.dumps(self.__dict__))
+        f.close()
+
+configTypes = ["Server","Sql", "Session"]
 def printConfigTypes():
     index = 1
     for configType in configTypes:
@@ -64,6 +80,8 @@ def getConfigObject(configType):
         return Server()
     if configType == '2':
         return Sql()
+    if configType == '3':
+        return Session()
     return None
 
 print("Welcome to PiDash configurator")

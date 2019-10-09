@@ -1,0 +1,34 @@
+<app-header-bar [activeIndex]="1"></app-header-bar>
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12">
+      <div name="cpu" class="CPU details">
+        <div class="title-container">
+          <h1>Cpu</h1>
+        </div>
+        <div class="widget-body-container" [hidden]="!cpu || cpu.length == 0">
+            <h3>Model</h3>
+            <span>{{cpu[0]?.model}}</span>
+          <h3>Cores</h3>
+          <span>{{cpu.length}}</span>
+        </div>
+
+      </div>
+      <div name="memory">
+
+          <div class="title-container">
+            <h1>Memory Monitor</h1>
+          </div>
+          <div class="widget-body-container" [hidden]="!memory?.total || !memory?.free || !memory?.usage">
+            <h3>Free / Total</h3><span [hidden]="!memory?.total || !memory?.free ">{{memory?.total-memory?.free}} / {{memory?.total}}</span>
+            <h3>Usage</h3><span [hidden]="!memory?.usage">{{memory?.usage*100}} %</span>
+            <div class="memory-usage-bar-container" [hidden]="!memory?.usage">
+              <div class="memory-usage-bar" [ngStyle]="{'width.%': memory?.usage*100}">
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>

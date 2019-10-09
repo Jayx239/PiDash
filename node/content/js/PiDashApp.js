@@ -230,6 +230,36 @@ var tryParseJson = function(res) {
     return jsonRes;
 
 };
+
+var hasPermission = function(piDashApp, userId) {
+    if(!piDashApp || piDashApp.appPermissions == null || userId == null || userId < 0) {
+        return false;
+    }
+
+    var appPermissions = piDashApp.appPermissions;
+    for(var i=0; i<appPermissions.length; i++) {
+        if(appPermissions[i].appUser.userId === userId) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+var hasExecutePermission = function(piDashApp, userId) {
+    if(!piDashApp || piDashApp.appPermissions == null || userId == null || userId < 0) {
+        return false;
+    }
+
+    var appPermissions = piDashApp.appPermissions;
+    for(var i=0; i<appPermissions.length; i++) {
+        if(appPermissions[i].appUser.userId === userId && appPermissions[i].execute) {
+            return true;
+        }
+    }
+    return false;
+};
+
 if(typeof module != 'undefined' && module.exports)
     module.exports = {
         PiDashApp: PiDashApp,
@@ -251,5 +281,7 @@ if(typeof module != 'undefined' && module.exports)
         buildPermissionsFromResponse: buildPermissionsFromResponse,
         buildProcessesFromResponse: buildProcessesFromResponse,
         createDefaultPiDashApp: createDefaultPiDashApp,
-        tryParseJson: tryParseJson
+        tryParseJson: tryParseJson,
+        hasPermission: hasPermission,
+        hasExecutePermission: hasExecutePermission
     };

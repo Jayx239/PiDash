@@ -1,0 +1,18 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <img class="mt-1 ml-2 mr-1" src="../../assets/img/PiDashClean.png" alt="" width="35px" height="35px;">
+    <!--<a class="nav-link" [ngClass]="{active: activeIndex == 0}" [routerLink]="['/dash']">PiDash</a>-->
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active:activeIndex==1}" [routerLink]="['/dash/dashboard']">Dashboard</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active:activeIndex==2}" [routerLink]="['/dash/servermanager']">Server Manager</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active:activeIndex==3}" [routerLink]="['/dash/account']">Account</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [ngClass]="{active: activeIndex == 4}" (click)="logout()">Logout</a>
+  </li>
+</ul>

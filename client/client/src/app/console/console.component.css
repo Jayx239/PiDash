@@ -1,0 +1,18 @@
+.console {
+  background-color: lightgrey;
+}
+
+.console .console-display {
+  background-color: black;
+  color:green;
+}
+.console .console-display .display-area {
+  background-color: black;
+  color: green;
+  width: 100%;
+}
+.console .console-input {
+  background-color: black;
+  color: green;
+}
+

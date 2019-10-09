@@ -4,6 +4,7 @@ var server = require('../Server');
 var app = server.app;
 var credentialProvider = require('../providers/CredentialProvider');
 var validation = require('../Validation');
+var responseEngine = require('../ResponseEngine');
 
 app.get("/Account", validation.requireLogon, function (req, res) {
     res.render("account");
@@ -12,14 +13,20 @@ app.get("/Account", validation.requireLogon, function (req, res) {
 app.post("/Account/ChangePassword", validation.requireLogon, function (req, res) {
     if (!validation.validPassword(req.body.OldPassword) || !validation.validPassword(req.body.NewPassword) || req.body.NewPassword !== req.body.RepeatNewPassword) {
         res.locals.messages.errors.push("Invalid password");
-        res.render("account");
+        responseEngine.render(res,"account",{
+            successful: false,
+            message: "Invalid password"
+        });
         return;
     }
     credentialProvider.getCredentialsByUserName(req.user, function (returnObject) {
         if (returnObject.status === credentialProvider.Statuses.Error || returnObject.results.length < 1) {
             logger.error("Error changing password, user not found, UserName: " + req.user);
             res.locals.messages.errors.push("User not found");
-            res.render("account");
+            responseEngine.render(res,"account",{
+                successful: false,
+                message: "User not found"
+            });
         }
         else {
             if (validation.validateUserPassword(req.body.OldPassword, returnObject.results[0].Hash, returnObject.results[0].Salt)) {
@@ -28,20 +35,33 @@ app.post("/Account/ChangePassword", validation.requireLogon, function (req, res)
                     if (result.status === credentialProvider.Statuses.Error) {
                         logger.error("Error updating User password, UserName: " + req.user);
                         res.locals.messages.errors.push("Error resetting password");
-                        res.render("account");
+
+                        responseEngine.render(res,"account",{
+                            successful: false,
+                            message: "Error reseting password"
+                        });
                     }
                     else if (result.status === credentialProvider.Statuses.Success) {
                         logger.info("User password updated, UserName: " + req.user);
                         res.locals.messages.success.push("Password reset successfully")
-                        res.render("account");
+                        responseEngine.render(res,"account",{
+                            successful: true,
+                            message: "Password reset"
+                        });
                     }
                     else {
-                        res.render("account");
+                        responseEngine.render(res,"account",{
+                            successful: false,
+                            message: "Unexpected error"
+                        });
                     }
                 });
             }
             else{
-                res.render("account");
+                responseEngine.render(res,"account",{
+                    successful: false,
+                    message: "Invalid current password"
+                });
             }
         }
     });
@@ -56,7 +76,10 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
             response.status="Error";
             response.message = "Invalid user";
             res.locals.messages.errors.push(response.message);
-            res.render('account');//res.json(response);
+            responseEngine.render(res,"account",{
+                successful: false,
+                message: "User not found"
+            });
         }
         else {
             credentialProvider.getAdminByUserName(userName,function(result) {
@@ -73,7 +96,10 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
                             res.locals.messages.success.push(response.message);
                         }
 
-                        res.render('account');//res.json(response);
+                        responseEngine.render(res,"account",{
+                            successful: false,
+                            message: response.message
+                        });//res.json(response);
                     });
                 }
                 else if(result.firstResult && result.firstResult.Active == 0) {
@@ -81,19 +107,31 @@ app.post("/Account/GrantAdminPrivileges", validation.requireAdmin, function (req
                         if(result.status === credentialProvider.Statuses.Error) {
                             response.message = "Error reactivating " + userName + " as admin";
                             res.locals.messages.errors.push("Error giving " + userName + " admin privileges");
+
+                            responseEngine.render(res,"account",{
+                                successful: false,
+                                message: "Error giving " + userName + " admin privileges"
+                            });
                         }
                         else {
                             response.message = userName + " added as admin";
                             res.locals.messages.success.push(response.message);
+
+                            responseEngine.render(res,"account",{
+                                successful: true,
+                                message: "Admin added"
+                            });
                         }
-                        res.render('account');//res.json(response);
                     });
                 }
                 else {
                     response.status = "Error";
                     response.message = "User is already an admin";
                     res.locals.messages.errors.push(response.message);
-                    res.render('account');//res.json(response);
+                    responseEngine.render(res,"account",{
+                        successful: false,
+                        message: response.message
+                    });
                 }
             });
         }

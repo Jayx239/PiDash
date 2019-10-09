@@ -49,7 +49,7 @@ var getPiDashAppByAppIdExtended = function(appId, noCache, callback) {
         return;
     }
     else {
-        getAppByIdExtended(appId, true, function(app) {
+        getAppByIdExtended(appId, noCache, function(app) {
             if(!app) {
                 if(callback)
                     callback(app);
@@ -137,7 +137,7 @@ var getAppUserByUserName = function(userName, callback) {
 var getPiDashAppsByUserId = function(userId, callback) {
     appProvider.getAppsByUserId(userId, function(results) {
         var piDashAppIds = [];
-        if(results.results.length > 0) {
+        if(results && results.results && results.results.length > 0) {
             for(var i=0; i<results.results.length; i++) {
                 if(results.results[i].Active == 1)
                     piDashAppIds.push(results.results[i].AppId);
@@ -411,6 +411,26 @@ var updateAppPermission = function(appPermission, callback) {
     });
 };
 
+
+// Check if user has write permissions for given app id
+var hasWritePermission = function(appId, userId, callback) {
+    getAppPermissionsByAppId(appId, function(appPermissions) {
+        var hasWritePermission = false;
+        if(appPermissions && appPermissions.length > 0) {
+            for(var i=0; i<appPermissions.length; i++) {
+                if(appPermissions[i].appUser.userId === userId && appPermissions[i].write) {
+                    hasWritePermission = true;
+                }
+            }
+        }
+
+        if(callback) {
+            callback(hasWritePermission);
+        }
+        return hasWritePermission;
+    })
+};
+
 module.exports = {
     PiDashApp: PiDashApp,
     App: App,
@@ -430,5 +450,6 @@ module.exports = {
     deleteAppByAppId: deleteAppByAppId,
     deleteAppPermissionByPermissionId: deleteAppPermissionByPermissionId,
     deleteAppLogByLogId: deleteAppLogByLogId,
-    updatePiDashApp: updatePiDashApp
+    updatePiDashApp: updatePiDashApp,
+    hasWritePermission: hasWritePermission
 };

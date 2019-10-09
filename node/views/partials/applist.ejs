@@ -3,7 +3,7 @@
         <div class="col-xs-12"><h2>Apps</h2></div>
     </div>
     <div class="row" ng-repeat="piDashApp in piDashApps track by $index">
-        <div class="col-xs-12 app-row" ng-click="setActiveApp(piDashApp.app.appId);">
+        <div ng-class="{'col-xs-12': true, 'app-row': true, 'active': activeApp == piDashApp.app}" ng-click="setActiveApp(piDashApp.app.appId);">
             <h4>{{piDashApp.app.name}}</h4>
         </div>
     </div>
