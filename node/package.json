@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@angular/cli": "^7.3.9",
-    "angular": "^1.7.8",
+    "angular": "^1.7.9",
     "body-parser": "^1.19.0",
     "bootstrap": "^3.4.1",
     "client-sessions": "^0.8.0",
