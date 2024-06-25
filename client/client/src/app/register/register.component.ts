@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {RegisterService} from './register.service';
-import {Form, NgForm} from '@angular/forms';
+import { NgForm } from '@angular/forms';
 import {Alert, IAlert} from '../common/alert/alert.component';
-import {NgbAlert} from '@ng-bootstrap/ng-bootstrap';
 import {Router} from '@angular/router';
-import {forEach} from "@angular/router/src/utils/collection";
 
 @Component({
   selector: 'app-register',

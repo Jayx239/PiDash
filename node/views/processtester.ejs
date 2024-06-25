@@ -6,7 +6,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <% include bundles/bundle %>
+    <%- include('bundles/bundle') %>
     <script>
         $(document).ready(function(){
             var Processes = [];
@@ -68,7 +68,7 @@
     </script>
 </head>
 <body>
-<% include partials/header %>
+<%- include('partials/header') %>
 <form id="CommandForm" name="CommandForm" method="POST" action="/Process/Spawn">
     <label for="Command">Command</label><input type="text" name="Command"/>
     <br>
@@ -96,7 +96,7 @@
     <textarea id="AppCommandConsole"></textarea>
     <button type="submit">Run App Command</button>
 </form>
-<% include partials/footer %>
+<%- include('partials/footer') %>
 
 </body>
 

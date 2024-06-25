@@ -5,13 +5,17 @@ const helpers = require('./Helpers')
 const bodyParser = require('body-parser');
 var winston = require('./Logger');
 var logger = winston.logger;
-var IP = require('ip');
 var defaultPort = 8000;
 var port = defaultPort;
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
-
+const IP = {
+	address: () => {
+		return "10.0.0.1";
+	},
+	
+};
 var startServer = function(callback) {
     fs.readFile('./config/server.config', 'utf-8', function (err, contents) {
         port = defaultPort;

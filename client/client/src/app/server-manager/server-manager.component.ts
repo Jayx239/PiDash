@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ServerManagerService} from './server-manager.service';
 import {AppLog, AppPermission, AppUser, PiDashApp, PiDashAppFactory} from '../common/pi-dash-app';
-import {debug} from 'util';
 import {interval, Observable, timer} from 'rxjs';
 import {NavigationStart, Router} from '@angular/router';
 import {Alert, IAlert} from '../common/alert/alert.component';

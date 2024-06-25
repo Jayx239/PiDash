@@ -60,7 +60,8 @@ fs.readFile('./sql.config', function (err, contents) {
                 process.exit(-1);
                 return;
             }
-            sqlConn.query("USE PiDash;", function (err, result, fields) {
+			// Note: Should use sql formatter to prevent injection attacks
+            sqlConn.query(`USE ${sqlCreds.database};`, function (err, result, fields) {
                 sqlConn.beginTransaction(function (err) {
                     if (err) {
                         console.log("Error starting transaction");
@@ -74,7 +75,7 @@ fs.readFile('./sql.config', function (err, contents) {
                         if (err || result.length == 0) {
                             sqlConn.query("INSERT INTO Users(UserName,PrimaryEmail,FirstName,MiddleName,LastName,BirthDay,BirthMonth,BirthYear) VALUES('admin','admin@admin.com','admin','admin','admin',1,1,1990);", function (err, result, fields) {
                                 if (err) {
-                                    console.log("Error adding user");
+                                    console.log(`Error adding user err: ${err}`);
                                     sqlConn.rollback(function () {
                                         process.exit(3);
                                     })
@@ -84,7 +85,7 @@ fs.readFile('./sql.config', function (err, contents) {
                                         var userId = result[0].UserId;
                                         console.log(userId);
                                         if (err || result.length === 0) {
-                                            console.log("Error adding user");
+                                            console.log(`Error adding user, err: ${err}`);
                                             sqlConn.rollback(function () {
                                                 process.exit(4);
                                             })

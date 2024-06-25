@@ -139,7 +139,7 @@ var createCredentialsTable = function (sqlConn, callback) {
 };
 
 var createGroupsTable = function (sqlConn, callback) {
-    var query = "CREATE Table Groups(" +
+    var query = "CREATE Table PidashGroups(" +
         "CreateDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
         "LastUpdate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
         "GroupId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
@@ -149,7 +149,7 @@ var createGroupsTable = function (sqlConn, callback) {
         "FOREIGN KEY(CreatorUserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Groups table");
+            console.log(`Error creating Groups table: ${err}`);
             exitError();
         }
         else {

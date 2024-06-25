@@ -17,7 +17,7 @@ import {InSessionRouteActivatorService} from './common/in-session-route-activato
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {AuthService} from './common/auth.service';
 import { AlertComponent } from './common/alert/alert.component';
-
+import { InSessionModule } from './in-session/in-session.module';
 
 
 @NgModule({
@@ -40,7 +40,7 @@ import { AlertComponent } from './common/alert/alert.component';
       {path: 'register', component: RegisterComponent, pathMatch: 'full'},
       {
         path: 'dash',
-        loadChildren: './in-session/in-session.module#InSessionModule',
+        loadChildren: () => InSessionModule,
         canActivate: [InSessionRouteActivatorService]
       },
     ])

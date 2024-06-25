@@ -6,16 +6,16 @@
 		<!-- Required meta tags -->
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<% include bundles/bundle %>
-		<%include bundles/pidash.ejs%>
+		<%- include('bundles/bundle') %>
+		<%- include('bundles/pidash') %>
 	</head>
 	<body>
-		<% include partials/header %>
+		<%- include('partials/header') %>
 		<div id="PiDashContainer" ng-app="PiDashApp">
-        	<% include partials/memorywidget %>
-			<% include partials/cpuwidget %>
+        	<%- include('partials/memorywidget') %>
+			<%- include('partials/cpuwidget') %>
 		</div>
-		<% include partials/footer %>
+		<%- include('partials/footer') %>
 
 	</body>
 
