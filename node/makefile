@@ -42,3 +42,9 @@ programsdir:
 .PHONY : configurator
 configurator:
 	python configurator.py
+
+configureSql:
+	node ./config/ConfigureSql.js
+
+createDefaultAdmin:
+	node ./config/CreateDefaultAdmin.js

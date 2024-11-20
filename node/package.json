@@ -33,6 +33,7 @@
     "express-session": "^1.16.2",
     "helmet": "^3.21.1",
     "https": "^1.0.0",
+    "ip": "^2.0.1",
     "jquery": "^3.5.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.9.1",

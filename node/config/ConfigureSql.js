@@ -4,13 +4,16 @@
 
 const mysql = require('mysql');
 const fs = require('fs');
+const path = require('path');
 var errors = false;
 var configureDatabase = function(test, callback){
     var configFile;
     if(test)
-        configFile = "./sqltest.config";
+        configFile = path.join(__dirname, "./sqltest.config");
     else
-        configFile = "./sql.config";
+        configFile = path.join(__dirname, "./sql.config");
+  
+    console.log(configFile)
 
     fs.readFile(configFile, function (err, contents) {
         if (err) {
@@ -29,7 +32,7 @@ var configureDatabase = function(test, callback){
 
             sqlConn.connect(function (err) {
                 if (err) {
-                    console.log("Error connecting to db");
+                    console.log(`Error connecting to db ${err}`);
                     console.log("Connection State: " + sqlConn.state);
                     exitError(callback);
                     return;
@@ -37,7 +40,7 @@ var configureDatabase = function(test, callback){
                 createDatabase(sqlConn, sqlCreds.database, function () {
                     sqlConn.query("USE " + sqlCreds.database + ";", function (err, result, fields) {
                         if (err) {
-                            console.log("Error using database");
+                            console.log(`Error using database ${err}`);
                             exitError(callback);
                             return;
                         }
@@ -79,7 +82,7 @@ var createDatabase = function (sqlConn, databaseName, callback) {
     var query = "CREATE DATABASE " + databaseName + ";";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating PiDash Database");
+            console.log(`Error creating PiDash Database ${err}`);
         }
         else {
             console.log("Success: PiDash Database created");
@@ -105,7 +108,7 @@ var createUsersTable = function (sqlConn, callback) {
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Users table");
+            console.log(`Error creating Users table ${err}`);
             exitError();
         }
         else {
@@ -126,7 +129,7 @@ var createCredentialsTable = function (sqlConn, callback) {
         "FOREIGN KEY(UserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Credentials table");
+            console.log(`Error creating Credentials table ${err}`);
             exitError();
         }
         else {
@@ -171,7 +174,7 @@ var createAdminsTable = function (sqlConn, callback) {
         "FOREIGN KEY(UserId) REFERENCES Users(UserId));";
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Admins table");
+            console.log(`Error creating Admins table ${err}`);
             exitError();
         }
         else {
@@ -195,7 +198,7 @@ var createAppsTable = function (sqlConn, callback) {
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating Apps table");
+            console.log(`Error creating Apps table ${err}`);
             exitError();
         }
         else {
@@ -221,7 +224,7 @@ var createAppPermissionsTable = function (sqlConn, callback) {
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating AppPermissions table");
+            console.log(`Error creating AppPermissions table ${err}`);
             exitError();
         }
         else {
@@ -243,7 +246,7 @@ var createAppLogsTable = function (sqlConn, callback) {
 
     sqlConn.query(query, function (err, result, fields) {
         if (err) {
-            console.log("Error creating AppLogs table");
+            console.log(`Error creating AppLogs table ${err}`);
             exitError();
         }
         else {
@@ -258,12 +261,17 @@ var createAppLogsTable = function (sqlConn, callback) {
 
 /* Create and configure database */
 configureDatabase(false,function(){
-
+    if (!errors) {
+      console.log(`Errors configuring main database ${err}`);
+      process.exit(-1);
+      return;
+    }
     /* Create and configure test database */
     configureDatabase(true, function() {
         if(errors)
-            process.exit(-1);
-        else
+          console.log(`Errors while attempting to configure test database, is the configuration defined? ${err}`);
+            //process.exit(-1);
+        //else
             process.exit(0);
 
     });

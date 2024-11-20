@@ -2,6 +2,7 @@
 const mysql = require('mysql');
 const fs = require('fs');
 const crypto = require('crypto');
+const path = require('path');
 
 /* Salt hash logic taken from Validation.js */
 function genRandomString(length) {
@@ -41,7 +42,9 @@ function rollback(sqlConn) {
     sqlConn.query("ROLLBACK;")
 }
 
-fs.readFile('./sql.config', function (err, contents) {
+const sqlConfigPath = path.join(__dirname, './sql.config');
+
+fs.readFile(sqlConfigPath, function (err, contents) {
     if (err) {
         console.log("Error reading sql config file");
     }

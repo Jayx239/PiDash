@@ -1,0 +1,17 @@
+1
+192.168.0.1
+3000
+y
+3
+thisIsMySecret123@4!
+3600
+900
+y
+2
+n
+db
+root
+password1234@!
+PiDash
+y
+q
