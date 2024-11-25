@@ -31,11 +31,11 @@ services:
     volumes:
       - my-db:/var/lib/mysql
   pidash:
-    build: ./node
+    build: .
     ports:
-      - '3000:3000'
+      - '4656:4656'
     expose:
-      - '3000'
+      - '4656'
     networks:
       - service_network
 # Names our volume

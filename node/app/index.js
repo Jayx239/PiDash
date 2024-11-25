@@ -1,6 +1,7 @@
 const server = require('./Server');
 const express = server.express;
 const app = server.app;
+const cors = require('cors');
 var validation = require('./Validation');
 var winston = require('./Logger');
 var PiSys = require('./PiSystem');
@@ -18,14 +19,34 @@ app.use('/popper', express.static('node_modules/popper.js'));
 app.use('/content', express.static(__dirname + '/../content'));
 app.use('/angular', express.static('node_modules/angular'));
 app.use('/angular-app', express.static(__dirname + '/../angular-app'));
+app.use('/v2', express.static(__dirname + '/../../client/client/dist/client'));
 
-app.use(function(req, res, next) {
+const corsOptions = {
+  origin: [
+    'http://0.0.0.0:3656',
+    'https://0.0.0.0:3656',
+    'http://0.0.0.0:4656',
+    'https://0.0.0.0:4656',
+    'http://localhost:3656',
+    'https://localhost:3656',
+    'http://localhost:4656',
+    'https://localhost:4656',
+    'http://192.168.0.1:3656',
+    'https://192.168.0.1:3656',
+    'http://192.168.0.1:4656',
+    'https://192.168.0.1:4656'
+  ]
+}
+
+app.use(cors(corsOptions));
+
+/*app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost:4200");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT");
     res.header("Access-Control-Allow-Credentials", "true");
     next();
-});
+});*/
 
 /* Don't morgan log these */
 var Process = require('./routes/ProcessRoute');

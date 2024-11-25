@@ -1,0 +1,20 @@
+/*
+const corsOptions = {
+  origin: [
+    'http://0.0.0.0:3656',
+    'https://0.0.0.0:3656',
+    'http://0.0.0.0:4656',
+    'https://0.0.0.0:4656',
+    'http://localhost:3656',
+    'https://localhost:3656',
+    'http://localhost:4656',
+    'https://localhost:4656',
+    'http://192.168.0.1:3656',
+    'https://192.168.0.1:3656',
+    'http://192.168.0.1:4656',
+    'https://192.168.0.1:4656'
+  ]
+}
+
+//app.use(cors(corsOptions));
+
