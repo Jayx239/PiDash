@@ -4,6 +4,7 @@
   "description": "A Raspberry Pi management WebApp",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "mocha test/**/**.spec.js"
   },
   "repository": {
